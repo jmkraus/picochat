@@ -2,13 +2,12 @@ package utils
 
 import (
 	"os"
-	"path/filepath"
 	"picochat/paths"
 	"strings"
 )
 
 func ListHistoryFiles() ([]string, error) {
-	basePath := filepath.Join(filepath.Dir(paths.GetConfigPath()), "history")
+	basePath := paths.GetHistoryDir()
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
 		return nil, err
@@ -21,4 +20,13 @@ func ListHistoryFiles() ([]string, error) {
 		}
 	}
 	return result, nil
+}
+
+const fileSuffix = ".chat"
+
+func EnsureSuffix(filename string) string {
+	if !strings.HasSuffix(filename, fileSuffix) {
+		return filename + fileSuffix
+	}
+	return filename
 }

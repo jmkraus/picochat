@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"picochat/paths"
+	"picochat/utils"
 	"time"
 )
 
@@ -39,7 +40,7 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 }
 
 func (h *ChatHistory) SaveToFile() (string, error) {
-	basePath := filepath.Join(filepath.Dir(paths.GetConfigPath()), "history")
+	basePath := paths.GetHistoryDir()
 	if err := os.MkdirAll(basePath, 0755); err != nil {
 		return "", fmt.Errorf("could not create history dir: %w", err)
 	}
@@ -60,7 +61,8 @@ func (h *ChatHistory) SaveToFile() (string, error) {
 }
 
 func (h *ChatHistory) LoadFromFile(filename string) error {
-	basePath := filepath.Join(filepath.Dir(paths.GetConfigPath()), "history")
+	basePath := paths.GetHistoryDir()
+	filename = utils.EnsureSuffix(filename)
 	fullPath := filepath.Join(basePath, filename)
 
 	data, err := os.ReadFile(fullPath)
