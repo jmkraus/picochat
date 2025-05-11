@@ -45,9 +45,7 @@ func main() {
 		log.Fatalf("Error while loading configuration: %v", err)
 	}
 
-	history := []types.Message{
-		{Role: "system", Content: cfg.Prompt},
-	}
+	history := types.NewHistory(cfg.Prompt)
 
 	log.Println("Chat with PicoAI started. Exit with '/bye'.")
 
@@ -60,22 +58,22 @@ func main() {
 		}
 
 		if isCommand {
-			output, quit := command.Handle(input, &history)
-			if output != "" {
-				fmt.Println(output)
+			result := command.Handle(input, history)
+			if result.Output != "" {
+				fmt.Println(result.Output)
 			}
-			if quit {
+			if result.Quit {
 				log.Println("Chat has ended.")
 				break
 			}
 			continue
 		}
 
-		history = append(history, types.Message{Role: "user", Content: input})
+		history.Add("user", input)
 
 		reqBody := types.ChatRequest{
 			Model:    cfg.Model,
-			Messages: history,
+			Messages: history.Messages,
 			Stream:   true,
 		}
 
@@ -94,7 +92,7 @@ func main() {
 
 		decoder := json.NewDecoder(resp.Body)
 		var fullReply strings.Builder
-		// var promptEvalCount, evalCount int
+		var promptEvalCount, evalCount int
 		fmt.Print("Assistant: ")
 
 		for {
@@ -111,20 +109,24 @@ func main() {
 			fullReply.WriteString(res.Message.Content)
 
 			if res.Done {
-				// promptEvalCount = res.PromptEvalCount
-				// evalCount = res.EvalCount
-				// fmt.Printf("\nToken stats: prompt_eval_count=%d, eval_count=%d\n", promptEvalCount, evalCount)
-				raw, err := json.MarshalIndent(res, "", "  ")
-				if err != nil {
-					fmt.Println("Error marshaling final response:", err)
-				} else {
-					fmt.Printf("\n[i] Final response (raw):\n%s\n", string(raw))
+				promptEvalCount = res.PromptEvalCount
+				evalCount = res.EvalCount
+				if promptEvalCount != 0 && evalCount != 0 {
+					// Ignore token output if zero (PicoAI doesn't have them)
+					fmt.Println()
+					log.Printf("Token stats: prompt_eval_count=%d, eval_count=%d", promptEvalCount, evalCount)
 				}
+				// raw, err := json.MarshalIndent(res, "", "  ")
+				// if err != nil {
+				// 	fmt.Println("Error marshaling final response:", err)
+				// } else {
+				// 	fmt.Printf("\n[i] Final response (raw):\n%s\n", string(raw))
+				// }
 				break
 			}
 		}
 
 		fmt.Println()
-		history = append(history, types.Message{Role: "assistant", Content: fullReply.String()})
+		history.Add("assistant", fullReply.String())
 	}
 }

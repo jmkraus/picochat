@@ -6,11 +6,6 @@ type Config struct {
 	Prompt string
 }
 
-type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-}
-
 type ChatRequest struct {
 	Model    string    `json:"model"`
 	Messages []Message `json:"messages"`
@@ -22,4 +17,11 @@ type StreamResponse struct {
 	Done            bool    `json:"done"`
 	PromptEvalCount int     `json:"prompt_eval_count"`
 	EvalCount       int     `json:"eval_count"`
+}
+
+type CommandResult struct {
+	Output     string
+	Quit       bool
+	NewHistory *ChatHistory
+	Error      error
 }
