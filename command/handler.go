@@ -25,10 +25,14 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 		input, _ := reader.ReadString('\n')
 		filename := strings.TrimSpace(input)
 
-		if err := history.LoadFromFile(filename); err != nil {
-			return types.CommandResult{Output: "Load failed: " + err.Error()}
+		if len(filename) > 0 {
+			if err := history.LoadFromFile(filename); err != nil {
+				return types.CommandResult{Output: "Load failed: " + err.Error()}
+			}
+			return types.CommandResult{Output: "History loaded successfully."}
+		} else {
+			return types.CommandResult{Output: "Load cancelled."}
 		}
-		return types.CommandResult{Output: "History loaded successfully."}
 	case "/show":
 		return types.CommandResult{Output: fmt.Sprintf("History has %d messages.", len(history.Get()))}
 	case "/list":
