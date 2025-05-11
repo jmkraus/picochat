@@ -1,45 +1,17 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"picochat/paths"
 	"picochat/types"
 
 	"github.com/BurntSushi/toml"
 )
 
 var configPath string
-
-// getConfigPath determines the configuration file path using the following priority:
-// 1. Command line argument (-config)
-// 2. Environment variable CONFIG_PATH
-// 3. XDG_CONFIG_HOME (or ~/.config if not set)
-// 4. Executable directory
-func getConfigPath() string {
-	// 1. Command line argument
-	flag.StringVar(&configPath, "config", "", "Path to configuration file")
-
-	// 2. Environment variable
-	if configPath == "" {
-		configPath = os.Getenv("CONFIG_PATH")
-	}
-
-	// 3. Fallback to XDG_CONFIG_HOME or home directory
-	if configPath == "" {
-		configPath = fallbackToXDGOrHome()
-	}
-
-	// 4. Fallback to executable directory
-	if configPath == "" {
-		configPath = fallbackToExecutableDir()
-	}
-
-	log.Printf("Configuration file used: %s", configPath)
-	return configPath
-}
 
 // fallbackToXDGOrHome returns the config path using XDG_CONFIG_HOME or home directory
 func fallbackToXDGOrHome() string {
@@ -70,7 +42,7 @@ func fallbackToExecutableDir() string {
 // Load reads the configuration from the specified file.
 func Load() (types.Config, error) {
 	var cfg types.Config
-	path := getConfigPath()
+	path := paths.GetConfigPath()
 
 	if _, err := toml.DecodeFile(path, &cfg); err != nil {
 		return types.Config{}, fmt.Errorf("failed to decode TOML file %q: %w", path, err)
