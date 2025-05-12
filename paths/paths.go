@@ -44,7 +44,10 @@ func GetConfigPath() string {
 func GetHistoryDir() string {
 	configDir := filepath.Dir(GetConfigPath())
 	historyDir := filepath.Join(configDir, "history")
-	os.MkdirAll(historyDir, os.ModePerm)
+	err := os.MkdirAll(historyDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
 	return historyDir
 }
 

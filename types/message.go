@@ -78,3 +78,17 @@ func (h *ChatHistory) LoadFromFile(filename string) error {
 	h.Replace(msgs)
 	return nil
 }
+
+func (h *ChatHistory) ClearExceptSystemPrompt() {
+	if len(h.Messages) > 1 {
+		h.Messages = h.Messages[:1]
+	}
+}
+
+func (h *ChatHistory) Len() int {
+	return len(h.Messages)
+}
+
+func (h *ChatHistory) IsEmpty() bool {
+	return len(h.Messages) == 1
+}

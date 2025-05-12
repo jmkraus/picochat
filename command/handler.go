@@ -34,7 +34,7 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 			return types.CommandResult{Output: "Load cancelled."}
 		}
 	case "/show":
-		return types.CommandResult{Output: fmt.Sprintf("History has %d messages.", len(history.Get()))}
+		return types.CommandResult{Output: fmt.Sprintf("History has %d messages.", history.Len())}
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
@@ -44,6 +44,21 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 			return types.CommandResult{Output: "No history files found."}
 		}
 		return types.CommandResult{Output: "Available history files:\n- " + strings.Join(files, "\n- ")}
+	case "/clear":
+		history.ClearExceptSystemPrompt()
+		return types.CommandResult{Output: "History cleared (system prompt retained)."}
+	case "/help":
+		commands := []string{
+			" /bye   - Exit the chat",
+			" /done  - Terminate the input",
+			" /save  - Save current chat history to a file",
+			" /load  - Load chat history from a file",
+			" /list  - List available saved history files",
+			" /show  - Show number of messages in history",
+			" /clear - Clear history and reinitialize with system prompt",
+			" /help  - Show available commands",
+		}
+		return types.CommandResult{Output: strings.Join(commands, "\n")}
 	default:
 		return types.CommandResult{Output: "Unknown command."}
 	}
