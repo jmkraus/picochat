@@ -26,9 +26,11 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 		filename := strings.TrimSpace(input)
 
 		if len(filename) > 0 {
-			if err := history.LoadFromFile(filename); err != nil {
+			loaded, err := types.LoadHistoryFromFile(filename)
+			if err != nil {
 				return types.CommandResult{Output: "Load failed: " + err.Error()}
 			}
+			history.Replace(loaded.Get())
 			return types.CommandResult{Output: "History loaded successfully."}
 		} else {
 			return types.CommandResult{Output: "Load cancelled."}

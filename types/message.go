@@ -41,10 +41,6 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 
 func (h *ChatHistory) SaveToFile() (string, error) {
 	basePath := paths.GetHistoryDir()
-	if err := os.MkdirAll(basePath, 0755); err != nil {
-		return "", fmt.Errorf("could not create history dir: %w", err)
-	}
-
 	filename := time.Now().Format("2006-01-02_15-04-05") + ".chat"
 	fullPath := filepath.Join(basePath, filename)
 
@@ -60,23 +56,40 @@ func (h *ChatHistory) SaveToFile() (string, error) {
 	return filename, nil
 }
 
-func (h *ChatHistory) LoadFromFile(filename string) error {
-	basePath := paths.GetHistoryDir()
+// func (h *ChatHistory) LoadFromFile(filename string) error {
+// 	basePath := paths.GetHistoryDir()
+// 	filename = utils.EnsureSuffix(filename)
+// 	fullPath := filepath.Join(basePath, filename)
+
+// 	data, err := os.ReadFile(fullPath)
+// 	if err != nil {
+// 		return fmt.Errorf("could not read file: %w", err)
+// 	}
+
+// 	var msgs []Message
+// 	if err := json.Unmarshal(data, &msgs); err != nil {
+// 		return fmt.Errorf("could not unmarshal JSON: %w", err)
+// 	}
+
+// 	h.Replace(msgs)
+// 	return nil
+// }
+
+func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	filename = utils.EnsureSuffix(filename)
-	fullPath := filepath.Join(basePath, filename)
+	fullPath := filepath.Join(paths.GetHistoryDir(), filename)
 
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
-		return fmt.Errorf("could not read file: %w", err)
+		return nil, fmt.Errorf("could not read file %s: %w", fullPath, err)
 	}
 
-	var msgs []Message
-	if err := json.Unmarshal(data, &msgs); err != nil {
-		return fmt.Errorf("could not unmarshal JSON: %w", err)
+	var messages []Message
+	if err := json.Unmarshal(data, &messages); err != nil {
+		return nil, fmt.Errorf("could not parse JSON: %w", err)
 	}
 
-	h.Replace(msgs)
-	return nil
+	return &ChatHistory{Messages: messages}, nil
 }
 
 func (h *ChatHistory) ClearExceptSystemPrompt() {

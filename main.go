@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"picochat/args"
 	"picochat/command"
 	"picochat/config"
 	"picochat/types"
@@ -18,13 +19,13 @@ import (
 func readMultilineInput() (string, bool, bool) {
 	scanner := bufio.NewScanner(os.Stdin)
 	var lines []string
-	first := true
+	firstLine := true
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		trimmed := strings.TrimSpace(line)
 
-		if first && strings.HasPrefix(trimmed, "/") {
+		if firstLine && strings.HasPrefix(trimmed, "/") {
 			return trimmed, true, false // input, isCommand, quit=false
 		}
 
@@ -33,21 +34,31 @@ func readMultilineInput() (string, bool, bool) {
 		}
 
 		lines = append(lines, line)
-		first = false
+		firstLine = false
 	}
 
 	return strings.Join(lines, "\n"), false, false
 }
 
 func main() {
+	args.Parse()
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Error while loading configuration: %v", err)
 	}
 
-	history := types.NewHistory(cfg.Prompt)
+	var history *types.ChatHistory
+	if *args.HistoryFile != "" {
+		history, err = types.LoadHistoryFromFile(*args.HistoryFile)
+		if err != nil {
+			log.Fatalf("Could not load history: %v", err)
+		}
+	} else {
+		history = types.NewHistory(cfg.Prompt)
+	}
 
-	log.Println("Chat with PicoAI started. Exit with '/bye'.")
+	log.Println("Chat with PicoAI started. Help with '/help'.")
 
 	for {
 		fmt.Print("\n>>> ")
