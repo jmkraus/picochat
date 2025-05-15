@@ -1,6 +1,7 @@
 package paths
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"picochat/args"
@@ -8,60 +9,72 @@ import (
 
 // var configPath string
 
-func GetConfigPath() string {
+func GetConfigPath() (string, error) {
 	if *args.ConfigPath != "" {
-		return *args.ConfigPath
+		return *args.ConfigPath, nil
 	}
 
 	// Fallback 1: $CONFIG_PATH
 	if env := os.Getenv("CONFIG_PATH"); env != "" {
-		return env
+		return env, nil
 	}
 
 	// Fallback 2: $XDG_CONFIG_HOME or ~/.config
-	if xdg := fallbackToXDGOrHome(); xdg != "" {
-		return xdg
+	xdg, err := fallbackToXDGOrHome()
+	if err != nil {
+		return "", err
+	}
+	if xdg != "" {
+		return xdg, nil
 	}
 
 	// Fallback 3: Executable path
-	if ex := fallbackToExecutableDir(); ex != "" {
-		return ex
+	ex, err := fallbackToExecutableDir()
+	if err != nil {
+		return "", err
+	}
+	if ex != "" {
+		return ex, nil
 	}
 
-	return "config.toml"
+	return "", fmt.Errorf("No valid config path found.")
 }
 
-func GetHistoryDir() string {
-	configDir := filepath.Dir(GetConfigPath())
-	historyDir := filepath.Join(configDir, "history")
-	err := os.MkdirAll(historyDir, 0755)
+func GetHistoryDir() (string, error) {
+	configPath, err := GetConfigPath()
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("History dir not found.")
 	}
-	return historyDir
+	configDir := filepath.Dir(configPath)
+	historyDir := filepath.Join(configDir, "history")
+	err = os.MkdirAll(historyDir, 0755)
+	if err != nil {
+		return "", fmt.Errorf("Couldn't create history dir")
+	}
+	return historyDir, nil
 }
 
 // fallbackToXDGOrHome returns the config path using XDG_CONFIG_HOME or home directory
-func fallbackToXDGOrHome() string {
+func fallbackToXDGOrHome() (string, error) {
 	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
 	if xdgConfigHome != "" {
-		return filepath.Join(xdgConfigHome, "picochat", "config.toml")
+		return filepath.Join(xdgConfigHome, "picochat", "config.toml"), nil
 	}
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return filepath.Join(homeDir, ".config", "picochat", "config.toml")
+	return filepath.Join(homeDir, ".config", "picochat", "config.toml"), nil
 }
 
 // fallbackToExecutableDir returns the config path using the executable directory
-func fallbackToExecutableDir() string {
+func fallbackToExecutableDir() (string, error) {
 	ex, err := os.Executable()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return filepath.Join(filepath.Dir(ex), "config.toml")
+	return filepath.Join(filepath.Dir(ex), "config.toml"), nil
 }

@@ -12,7 +12,10 @@ import (
 // Load reads the configuration from the specified file.
 func Load() (types.Config, error) {
 	var cfg types.Config
-	path := paths.GetConfigPath()
+	path, err := paths.GetConfigPath()
+	if err != nil {
+		return types.Config{}, err
+	}
 	log.Printf("Configuration file used: %s", path)
 
 	if _, err := toml.DecodeFile(path, &cfg); err != nil {

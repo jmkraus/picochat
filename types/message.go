@@ -40,7 +40,10 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 }
 
 func (h *ChatHistory) SaveHistoryToFile() (string, error) {
-	basePath := paths.GetHistoryDir()
+	basePath, err := paths.GetHistoryDir()
+	if err != nil {
+		return "", err
+	}
 	filename := time.Now().Format("2006-01-02_15-04-05") + ".chat"
 	fullPath := filepath.Join(basePath, filename)
 
@@ -58,7 +61,11 @@ func (h *ChatHistory) SaveHistoryToFile() (string, error) {
 
 func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	filename = utils.EnsureSuffix(filename)
-	fullPath := filepath.Join(paths.GetHistoryDir(), filename)
+	historyDir, err := paths.GetHistoryDir()
+	if err != nil {
+		return nil, fmt.Errorf("history dir not found.")
+	}
+	fullPath := filepath.Join(historyDir, filename)
 
 	data, err := os.ReadFile(fullPath)
 	if err != nil {

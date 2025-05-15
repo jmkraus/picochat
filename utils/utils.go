@@ -7,7 +7,11 @@ import (
 )
 
 func ListHistoryFiles() ([]string, error) {
-	basePath := paths.GetHistoryDir()
+	basePath, err := paths.GetHistoryDir()
+	if err != nil {
+		return nil, err
+	}
+
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
 		return nil, err
