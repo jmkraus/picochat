@@ -58,7 +58,7 @@ func main() {
 		history = types.NewHistory(cfg.Prompt)
 	}
 
-	log.Println("Chat with PicoAI started. Help with '/help'.")
+	log.Println("Chat with PicoAI started. Help with '/?'.")
 
 	for {
 		fmt.Print("\n>>> ")
@@ -104,7 +104,7 @@ func main() {
 		decoder := json.NewDecoder(resp.Body)
 		var fullReply strings.Builder
 		var promptEvalCount, evalCount int
-		fmt.Print("Assistant: ")
+		fmt.Println("Assistant: ")
 
 		for {
 			var res types.StreamResponse
@@ -127,12 +127,6 @@ func main() {
 					fmt.Println()
 					log.Printf("Token stats: prompt_eval_count=%d, eval_count=%d", promptEvalCount, evalCount)
 				}
-				// raw, err := json.MarshalIndent(res, "", "  ")
-				// if err != nil {
-				// 	fmt.Println("Error marshaling final response:", err)
-				// } else {
-				// 	fmt.Printf("\n[i] Final response (raw):\n%s\n", string(raw))
-				// }
 				break
 			}
 		}

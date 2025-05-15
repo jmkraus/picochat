@@ -14,7 +14,7 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 	case "/bye":
 		return types.CommandResult{Quit: true}
 	case "/save":
-		name, err := history.SaveToFile()
+		name, err := history.SaveHistoryToFile()
 		if err != nil {
 			return types.CommandResult{Output: "Save failed: " + err.Error()}
 		}
@@ -49,16 +49,16 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 	case "/clear":
 		history.ClearExceptSystemPrompt()
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}
-	case "/help":
+	case "/help", "/?":
 		commands := []string{
-			" /bye   - Exit the chat",
-			" /done  - Terminate the input",
-			" /save  - Save current chat history to a file",
-			" /load  - Load chat history from a file",
-			" /list  - List available saved history files",
-			" /show  - Show number of messages in history",
-			" /clear - Clear history and reinitialize with system prompt",
-			" /help  - Show available commands",
+			" /done       Terminate the input",
+			" /show       Show number of messages in history",
+			" /load       Load a session",
+			" /save       Save your current session",
+			" /list       List saved sessions",
+			" /clear      Clear session context",
+			" /bye        Exit",
+			" /?, /help   Show available commands",
 		}
 		return types.CommandResult{Output: strings.Join(commands, "\n")}
 	default:

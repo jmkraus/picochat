@@ -6,7 +6,7 @@ import (
 	"picochat/args"
 )
 
-var configPath string
+// var configPath string
 
 func GetConfigPath() string {
 	if *args.ConfigPath != "" {
@@ -19,17 +19,13 @@ func GetConfigPath() string {
 	}
 
 	// Fallback 2: $XDG_CONFIG_HOME or ~/.config
-	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-		return filepath.Join(xdg, "picochat", "config.toml")
-	}
-
-	if home, err := os.UserHomeDir(); err == nil {
-		return filepath.Join(home, ".config", "picochat", "config.toml")
+	if xdg := fallbackToXDGOrHome(); xdg != "" {
+		return xdg
 	}
 
 	// Fallback 3: Executable path
-	if ex, err := os.Executable(); err == nil {
-		return filepath.Join(filepath.Dir(ex), "config.toml")
+	if ex := fallbackToExecutableDir(); ex != "" {
+		return ex
 	}
 
 	return "config.toml"
