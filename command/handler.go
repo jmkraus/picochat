@@ -51,14 +51,15 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}
 	case "/help", "/?":
 		commands := []string{
-			" /done       Terminate the input",
-			" /show       Show number of messages in history",
-			" /load       Load a session",
-			" /save       Save your current session",
-			" /list       List saved sessions",
-			" /clear      Clear session context",
-			" /bye        Exit",
-			" /?, /help   Show available commands",
+			"Available Commands:",
+			"  /done       Terminate the input",
+			"  /show       Show number of messages in history",
+			"  /load       Load a session",
+			"  /save       Save your current session",
+			"  /list       List saved sessions",
+			"  /clear      Clear session context",
+			"  /bye        Exit",
+			"  /?, /help   Show available commands",
 		}
 		return types.CommandResult{Output: strings.Join(commands, "\n")}
 	default:
