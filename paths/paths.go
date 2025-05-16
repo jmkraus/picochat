@@ -7,8 +7,6 @@ import (
 	"picochat/args"
 )
 
-// var configPath string
-
 func GetConfigPath() (string, error) {
 	if *args.ConfigPath != "" {
 		return *args.ConfigPath, nil
@@ -43,18 +41,17 @@ func GetConfigPath() (string, error) {
 func GetHistoryDir() (string, error) {
 	configPath, err := GetConfigPath()
 	if err != nil {
-		return "", fmt.Errorf("History dir not found.")
+		return "", err
 	}
 	configDir := filepath.Dir(configPath)
 	historyDir := filepath.Join(configDir, "history")
 	err = os.MkdirAll(historyDir, 0755)
 	if err != nil {
-		return "", fmt.Errorf("Couldn't create history dir")
+		return "", err
 	}
 	return historyDir, nil
 }
 
-// fallbackToXDGOrHome returns the config path using XDG_CONFIG_HOME or home directory
 func fallbackToXDGOrHome() (string, error) {
 	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
 	if xdgConfigHome != "" {
@@ -69,7 +66,6 @@ func fallbackToXDGOrHome() (string, error) {
 	return filepath.Join(homeDir, ".config", "picochat", "config.toml"), nil
 }
 
-// fallbackToExecutableDir returns the config path using the executable directory
 func fallbackToExecutableDir() (string, error) {
 	ex, err := os.Executable()
 	if err != nil {

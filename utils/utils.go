@@ -19,7 +19,7 @@ func ListHistoryFiles() ([]string, error) {
 
 	var result []string
 	for _, entry := range entries {
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".chat") {
+		if !entry.IsDir() && HasSuffix(entry.Name()) {
 			result = append(result, entry.Name())
 		}
 	}
@@ -28,8 +28,12 @@ func ListHistoryFiles() ([]string, error) {
 
 const fileSuffix = ".chat"
 
+func HasSuffix(filename string) bool {
+	return strings.HasSuffix(filename, fileSuffix)
+}
+
 func EnsureSuffix(filename string) string {
-	if !strings.HasSuffix(filename, fileSuffix) {
+	if !HasSuffix(filename) {
 		return filename + fileSuffix
 	}
 	return filename
