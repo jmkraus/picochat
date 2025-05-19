@@ -3,13 +3,13 @@ package command
 import (
 	"bufio"
 	"fmt"
-	"os"
+	"io"
 	"picochat/types"
 	"picochat/utils"
 	"strings"
 )
 
-func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
+func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.CommandResult {
 	switch cmd {
 	case "/bye":
 		return types.CommandResult{Quit: true}
@@ -21,9 +21,9 @@ func Handle(cmd string, history *types.ChatHistory) types.CommandResult {
 		return types.CommandResult{Output: fmt.Sprintf("History saved as %s", name)}
 	case "/load":
 		fmt.Print("Enter filename to load: ")
-		reader := bufio.NewReader(os.Stdin)
-		input, _ := reader.ReadString('\n')
-		filename := strings.TrimSpace(input)
+		reader := bufio.NewReader(input)
+		inputLine, _ := reader.ReadString('\n')
+		filename := strings.TrimSpace(inputLine)
 
 		if len(filename) > 0 {
 			loaded, err := types.LoadHistoryFromFile(filename)

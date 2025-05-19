@@ -13,6 +13,7 @@ import (
 	"picochat/command"
 	"picochat/config"
 	"picochat/types"
+	"picochat/version"
 	"strings"
 )
 
@@ -43,6 +44,11 @@ func readMultilineInput() (string, bool, bool) {
 func main() {
 	args.Parse()
 
+	if *args.ShowVersion {
+		fmt.Println("picochat version is", version.Version)
+		os.Exit(0)
+	}
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Error while loading configuration: %v", err)
@@ -69,7 +75,7 @@ func main() {
 		}
 
 		if isCommand {
-			result := command.Handle(input, history)
+			result := command.Handle(input, history, os.Stdin)
 			if result.Output != "" {
 				fmt.Println(result.Output)
 			}
