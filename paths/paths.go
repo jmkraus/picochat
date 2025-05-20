@@ -5,13 +5,30 @@ import (
 	"os"
 	"path/filepath"
 	"picochat/args"
+	"strings"
 )
 
 func GetConfigPath() (string, error) {
+	configDir, err := getConfigDir()
+	if err != nil {
+		return "", err
+	}
 	if *args.ConfigPath != "" {
+		if strings.HasPrefix(*args.ConfigPath, "@") {
+			name := strings.TrimPrefix(*args.ConfigPath, "@")
+			suffix := ""
+			if !strings.HasSuffix(name, ".toml") {
+				suffix = ".toml"
+			}
+			return filepath.Join(configDir, name+suffix), nil
+		}
 		return *args.ConfigPath, nil
 	}
 
+	return filepath.Join(configDir, "config.toml"), nil
+}
+
+func getConfigDir() (string, error) {
 	// Fallback 1: $CONFIG_PATH
 	if env := os.Getenv("CONFIG_PATH"); env != "" {
 		return env, nil
@@ -64,7 +81,7 @@ func GetHistoryDir() (string, error) {
 func fallbackToXDGOrHome() (string, error) {
 	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
 	if xdgConfigHome != "" {
-		return filepath.Join(xdgConfigHome, "picochat", "config.toml"), nil
+		return filepath.Join(xdgConfigHome, "picochat"), nil
 	}
 
 	homeDir, err := os.UserHomeDir()
@@ -72,7 +89,7 @@ func fallbackToXDGOrHome() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(homeDir, ".config", "picochat", "config.toml"), nil
+	return filepath.Join(homeDir, ".config", "picochat"), nil
 }
 
 func fallbackToExecutableDir() (string, error) {
@@ -81,5 +98,5 @@ func fallbackToExecutableDir() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(filepath.Dir(ex), "config.toml"), nil
+	return filepath.Dir(ex), nil
 }
