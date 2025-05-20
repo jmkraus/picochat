@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"picochat/paths"
@@ -16,8 +17,9 @@ type Message struct {
 }
 
 type ChatHistory struct {
-	Messages   []Message
-	maxHistory int
+	Messages     []Message
+	maxHistory   int
+	contextLimit bool
 }
 
 func NewHistory(systemPrompt string, maxHistory int) *ChatHistory {
@@ -88,23 +90,21 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 	if len(h.Messages) > 1 {
 		h.Messages = h.Messages[:1]
 	}
+	h.contextLimit = false
 }
 
 func (h *ChatHistory) Compress(max int) {
-	if len(h.Messages) > max {
-		keep := max - 1
-		if keep <= 0 {
-			keep = 1
-		}
-
-		newMessages := make([]Message, 1, max)
-		newMessages[0] = h.Messages[0] // system prompt
-
-		tail := h.Messages[len(h.Messages)-keep:]
-		newMessages = append(newMessages, tail...)
-
-		h.Messages = newMessages
+	if len(h.Messages) < max {
+		return
 	}
+
+	if !h.contextLimit {
+		log.Println("Message history limit of", h.maxHistory, "reached.")
+		h.contextLimit = true
+	}
+
+	keep := h.Messages[len(h.Messages)-(max-1):]
+	h.Messages = append(h.Messages[:1], keep...)
 }
 
 func (h *ChatHistory) Len() int {
