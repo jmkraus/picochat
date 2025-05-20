@@ -1,13 +1,14 @@
 package types_test
 
 import (
+	"fmt"
 	"picochat/paths"
 	"picochat/types"
 	"testing"
 )
 
 func TestNewHistory(t *testing.T) {
-	h := types.NewHistory("hello world")
+	h := types.NewHistory("hello world", 5)
 
 	if len(h.Get()) != 1 {
 		t.Fatalf("expected 1 message, got %d", len(h.Get()))
@@ -23,7 +24,7 @@ func TestNewHistory(t *testing.T) {
 }
 
 func TestAddAndClear(t *testing.T) {
-	h := types.NewHistory("init")
+	h := types.NewHistory("init", 5)
 
 	h.Add("user", "Hello!")
 	h.Add("assistant", "Hi there!")
@@ -40,7 +41,7 @@ func TestAddAndClear(t *testing.T) {
 }
 
 func TestSaveAndLoad(t *testing.T) {
-	h := types.NewHistory("persist me")
+	h := types.NewHistory("persist me", 5)
 	h.Add("user", "data")
 
 	// Temporäres Verzeichnis erzwingen
@@ -59,5 +60,26 @@ func TestSaveAndLoad(t *testing.T) {
 
 	if loaded.Len() != h.Len() {
 		t.Errorf("loaded history length mismatch: got %d, want %d", loaded.Len(), h.Len())
+	}
+}
+
+func TestCompressKeepsLimitAndPrompt(t *testing.T) {
+	h := types.NewHistory("system prompt", 5)
+
+	for i := 1; i <= 10; i++ {
+		h.Add("user", fmt.Sprintf("msg %d", i))
+	}
+
+	if h.Len() != 5 {
+		t.Errorf("expected 5 messages, got %d", h.Len())
+	}
+
+	if h.Get()[0].Role != "system" {
+		t.Error("expected first message to be system prompt")
+	}
+
+	last := h.Get()[h.Len()-1]
+	if last.Content != "msg 10" {
+		t.Errorf("expected last message to be msg 10, got %s", last.Content)
 	}
 }

@@ -61,7 +61,7 @@ func main() {
 			log.Fatalf("Could not load history: %v", err)
 		}
 	} else {
-		history = types.NewHistory(cfg.Prompt)
+		history = types.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
 	log.Println("Chat with PicoAI started. Help with '/?'.")

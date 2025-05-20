@@ -16,19 +16,23 @@ type Message struct {
 }
 
 type ChatHistory struct {
-	Messages []Message
+	Messages   []Message
+	maxHistory int
 }
 
-func NewHistory(systemPrompt string) *ChatHistory {
+func NewHistory(systemPrompt string, maxHistory int) *ChatHistory {
 	return &ChatHistory{
-		Messages: []Message{
-			{Role: "system", Content: systemPrompt},
-		},
+		Messages:   []Message{{Role: "system", Content: systemPrompt}},
+		maxHistory: maxHistory,
 	}
 }
 
 func (h *ChatHistory) Add(role, content string) {
 	h.Messages = append(h.Messages, Message{Role: role, Content: content})
+
+	if h.maxHistory > 0 {
+		h.Compress(h.maxHistory)
+	}
 }
 
 func (h *ChatHistory) Get() []Message {
@@ -86,8 +90,29 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 	}
 }
 
+func (h *ChatHistory) Compress(max int) {
+	if len(h.Messages) > max {
+		keep := max - 1
+		if keep <= 0 {
+			keep = 1
+		}
+
+		newMessages := make([]Message, 1, max)
+		newMessages[0] = h.Messages[0] // system prompt
+
+		tail := h.Messages[len(h.Messages)-keep:]
+		newMessages = append(newMessages, tail...)
+
+		h.Messages = newMessages
+	}
+}
+
 func (h *ChatHistory) Len() int {
 	return len(h.Messages)
+}
+
+func (h *ChatHistory) Max() int {
+	return h.maxHistory
 }
 
 func (h *ChatHistory) IsEmpty() bool {

@@ -8,7 +8,7 @@ import (
 )
 
 func TestHandleClear(t *testing.T) {
-	h := types.NewHistory("initial system prompt")
+	h := types.NewHistory("initial system prompt", 50)
 	h.Add("user", "hello")
 
 	result := command.Handle("/clear", h, strings.NewReader(""))
@@ -21,7 +21,7 @@ func TestHandleClear(t *testing.T) {
 }
 
 func TestHandleHelp(t *testing.T) {
-	h := types.NewHistory("prompt")
+	h := types.NewHistory("prompt", 50)
 	result := command.Handle("/help", h, strings.NewReader(""))
 	if !strings.Contains(result.Output, "/save") {
 		t.Errorf("expected help to contain /save, got: %s", result.Output)
@@ -29,7 +29,7 @@ func TestHandleHelp(t *testing.T) {
 }
 
 func TestHandleLoad_WithFilename(t *testing.T) {
-	h := types.NewHistory("system prompt")
+	h := types.NewHistory("system prompt", 50)
 	input := strings.NewReader("dummy.chat\n")
 
 	result := command.Handle("/load", h, input)

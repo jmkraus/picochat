@@ -27,5 +27,9 @@ func Load() (types.Config, error) {
 		return types.Config{}, fmt.Errorf("required fields URL, Model, or Prompt are missing in config")
 	}
 
+	if cfg.Context != 0 && (cfg.Context < 5 || cfg.Context > 100) {
+		return types.Config{}, fmt.Errorf("Context size must be between 5 and 100")
+	}
+
 	return cfg, nil
 }

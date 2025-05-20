@@ -1,9 +1,10 @@
 package types
 
 type Config struct {
-	URL    string
-	Model  string
-	Prompt string
+	URL     string
+	Model   string
+	Context int
+	Prompt  string
 }
 
 type ChatRequest struct {

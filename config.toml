@@ -2,6 +2,7 @@
 URL = "http://localhost:11434/api/chat"
 Model = "Qwen3-8B-8bit"
 # Model = "DeepSeek-R1-Distill-Qwen-14B-6bit",
+Context = 50
 Prompt = """
 You are an experienced software engineer with deep knowledge of computer science fundamentals, software design patterns, and modern development practices. 
 When the answer involves the review of the existing code: 

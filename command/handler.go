@@ -36,7 +36,7 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 			return types.CommandResult{Output: "Load cancelled."}
 		}
 	case "/show":
-		return types.CommandResult{Output: fmt.Sprintf("History has %d messages.", history.Len())}
+		return types.CommandResult{Output: fmt.Sprintf("History has %d messages (max. %d).", history.Len(), history.Max())}
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
