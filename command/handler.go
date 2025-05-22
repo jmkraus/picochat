@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"picochat/config"
 	"picochat/types"
 	"picochat/utils"
 	"strings"
 )
 
 func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.CommandResult {
+	cfg := config.Get()
+
 	switch cmd {
 	case "/bye":
 		return types.CommandResult{Quit: true}
@@ -46,6 +49,12 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 			return types.CommandResult{Output: "No history files found."}
 		}
 		return types.CommandResult{Output: "Available history files:\n- " + strings.Join(files, "\n- ")}
+	case "/models":
+		models, err := utils.ShowAvailableModels(cfg.URL)
+		if err != nil {
+			return types.CommandResult{Output: "Models failed: " + err.Error()}
+		}
+		return types.CommandResult{Output: models}
 	case "/clear":
 		history.ClearExceptSystemPrompt()
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}

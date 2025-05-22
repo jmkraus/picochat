@@ -49,10 +49,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	cfg, err := config.Load()
+	err := config.Load()
 	if err != nil {
 		log.Fatalf("Error while loading configuration: %v", err)
 	}
+	cfg := config.Get()
 
 	var history *types.ChatHistory
 	if *args.HistoryFile != "" {
@@ -100,7 +101,7 @@ func main() {
 			continue
 		}
 
-		resp, err := http.Post(cfg.URL, "application/json", bytes.NewBuffer(jsonData))
+		resp, err := http.Post(cfg.URL+"/chat", "application/json", bytes.NewBuffer(jsonData))
 		if err != nil {
 			fmt.Println("Error while HTTP-Request:", err)
 			continue

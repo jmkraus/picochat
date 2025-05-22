@@ -78,6 +78,11 @@ func TestCompressKeepsLimitAndPrompt(t *testing.T) {
 		t.Error("expected first message to be system prompt")
 	}
 
+	first := h.Get()[1]
+	if first.Content != "msg 7" {
+		t.Errorf("expected first message to be msg 7, got %s", first.Content)
+	}
+
 	last := h.Get()[h.Len()-1]
 	if last.Content != "msg 10" {
 		t.Errorf("expected last message to be msg 10, got %s", last.Content)

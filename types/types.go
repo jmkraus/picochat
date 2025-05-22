@@ -1,12 +1,5 @@
 package types
 
-type Config struct {
-	URL     string
-	Model   string
-	Context int
-	Prompt  string
-}
-
 type ChatRequest struct {
 	Model    string    `json:"model"`
 	Messages []Message `json:"messages"`

@@ -18,22 +18,22 @@ type Message struct {
 
 type ChatHistory struct {
 	Messages     []Message
-	maxHistory   int
-	contextLimit bool
+	Limit        int
+	limitReached bool
 }
 
-func NewHistory(systemPrompt string, maxHistory int) *ChatHistory {
+func NewHistory(systemPrompt string, maxLimit int) *ChatHistory {
 	return &ChatHistory{
-		Messages:   []Message{{Role: "system", Content: systemPrompt}},
-		maxHistory: maxHistory,
+		Messages: []Message{{Role: "system", Content: systemPrompt}},
+		Limit:    maxLimit,
 	}
 }
 
 func (h *ChatHistory) Add(role, content string) {
 	h.Messages = append(h.Messages, Message{Role: role, Content: content})
 
-	if h.maxHistory > 0 {
-		h.Compress(h.maxHistory)
+	if h.Limit > 0 {
+		h.Compress(h.Limit)
 	}
 }
 
@@ -90,7 +90,7 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 	if len(h.Messages) > 1 {
 		h.Messages = h.Messages[:1]
 	}
-	h.contextLimit = false
+	h.limitReached = false
 }
 
 func (h *ChatHistory) Compress(max int) {
@@ -98,9 +98,9 @@ func (h *ChatHistory) Compress(max int) {
 		return
 	}
 
-	if !h.contextLimit {
-		log.Println("Message history limit of", h.maxHistory, "reached.")
-		h.contextLimit = true
+	if !h.limitReached {
+		log.Println("Message history limit of", h.Limit, "reached.")
+		h.limitReached = true
 	}
 
 	keep := h.Messages[len(h.Messages)-(max-1):]
@@ -112,7 +112,7 @@ func (h *ChatHistory) Len() int {
 }
 
 func (h *ChatHistory) Max() int {
-	return h.maxHistory
+	return h.Limit
 }
 
 func (h *ChatHistory) IsEmpty() bool {

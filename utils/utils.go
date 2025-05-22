@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"picochat/paths"
+	"picochat/requests"
 	"strings"
 )
 
@@ -24,6 +26,25 @@ func ListHistoryFiles() ([]string, error) {
 		}
 	}
 	return result, nil
+}
+
+// showAvailableModels lists all models via /tags API call
+func ShowAvailableModels(baseUrl string) (string, error) {
+	models, err := requests.GetAvailableModels(baseUrl)
+	if err != nil {
+		return "", fmt.Errorf("Failed to get models: %v", err)
+	}
+
+	if len(models) == 0 {
+		return "", fmt.Errorf("No models available.")
+	}
+
+	output := "Available models:\n"
+	for _, name := range models {
+		output += fmt.Sprintf(" - %s\n", name)
+	}
+
+	return output, nil
 }
 
 const fileSuffix = ".chat"
