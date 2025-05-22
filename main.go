@@ -12,6 +12,7 @@ import (
 	"picochat/args"
 	"picochat/command"
 	"picochat/config"
+	"picochat/requests"
 	"picochat/types"
 	"picochat/version"
 	"strings"
@@ -101,7 +102,11 @@ func main() {
 			continue
 		}
 
-		resp, err := http.Post(cfg.URL+"/chat", "application/json", bytes.NewBuffer(jsonData))
+		chatURL, err := requests.CleanUrl(cfg.URL, "chat")
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+		resp, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
 		if err != nil {
 			fmt.Println("Error while HTTP-Request:", err)
 			continue
