@@ -9,13 +9,6 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type Config struct {
-	URL     string
-	Model   string
-	Context int
-	Prompt  string
-}
-
 var (
 	instance *Config
 	once     sync.Once
