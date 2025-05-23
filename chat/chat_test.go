@@ -2,6 +2,8 @@ package chat_test
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -12,11 +14,11 @@ import (
 	"picochat/types"
 )
 
-// Simulierter Streaming-Handler (PicoAI)
+// Simulated Streaming-Handler (PicoAI)
 func streamingHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Simulierter Streaming-Body (Chunked JSON)
+	// Simulated Streaming-Body (Chunked JSON)
 	chunks := []string{
 		`{"message":{"content":"Hallo"}}`,
 		`{"message":{"content":" Welt"},"done":true,"prompt_eval_count":5,"eval_count":10}`,
@@ -28,7 +30,8 @@ func streamingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestHandleChat(t *testing.T) {
-	// Starte Fake-Server
+	log.SetOutput(io.Discard)
+	// Starting fake server
 	server := httptest.NewServer(http.HandlerFunc(streamingHandler))
 	defer server.Close()
 
@@ -41,13 +44,13 @@ func TestHandleChat(t *testing.T) {
 	history := types.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "Sag Hallo")
 
-	// Simuliere HandleChat
+	// Simulate HandleChat
 	err := chat.HandleChat(cfg, history)
 	if err != nil {
 		t.Fatalf("HandleChat returned error: %v", err)
 	}
 
-	// Prüfe, ob Bot-Antwort gespeichert wurde
+	// Check if bot reply was stored
 	messages := history.Get()
 	if len(messages) != 3 {
 		t.Errorf("expected 3 messages (system, user, assistant), got %d", len(messages))

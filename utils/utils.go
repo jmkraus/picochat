@@ -39,10 +39,12 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 		return "", fmt.Errorf("No models available.")
 	}
 
-	output := "Available models:\n"
-	for _, name := range models {
-		output += fmt.Sprintf(" - %s\n", name)
+	modelLines := make([]string, len(models))
+	for i, name := range models {
+		modelLines[i] = fmt.Sprintf(" - %s", name)
 	}
+
+	output := "Available models:\n" + strings.Join(modelLines, "\n")
 
 	return output, nil
 }
