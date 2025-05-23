@@ -42,8 +42,6 @@ func readMultilineInput() (string, bool, bool) {
 	return strings.Join(lines, "\n"), false, false
 }
 
-// main.go
-
 func handleChat(cfg *config.Config, history *types.ChatHistory) error {
 	reqBody := types.ChatRequest{
 		Model:    cfg.Model,
