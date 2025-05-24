@@ -9,15 +9,15 @@ import (
 )
 
 // ListHistoryFiles shows all saved sessions in 'history' dir
-func ListHistoryFiles() ([]string, error) {
+func ListHistoryFiles() (string, error) {
 	basePath, err := paths.GetHistoryDir()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	var result []string
@@ -27,20 +27,20 @@ func ListHistoryFiles() ([]string, error) {
 		}
 	}
 
-	return result, nil
-	// if err != nil {
-	// 	return types.CommandResult{Output: "Listing failed: " + err.Error()}
-	// }
-	// if len(files) == 0 {
-	// 	return types.CommandResult{Output: "No history files found."}
-	// }
+	if len(result) == 0 {
+		return "", fmt.Errorf("No history files found.")
+	}
+
+	output := "Available history files:\n- " + strings.Join(result, "\n- ")
+
+	return output, nil
 }
 
 // showAvailableModels lists all models via /tags API call
 func ShowAvailableModels(baseUrl string) (string, error) {
 	models, err := requests.GetAvailableModels(baseUrl)
 	if err != nil {
-		return "", fmt.Errorf("Failed to get models: %v", err)
+		return "", err
 	}
 
 	if len(models) == 0 {

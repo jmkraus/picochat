@@ -47,10 +47,7 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 		if err != nil {
 			return types.CommandResult{Output: "Listing failed: " + err.Error()}
 		}
-		if len(files) == 0 {
-			return types.CommandResult{Output: "No history files found."}
-		}
-		return types.CommandResult{Output: "Available history files:\n- " + strings.Join(files, "\n- ")}
+		return types.CommandResult{Output: files}
 	case "/models":
 		models, err := utils.ShowAvailableModels(cfg.URL)
 		if err != nil {
