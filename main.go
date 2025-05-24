@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func readMultilineInput() (string, bool, bool) {
+func readMultilineInput() (string, bool) {
 	scanner := bufio.NewScanner(os.Stdin)
 	var lines []string
 	firstLine := true
@@ -24,7 +24,7 @@ func readMultilineInput() (string, bool, bool) {
 		trimmed := strings.TrimSpace(line)
 
 		if firstLine && strings.HasPrefix(trimmed, "/") {
-			return trimmed, true, false // input, isCommand, quit=false
+			return trimmed, true // input, isCommand
 		}
 
 		if trimmed == "/done" {
@@ -35,7 +35,7 @@ func readMultilineInput() (string, bool, bool) {
 		firstLine = false
 	}
 
-	return strings.Join(lines, "\n"), false, false
+	return strings.Join(lines, "\n"), false
 }
 
 func main() {
@@ -62,15 +62,12 @@ func main() {
 		history = types.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	log.Println("Chat with PicoAI started. Help with '/?'.")
+	log.Println("Chat with Pico AI started. Help with '/?'.")
 
 	for {
 		fmt.Print("\n>>> ")
 
-		input, isCommand, quit := readMultilineInput()
-		if quit {
-			break
-		}
+		input, isCommand := readMultilineInput()
 
 		if isCommand {
 			result := command.Handle(input, history, os.Stdin)

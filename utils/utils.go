@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// ListHistoryFiles shows all saved sessions in 'history' dir
 func ListHistoryFiles() ([]string, error) {
 	basePath, err := paths.GetHistoryDir()
 	if err != nil {
@@ -25,7 +26,14 @@ func ListHistoryFiles() ([]string, error) {
 			result = append(result, entry.Name())
 		}
 	}
+
 	return result, nil
+	// if err != nil {
+	// 	return types.CommandResult{Output: "Listing failed: " + err.Error()}
+	// }
+	// if len(files) == 0 {
+	// 	return types.CommandResult{Output: "No history files found."}
+	// }
 }
 
 // showAvailableModels lists all models via /tags API call
