@@ -14,6 +14,8 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 	cfg := config.Get()
 
 	switch cmd {
+	case "/done":
+		return types.CommandResult{Output: "Use this command for terminating a multi-line input."}
 	case "/bye":
 		return types.CommandResult{Quit: true}
 	case "/save":
@@ -59,7 +61,7 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 		history.ClearExceptSystemPrompt()
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}
 	case "/help", "/?":
-		return types.CommandResult{Output: strings.Join(commands, "\n")}
+		return types.CommandResult{Output: HelpText()}
 	default:
 		return types.CommandResult{Output: "Unknown command."}
 	}
