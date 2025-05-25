@@ -1,5 +1,5 @@
 # Configuration for PicoChat
-URL = "http://localhost:11434/api/chat"
+URL = "http://localhost:11434/api"
 # Model = "Qwen3-8B-8bit"
 Model = "DeepSeek-R1-Distill-Qwen-14B-6bit"
 Context = 50
