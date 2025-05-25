@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"picochat/config"
+	"picochat/requests"
 	"picochat/types"
 	"picochat/utils"
 	"strings"
@@ -41,7 +42,16 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 			return types.CommandResult{Output: "Load cancelled."}
 		}
 	case "/show":
-		return types.CommandResult{Output: fmt.Sprintf("History has %d messages (max. %d).", history.Len(), history.Max())}
+		apiBaseUrl := config.Get().URL
+		serverVersion, err := requests.GetServerVersion(apiBaseUrl)
+		if err != nil {
+			return types.CommandResult{Output: "Fetching server version failed: " + err.Error()}
+		}
+
+		messages := fmt.Sprintf("History has %d messages (max. %d).", history.Len(), history.Max())
+		version := fmt.Sprintf("Server version is %s", serverVersion)
+
+		return types.CommandResult{Output: messages + "\n" + version}
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {

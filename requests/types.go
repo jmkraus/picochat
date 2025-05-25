@@ -7,3 +7,7 @@ type ModelTag struct {
 type ModelTagsResponse struct {
 	Models []ModelTag `json:"models"`
 }
+
+type ServerVersion struct {
+	Version string `json:"version"`
+}

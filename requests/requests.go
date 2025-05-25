@@ -40,6 +40,30 @@ func GetAvailableModels(apiBaseURL string) ([]string, error) {
 	return names, nil
 }
 
+func GetServerVersion(apiBaseURL string) (string, error) {
+	versionURL, err := CleanUrl(apiBaseURL, "version")
+	if err != nil {
+		return "", fmt.Errorf("error fetching version: %w", err)
+	}
+
+	resp, err := http.Get(versionURL)
+	if err != nil {
+		return "", fmt.Errorf("could not fetch server version: %w", err)
+	}
+	defer resp.Body.Close()
+
+	var v ServerVersion
+	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+		return "", fmt.Errorf("invalid server version response: %w", err)
+	}
+
+	if v.Version == "" {
+		return "", fmt.Errorf("server response did not include a version")
+	}
+
+	return v.Version, nil
+}
+
 func CleanUrl(apiBaseURL, endPoint string) (string, error) {
 	u, err := url.Parse(apiBaseURL)
 	if err != nil {
