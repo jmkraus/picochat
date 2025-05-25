@@ -31,9 +31,7 @@ func ListHistoryFiles() (string, error) {
 		return "", fmt.Errorf("No history files found.")
 	}
 
-	output := "Available history files:\n- " + strings.Join(result, "\n- ")
-
-	return output, nil
+	return formatList(result, "history files", true), nil
 }
 
 // showAvailableModels lists all models via /tags API call
@@ -47,14 +45,7 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 		return "", fmt.Errorf("No models available.")
 	}
 
-	modelLines := make([]string, len(models))
-	for i, name := range models {
-		modelLines[i] = fmt.Sprintf(" - %s", name)
-	}
-
-	output := "Available models:\n" + strings.Join(modelLines, "\n")
-
-	return output, nil
+	return formatList(models, "models", true), nil
 }
 
 const fileSuffix = ".chat"
@@ -68,4 +59,21 @@ func EnsureSuffix(filename string) string {
 		return filename + fileSuffix
 	}
 	return filename
+}
+
+func formatList(content []string, heading string, numbered bool) string {
+	if len(content) == 0 {
+		return fmt.Sprintf("No %s found.", strings.ToLower(heading))
+	}
+
+	var lines []string
+	for i, item := range content {
+		if numbered {
+			lines = append(lines, fmt.Sprintf("(%02d) %s", i+1, item))
+		} else {
+			lines = append(lines, "- "+item)
+		}
+	}
+
+	return fmt.Sprintf("Available %s:\n%s", strings.ToLower(heading), strings.Join(lines, "\n"))
 }
