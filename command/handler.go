@@ -20,7 +20,7 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 	case "/bye":
 		return types.CommandResult{Quit: true}
 	case "/save":
-		name, err := history.SaveHistoryToFile()
+		name, err := history.SaveHistoryToFile("")
 		if err != nil {
 			return types.CommandResult{Output: "Save failed: " + err.Error()}
 		}
@@ -42,8 +42,7 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 			return types.CommandResult{Output: "Load cancelled."}
 		}
 	case "/show":
-		apiBaseUrl := config.Get().URL
-		serverVersion, err := requests.GetServerVersion(apiBaseUrl)
+		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {
 			return types.CommandResult{Output: "Fetching server version failed: " + err.Error()}
 		}
@@ -72,4 +71,17 @@ func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.Comma
 	default:
 		return types.CommandResult{Output: "Unknown command."}
 	}
+}
+
+func parseCommandArgs(input string) (string, string) {
+	parts := strings.Fields(input)
+	if len(parts) == 0 {
+		return "", ""
+	}
+	cmd := parts[0]
+	arg := ""
+	if len(parts) > 1 {
+		arg = strings.Join(parts[1:], " ")
+	}
+	return cmd, arg
 }

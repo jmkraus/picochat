@@ -44,11 +44,11 @@ func TestSaveAndLoad(t *testing.T) {
 	h := types.NewHistory("persist me", 5)
 	h.Add("user", "data")
 
-	// Temporäres Verzeichnis erzwingen
+	// Force temporary directory
 	tmpDir := t.TempDir()
 	paths.OverrideHistoryDir(tmpDir)
 
-	filename, err := h.SaveHistoryToFile()
+	filename, err := h.SaveHistoryToFile("")
 	if err != nil {
 		t.Fatalf("save failed: %v", err)
 	}

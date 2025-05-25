@@ -45,12 +45,16 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 	h.Messages = newMessages
 }
 
-func (h *ChatHistory) SaveHistoryToFile() (string, error) {
+func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	basePath, err := paths.GetHistoryDir()
 	if err != nil {
 		return "", err
 	}
-	filename := time.Now().Format("2006-01-02_15-04-05") + ".chat"
+	if filename == "" {
+		filename = utils.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"))
+	} else {
+		filename = utils.EnsureSuffix(filename)
+	}
 	fullPath := filepath.Join(basePath, filename)
 
 	data, err := json.MarshalIndent(h.Messages, "", "  ")
