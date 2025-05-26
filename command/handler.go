@@ -11,25 +11,29 @@ import (
 	"strings"
 )
 
-func Handle(cmd string, history *types.ChatHistory, input io.Reader) types.CommandResult {
+func Handle(commandLine string, history *types.ChatHistory, input io.Reader) types.CommandResult {
 	cfg := config.Get()
 
+	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
 	case "/done":
 		return types.CommandResult{Output: "Use this command for terminating a multi-line input."}
 	case "/bye":
 		return types.CommandResult{Quit: true}
 	case "/save":
-		name, err := history.SaveHistoryToFile("")
+		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
 			return types.CommandResult{Output: "Save failed: " + err.Error()}
 		}
 		return types.CommandResult{Output: fmt.Sprintf("History saved as %s", name)}
 	case "/load":
-		fmt.Print("Enter filename to load: ")
-		reader := bufio.NewReader(input)
-		inputLine, _ := reader.ReadString('\n')
-		filename := strings.TrimSpace(inputLine)
+		filename := args
+		if filename == "" {
+			fmt.Print("Enter filename to load: ")
+			reader := bufio.NewReader(input)
+			inputLine, _ := reader.ReadString('\n')
+			filename = strings.TrimSpace(inputLine)
+		}
 
 		if len(filename) > 0 {
 			loaded, err := types.LoadHistoryFromFile(filename)
