@@ -16,7 +16,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 
 	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
-	case "/done":
+	case "/done", "///":
 		return types.CommandResult{Output: "Use this command for terminating a multi-line input."}
 	case "/bye":
 		return types.CommandResult{Quit: true}

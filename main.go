@@ -27,7 +27,7 @@ func readMultilineInput() (string, bool) {
 			return trimmed, true // input, isCommand
 		}
 
-		if trimmed == "/done" {
+		if trimmed == "/done" || trimmed == "///" {
 			break
 		}
 

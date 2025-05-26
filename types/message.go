@@ -53,7 +53,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	if filename == "" {
 		filename = utils.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"))
 	} else {
-		filename = utils.EnsureSuffix(filename)
+		filename = utils.EnsureSuffix(filepath.Base(filename))
 	}
 	fullPath := filepath.Join(basePath, filename)
 
