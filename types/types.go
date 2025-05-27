@@ -19,3 +19,10 @@ type CommandResult struct {
 	NewHistory *ChatHistory
 	Error      error
 }
+
+// temporary solution (it's a var not a type)
+// TODO: refactoring to a dedicated caches module
+var SelectionCache = struct {
+	HistoryFiles []string
+	Models       []string
+}{}

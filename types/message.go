@@ -41,6 +41,10 @@ func (h *ChatHistory) Get() []Message {
 	return h.Messages
 }
 
+func (h *ChatHistory) GetLast() Message {
+	return h.Get()[h.Len()-1]
+}
+
 func (h *ChatHistory) Replace(newMessages []Message) {
 	h.Messages = newMessages
 }

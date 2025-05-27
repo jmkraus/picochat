@@ -5,6 +5,7 @@ import (
 	"os"
 	"picochat/paths"
 	"picochat/requests"
+	"regexp"
 	"strings"
 )
 
@@ -71,9 +72,15 @@ func formatList(content []string, heading string, numbered bool) string {
 		if numbered {
 			lines = append(lines, fmt.Sprintf("(%02d) %s", i+1, item))
 		} else {
-			lines = append(lines, "- "+item)
+			lines = append(lines, " - "+item)
 		}
 	}
 
 	return fmt.Sprintf("Available %s:\n%s", strings.ToLower(heading), strings.Join(lines, "\n"))
+}
+
+func StripReasoning(answer string) string {
+	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
+	cleaned := re.ReplaceAllString(answer, "")
+	return cleaned
 }

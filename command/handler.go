@@ -9,6 +9,8 @@ import (
 	"picochat/types"
 	"picochat/utils"
 	"strings"
+
+	"github.com/atotto/clipboard"
 )
 
 func Handle(commandLine string, history *types.ChatHistory, input io.Reader) types.CommandResult {
@@ -51,16 +53,24 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 			return types.CommandResult{Output: "Fetching server version failed: " + err.Error()}
 		}
 
-		messages := fmt.Sprintf("History has %d messages (max. %d).", history.Len(), history.Max())
-		version := fmt.Sprintf("Server version is %s", serverVersion)
+		server := fmt.Sprintf("Server version is %s", serverVersion)
+		messages := fmt.Sprintf("History has %d messages (max. %d)", history.Len(), history.Max())
+		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
 
-		return types.CommandResult{Output: messages + "\n" + version}
+		return types.CommandResult{Output: model + "\n" + messages + "\n" + server}
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
 			return types.CommandResult{Output: "Listing failed: " + err.Error()}
 		}
 		return types.CommandResult{Output: files}
+	case "/copy":
+		lastAnswer := utils.StripReasoning(history.GetLast().Content)
+		err := clipboard.WriteAll(lastAnswer)
+		if err != nil {
+			return types.CommandResult{Output: "Clipboard failed: " + err.Error()}
+		}
+		return types.CommandResult{Output: "Last answer written to clipboard."}
 	case "/models":
 		models, err := utils.ShowAvailableModels(cfg.URL)
 		if err != nil {
