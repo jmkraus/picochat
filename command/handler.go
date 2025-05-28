@@ -81,7 +81,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		history.ClearExceptSystemPrompt()
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}
 	case "/help", "/?":
-		return types.CommandResult{Output: HelpText()}
+		return types.CommandResult{Output: HelpText(args)}
 	default:
 		return types.CommandResult{Output: "Unknown command."}
 	}
