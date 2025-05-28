@@ -23,7 +23,7 @@ func Load() error {
 			return
 		}
 
-		fmt.Printf("Configuration file used: %s", path)
+		fmt.Println("Configuration file used:", path)
 
 		var cfg Config
 		if _, err := toml.DecodeFile(path, &cfg); err != nil {
