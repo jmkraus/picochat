@@ -10,6 +10,7 @@ import (
 	"picochat/requests"
 	"picochat/types"
 	"strings"
+	"time"
 )
 
 func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
@@ -29,6 +30,7 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 		return err
 	}
 
+	start := time.Now()
 	resp, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("http error: %w", err)
@@ -51,10 +53,12 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 		fullReply.WriteString(res.Message.Content)
 
 		if res.Done {
-			if res.PromptEvalCount != 0 && res.EvalCount != 0 {
-				fmt.Println()
-				fmt.Printf("Token stats: prompt_eval_count=%d, eval_count=%d", res.PromptEvalCount, res.EvalCount)
-			}
+			elapsed := time.Since(start)
+			minutes := int(elapsed.Minutes())
+			seconds := int(elapsed.Seconds()) % 60
+			t := fmt.Sprintf("%02d:%02d", minutes, seconds)
+			fmt.Println()
+			fmt.Printf("Elapsed (mm:ss): %s; Tokens: prompt_eval_count=%d, eval_count=%d", t, res.PromptEvalCount, res.EvalCount)
 			break
 		}
 	}
