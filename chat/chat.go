@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"picochat/config"
 	"picochat/requests"
@@ -54,7 +53,7 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 		if res.Done {
 			if res.PromptEvalCount != 0 && res.EvalCount != 0 {
 				fmt.Println()
-				log.Printf("Token stats: prompt_eval_count=%d, eval_count=%d", res.PromptEvalCount, res.EvalCount)
+				fmt.Printf("Token stats: prompt_eval_count=%d, eval_count=%d", res.PromptEvalCount, res.EvalCount)
 			}
 			break
 		}

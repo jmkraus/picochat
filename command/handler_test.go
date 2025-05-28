@@ -34,7 +34,6 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 
 	result := command.Handle("/load", h, input)
 
-	// hier kannst du prüfen, ob die Meldung korrekt ist — oder Fehler bei ungültiger Datei
 	if !strings.Contains(result.Output, "failed") && !strings.Contains(result.Output, "success") {
 		t.Errorf("Unexpected load result: %s", result.Output)
 	}

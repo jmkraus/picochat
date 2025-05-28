@@ -21,7 +21,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 	case "/done", "///":
 		return types.CommandResult{Output: "Use this command for terminating a multi-line input."}
 	case "/bye":
-		return types.CommandResult{Quit: true}
+		return types.CommandResult{Output: "Chat has ended.", Quit: true}
 	case "/save":
 		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
@@ -66,6 +66,9 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		return types.CommandResult{Output: files}
 	case "/copy":
 		lastAnswer := utils.StripReasoning(history.GetLast().Content)
+		if args == "code" {
+			lastAnswer = utils.ExtractCodeBlock(lastAnswer)
+		}
 		err := clipboard.WriteAll(lastAnswer)
 		if err != nil {
 			return types.CommandResult{Output: "Clipboard failed: " + err.Error()}

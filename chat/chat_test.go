@@ -2,8 +2,6 @@ package chat_test
 
 import (
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -30,7 +28,6 @@ func streamingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestHandleChat(t *testing.T) {
-	log.SetOutput(io.Discard)
 	// Starting fake server
 	server := httptest.NewServer(http.HandlerFunc(streamingHandler))
 	defer server.Close()

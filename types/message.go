@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"picochat/paths"
@@ -107,7 +106,7 @@ func (h *ChatHistory) Compress(max int) {
 	}
 
 	if !h.limitReached {
-		log.Println("Message history limit of", h.Limit, "reached.")
+		fmt.Println("Message history limit of", h.Limit, "reached.")
 		h.limitReached = true
 	}
 

@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"picochat/args"
 	"picochat/chat"
@@ -48,7 +47,8 @@ func main() {
 
 	err := config.Load()
 	if err != nil {
-		log.Fatalf("Error while loading configuration: %v", err)
+		fmt.Fprintf(os.Stderr, "Error while loading configuration: %v", err)
+		os.Exit(1)
 	}
 	cfg := config.Get()
 
@@ -56,13 +56,14 @@ func main() {
 	if *args.HistoryFile != "" {
 		history, err = types.LoadHistoryFromFile(*args.HistoryFile)
 		if err != nil {
-			log.Fatalf("Could not load history: %v", err)
+			fmt.Fprintf(os.Stderr, "Could not load history: %v", err)
+			os.Exit(1)
 		}
 	} else {
 		history = types.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	log.Println("Chat with Pico AI started. Help with '/?'.")
+	fmt.Println("Chat with Pico AI started. Help with '/?'.")
 
 	for {
 		fmt.Print("\n>>> ")
@@ -75,7 +76,6 @@ func main() {
 				fmt.Println(result.Output)
 			}
 			if result.Quit {
-				log.Println("Chat has ended.")
 				break
 			}
 			continue
@@ -83,7 +83,7 @@ func main() {
 
 		history.Add("user", input)
 		if err := chat.HandleChat(cfg, history); err != nil {
-			log.Fatalf("Chat error: %v", err)
+			fmt.Fprintf(os.Stderr, "Chat error: %v", err)
 		}
 	}
 }

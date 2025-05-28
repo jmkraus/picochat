@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"picochat/paths"
 	"sync"
 
@@ -24,7 +23,7 @@ func Load() error {
 			return
 		}
 
-		log.Printf("Configuration file used: %s", path)
+		fmt.Printf("Configuration file used: %s", path)
 
 		var cfg Config
 		if _, err := toml.DecodeFile(path, &cfg); err != nil {

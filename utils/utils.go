@@ -84,3 +84,12 @@ func StripReasoning(answer string) string {
 	cleaned := re.ReplaceAllString(answer, "")
 	return cleaned
 }
+
+func ExtractCodeBlock(s string) string {
+	re := regexp.MustCompile("(?s)```\\w*\\n(.*?)```")
+	match := re.FindStringSubmatch(s)
+	if len(match) >= 2 {
+		return match[1]
+	}
+	return ""
+}
