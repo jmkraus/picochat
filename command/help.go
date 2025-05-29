@@ -5,20 +5,32 @@ import "strings"
 var helpTopics = map[string][]string{
 	"": {
 		"Available Commands:",
-		"  /done, ///  Terminate the input",
-		"  /copy       Copy the last answer to clipboard",
-		"  /show       Show number of messages in history",
-		"  /load       Load a session",
-		"  /save       Save current session",
-		"  /list       List saved sessions",
-		"  /models     List available (downloaded) models",
-		"  /clear      Clear session context",
-		"  /bye        Exit",
-		"  /help, /?   Show available commands",
+		"  /done, ///   Terminate the input",
+		"  /copy        Copy the last answer to clipboard",
+		"  /show        Show system information",
+		"  /load        Load a session",
+		"  /save        Save current session",
+		"  /list        List saved sessions",
+		"  /models      List available (downloaded) models",
+		"  /clear       Clear session context",
+		"  /bye         Exit",
+		"  /help, /?    Show available commands",
 	},
-	"test": {
-		"TEST:",
-		"  /test: Example output",
+	"copy": {
+		"Available Commands:",
+		"  /copy        Copy the last answer to clipboard",
+		"  /copy code   Copy only code between ``` to clipboard",
+	},
+	"load": {
+		"Standard command:",
+		"  /load <filename>   Load the history file with name <filename>",
+		"  If <filename> is omitted, the filename is requested by input line.",
+		"  If no filename is entered, the load is cancelled.",
+	},
+	"save": {
+		"Standard command:",
+		"  /save <filename>   Save the history file with name <filename>",
+		"  If <filename> is omitted, the filename is set as current timestamp.",
 	},
 }
 

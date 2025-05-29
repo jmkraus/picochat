@@ -53,9 +53,9 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 			return types.CommandResult{Output: "Fetching server version failed: " + err.Error()}
 		}
 
-		server := fmt.Sprintf("Server version is %s", serverVersion)
-		messages := fmt.Sprintf("History has %d messages (max. %d)", history.Len(), history.Max())
 		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
+		messages := fmt.Sprintf("History has %d messages (max. %d)", history.Len(), history.Max())
+		server := fmt.Sprintf("Server version is %s", serverVersion)
 
 		return types.CommandResult{Output: model + "\n" + messages + "\n" + server}
 	case "/list":
