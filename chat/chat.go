@@ -18,6 +18,9 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 		Model:    cfg.Model,
 		Messages: history.Messages,
 		Stream:   true,
+		Options: &types.ChatOptions{
+			Temperature: 0.1,
+		},
 	}
 
 	jsonData, err := json.Marshal(reqBody)
