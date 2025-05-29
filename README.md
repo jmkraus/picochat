@@ -50,7 +50,7 @@ Currently picochat supports four values in the config file:
 | /save    | Save current chat history to a file |
 | /load    | Load chat history from a file |
 | /list    | List available saved history files |
-| /modules | List available saved history files |
+| /models  | List downloaded models |
 | /show    | Show number of messages in history |
 | /clear   | Clear history and reinitialize with system prompt |
 | /help    | Show available commands |
