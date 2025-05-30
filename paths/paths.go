@@ -55,14 +55,14 @@ func getConfigDir() (string, error) {
 	return "", fmt.Errorf("No valid config path found.")
 }
 
-var overrideHistoryDir string // for Unit Tests
-func OverrideHistoryDir(path string) {
-	overrideHistoryDir = path
+var overrideHistoryPath string // for Unit Tests
+func OverrideHistoryPath(path string) {
+	overrideHistoryPath = path
 }
 
-func GetHistoryDir() (string, error) {
-	if overrideHistoryDir != "" {
-		return overrideHistoryDir, nil
+func GetHistoryPath() (string, error) {
+	if overrideHistoryPath != "" {
+		return overrideHistoryPath, nil
 	}
 
 	configPath, err := GetConfigPath()

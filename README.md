@@ -38,6 +38,7 @@ Currently picochat supports four values in the config file:
  * Context size (must be a value between 5 and 100) - this is the number of messages!
  * System prompt ("Persona") where a specific skill or background can be specified
 
+Since Pico AI currently doesn't report token counts, it is difficult to calculate a proper context size. Maybe this changes in the future, but for now the context size is limited by the number of total messages, where the oldest ones are dropped when the limit is reached.
 
 ### Commands
 

@@ -6,7 +6,7 @@ import (
 
 func TestFormatList_WithBullets(t *testing.T) {
 	items := []string{"first.chat", "second.chat"}
-	expected := "Available history files:\n- first.chat\n- second.chat"
+	expected := "Available history files:\n - first.chat\n - second.chat"
 
 	result := formatList(items, "history files", false)
 

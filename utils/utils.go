@@ -11,7 +11,7 @@ import (
 
 // ListHistoryFiles shows all saved sessions in 'history' dir
 func ListHistoryFiles() (string, error) {
-	basePath, err := paths.GetHistoryDir()
+	basePath, err := paths.GetHistoryPath()
 	if err != nil {
 		return "", err
 	}

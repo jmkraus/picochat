@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"picochat/paths"
 	"picochat/utils"
+	"strings"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 }
 
 func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
-	basePath, err := paths.GetHistoryDir()
+	basePath, err := paths.GetHistoryPath()
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +75,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 
 func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	filename = utils.EnsureSuffix(filename)
-	historyDir, err := paths.GetHistoryDir()
+	historyDir, err := paths.GetHistoryPath()
 	if err != nil {
 		return nil, fmt.Errorf("history dir not found.")
 	}
@@ -124,4 +125,17 @@ func (h *ChatHistory) Max() int {
 
 func (h *ChatHistory) IsEmpty() bool {
 	return len(h.Messages) == 1
+}
+
+func (h *ChatHistory) EstimateTokens() int {
+	total := 0
+	for _, msg := range h.Messages {
+		total += calculateTokens(msg.Content)
+	}
+	return total
+}
+
+func calculateTokens(text string) int {
+	words := strings.Fields(text)
+	return int(float64(len(words)) * 1.3)
 }
