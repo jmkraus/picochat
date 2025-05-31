@@ -1,7 +1,7 @@
 # Pico Chat - a CLI Chat Client
 
 ## Purpose
-Unlike similar tools like ollama, the Mac-only App "[Pico AI Homelab](https://picogpt.app/)" doesn't come with a dedicated CLI interface.
+Unlike similar tools like ollama, the Mac-only app "[Pico AI Homelab](https://picogpt.app/)" doesn't come with a dedicated CLI interface.
 
 This tool fills the gap and has some additional tricks up its sleeve.
 
@@ -19,7 +19,7 @@ This tool fills the gap and has some additional tricks up its sleeve.
 
 ### Configuration files
 
-picochat expects a configuration file. If no dedicated name is specified, it looks for a file `config.toml`
+picochat expects a configuration file. If no specific name is given, it looks for a file `config.toml`
 
 The lookup for the configuration file is in the following order:
 
@@ -31,7 +31,7 @@ The lookup for the configuration file is in the following order:
 
 The history files (see below) are invariably stored in a subfolder of the picochat config folder, e.g. `.config/picochat/history`.
 
-Currently picochat supports four values in the config file:
+Picochat currently supports four configurable values in the config file:
 
  * Link to the core api endpoint (default usually `http://localhost:11434/api`)
  * Model name (must be already downloaded!)
@@ -51,6 +51,7 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /list    | List available saved history files |
 | /models  | List downloaded models |
 | /show    | Show number of messages in history |
+| /set     | Set session variables |
 | /clear   | Clear history and reinitialize with system prompt |
 | /help    | Show available commands |
 
@@ -74,8 +75,14 @@ This command copies the full last answer into the clipboard. However, it removes
 If `\copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
 
 
+### Multiline input
+Unlike Ollama, Picochat uses standard input instead of raw input. Besides the simpler implementation, I was also uncomfortable with the approach of multiline input enclosed by """.
+
+Sometimes I decided to enter more text but didn't start with """ so that I had to start from scratch. Therefore I considered a stop command as better solution for me. When entering a user prompt, as much text as desired can be entered or pasted. Press __Enter_ for newline, then either enter `\done` or `\\\` followed by __Enter__. Either will terminate the input and send it to the AI server.
+
+
 ### Personas
 
 Picochat allows basic persona handling: Store different configuration files in your config-path, e.g. "generic.toml" or "developer.toml" with specific system prompts.
 
-Then load this configuration with a shortcut, e.g. `picochat -config @developer`. You can skip path (covered by "@") and suffix ".toml". Then picochat starts with the specified configuration file.
+You can load this configuration using a shortcut, such as `picochat -config @developer`. The path and ".toml" suffix can be omitted since they are implied by the '@' symbol. Then picochat starts with the specified configuration file.
