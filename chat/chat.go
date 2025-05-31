@@ -19,7 +19,8 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 		Messages: history.Messages,
 		Stream:   true,
 		Options: &types.ChatOptions{
-			Temperature: 0.1,
+			Temperature: cfg.Temperature,
+			TopP:        cfg.TopP,
 		},
 	}
 
