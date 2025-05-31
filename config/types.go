@@ -5,4 +5,7 @@ type Config struct {
 	Model   string
 	Context int
 	Prompt  string
+
+	Temperature float64
+	TopP        float64
 }

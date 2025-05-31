@@ -80,6 +80,13 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 			return types.CommandResult{Output: "Models failed: " + err.Error()}
 		}
 		return types.CommandResult{Output: models}
+	case "/set":
+		key, value, err := ParseArgs(args)
+		if err != nil {
+			return types.CommandResult{Output: "Parse args failed: " + err.Error()}
+		}
+		output := fmt.Sprintf("Key: %s, Value: %v, Type: %T", key, value, value)
+		return types.CommandResult{Output: output}
 	case "/clear":
 		history.ClearExceptSystemPrompt()
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}

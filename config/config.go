@@ -25,7 +25,12 @@ func Load() error {
 
 		fmt.Println("Configuration file used:", path)
 
-		var cfg Config
+		var cfg = Config{
+			Temperature: 0.7,
+			TopP:        0.9,
+			Context:     20,
+		}
+
 		if _, err := toml.DecodeFile(path, &cfg); err != nil {
 			loadErr = fmt.Errorf("failed to decode TOML file %q: %w", path, err)
 			return
