@@ -59,7 +59,7 @@ Some commands can have an argument:
 
 #### \load `<filename>`
 
-Without a filename, an input line shows up, where the name can be entered. If the input is omitted (only __ENTER__), then the load process is cancelled.
+Without a filename, an input line shows up, where the name can be entered. If the input is omitted (only _ENTER_), then the load process is cancelled.
 
 Filename is sufficient since the path is invariably set (see above). Suffix can be omitted, it is always `.chat`.
 
@@ -78,7 +78,7 @@ If `\copy code` is entered, the first occurrence of a codeblock between ` ``` ` 
 ### Multiline input
 Unlike Ollama, Picochat uses standard input instead of raw input. Besides the simpler implementation, I was also uncomfortable with the approach of multiline input enclosed by """.
 
-Sometimes I decided to enter more text but didn't start with """ so that I had to start from scratch. Therefore I considered a stop command as better solution for me. When entering a user prompt, as much text as desired can be entered or pasted. Press __Enter_ for newline, then either enter `\done` or `\\\` followed by __Enter__. Either will terminate the input and send it to the AI server.
+Sometimes I decided to enter more text but didn't start with """ so that I had to start from scratch. Therefore I considered a stop command as better solution for me. When entering a user prompt, as much text as desired can be entered or pasted. Press _ENTER_ for newline, then either enter `\done` or `\\\` followed by _ENTER_. Either will terminate the input and send it to the AI server.
 
 
 ### Personas
