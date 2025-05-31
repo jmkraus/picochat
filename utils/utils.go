@@ -32,7 +32,7 @@ func ListHistoryFiles() (string, error) {
 		return "", fmt.Errorf("No history files found.")
 	}
 
-	return formatList(result, "history files", true), nil
+	return FormatList(result, "history files", true), nil
 }
 
 // showAvailableModels lists all models via /tags API call
@@ -46,7 +46,7 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 		return "", fmt.Errorf("No models available.")
 	}
 
-	return formatList(models, "models", true), nil
+	return FormatList(models, "models", true), nil
 }
 
 const fileSuffix = ".chat"
@@ -62,7 +62,7 @@ func EnsureSuffix(filename string) string {
 	return filename
 }
 
-func formatList(content []string, heading string, numbered bool) string {
+func FormatList(content []string, heading string, numbered bool) string {
 	if len(content) == 0 {
 		return fmt.Sprintf("No %s found.", strings.ToLower(heading))
 	}

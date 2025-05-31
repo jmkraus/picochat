@@ -81,12 +81,29 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		}
 		return types.CommandResult{Output: models}
 	case "/set":
+		if strings.TrimSpace(args) == "" {
+			// Aktuelle Config-Werte anzeigen
+			cfg := config.Get()
+
+			// Inhalt vorbereiten
+			list := []string{
+				fmt.Sprintf("context = %d", cfg.Context),
+				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
+				fmt.Sprintf("top_p = %.2f", cfg.TopP),
+			}
+
+			return types.CommandResult{Output: utils.FormatList(list, "Config settings", false)}
+		}
+
 		key, value, err := ParseArgs(args)
 		if err != nil {
 			return types.CommandResult{Output: "Parse args failed: " + err.Error()}
 		}
-		output := fmt.Sprintf("Key: %s, Value: %v, Type: %T", key, value, value)
-		return types.CommandResult{Output: output}
+		err = applyToConfig(key, value)
+		if err != nil {
+			return types.CommandResult{Output: "Failed to apply config: " + err.Error()}
+		}
+		return types.CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
 	case "/clear":
 		history.ClearExceptSystemPrompt()
 		return types.CommandResult{Output: "History cleared (system prompt retained)."}

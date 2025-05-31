@@ -5,7 +5,7 @@ import "strings"
 var helpTopics = map[string][]string{
 	"": {
 		"Available Commands:",
-		"  /done, ///   Terminate the input",
+		"  /done, ///   Terminate the input message",
 		"  /copy        Copy the last answer to clipboard",
 		"  /show        Show system information",
 		"  /load        Load a session",
@@ -13,6 +13,7 @@ var helpTopics = map[string][]string{
 		"  /list        List saved sessions",
 		"  /models      List available (downloaded) models",
 		"  /clear       Clear session context",
+		"  /set         Set session variables",
 		"  /bye         Exit",
 		"  /help, /?    Show available commands",
 	},
