@@ -82,10 +82,8 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		return types.CommandResult{Output: models}
 	case "/set":
 		if strings.TrimSpace(args) == "" {
-			// Aktuelle Config-Werte anzeigen
 			cfg := config.Get()
 
-			// Inhalt vorbereiten
 			list := []string{
 				fmt.Sprintf("context = %d", cfg.Context),
 				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
