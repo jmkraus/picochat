@@ -1,7 +1,7 @@
 # Pico Chat - a CLI Chat Client
 
 ## Purpose
-Unlike similar tools like ollama, the Mac-only app "[Pico AI Homelab](https://picogpt.app/)" doesn't come with a dedicated CLI interface.
+Unlike similar tools like ollama, the Mac-only app "[Pico AI Homelab](https://picogpt.app/)" doesn't come with a dedicated CLI client.
 
 This tool fills the gap and has some additional tricks up its sleeve.
 
@@ -86,3 +86,18 @@ Sometimes I decided to enter more text but didn't start with """ so that I had t
 Picochat allows basic persona handling: Store different configuration files in your config-path, e.g. "generic.toml" or "developer.toml" with specific system prompts.
 
 You can load this configuration using a shortcut, such as `picochat -config @developer`. The path and ".toml" suffix can be omitted since they are implied by the '@' symbol. Then picochat starts with the specified configuration file.
+
+
+## Acknowledgements
+
+Big shoutout to the providers of the libraries I used for this project:
+
+ * [The TOML library by BurntSushi](https://github.com/BurntSushi/toml)
+ * [Atotto's clipboard library for Go](https://github.com/atotto/clipboard)
+
+
+## License
+
+This project is distributed under the MIT license.
+
+JMK 2025
