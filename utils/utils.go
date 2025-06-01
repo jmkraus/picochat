@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"picochat/paths"
 	"picochat/requests"
 	"regexp"
@@ -94,6 +95,12 @@ func ExtractCodeBlock(s string) string {
 	return ""
 }
 
-func WeAreTmux() bool {
+func IsTmuxSession() bool {
 	return os.Getenv("TMUX") != ""
+}
+
+func CopyToTmuxBufferStdin(text string) error {
+	cmd := exec.Command("tmux", "load-buffer", "-")
+	cmd.Stdin = strings.NewReader(text)
+	return cmd.Run()
 }
