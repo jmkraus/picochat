@@ -74,10 +74,6 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 			return types.CommandResult{Output: "Clipboard failed: " + err.Error()}
 		}
 		if utils.IsTmuxSession() {
-			//TODO: This is macOS only!!!
-			// Why doesn't the following line work?
-			// exec.Command("tmux", "load-buffer", "-").Stdin = strings.NewReader(lastAnswer)
-			// err := exec.Command("sh", "-c", "pbpaste | tmux load-buffer -").Run()
 			err := utils.CopyToTmuxBufferStdin(lastAnswer)
 			if err != nil {
 				return types.CommandResult{Output: "Tmux clipboard failed: " + err.Error()}
