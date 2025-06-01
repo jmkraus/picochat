@@ -93,3 +93,7 @@ func ExtractCodeBlock(s string) string {
 	}
 	return ""
 }
+
+func WeAreTmux() bool {
+	return os.Getenv("TMUX") != ""
+}

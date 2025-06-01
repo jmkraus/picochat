@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os/exec"
 	"picochat/config"
 	"picochat/requests"
 	"picochat/types"
@@ -72,6 +73,15 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		err := clipboard.WriteAll(lastAnswer)
 		if err != nil {
 			return types.CommandResult{Output: "Clipboard failed: " + err.Error()}
+		}
+		if utils.WeAreTmux() {
+			//TODO: This is macOS only!!!
+			// Why doesn't the following line work?
+			// exec.Command("tmux", "load-buffer", "-").Stdin = strings.NewReader(lastAnswer)
+			err := exec.Command("sh", "-c", "pbpaste | tmux load-buffer -").Run()
+			if err != nil {
+				return types.CommandResult{Output: "Tmux clipboard failed: " + err.Error()}
+			}
 		}
 		return types.CommandResult{Output: "Last answer written to clipboard."}
 	case "/models":
