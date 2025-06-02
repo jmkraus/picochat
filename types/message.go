@@ -17,23 +17,23 @@ type Message struct {
 }
 
 type ChatHistory struct {
-	Messages     []Message
-	Limit        int
-	limitReached bool
+	Messages          []Message
+	MaxContext        int
+	MaxContextReached bool
 }
 
-func NewHistory(systemPrompt string, maxLimit int) *ChatHistory {
+func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 	return &ChatHistory{
-		Messages: []Message{{Role: "system", Content: systemPrompt}},
-		Limit:    maxLimit,
+		Messages:   []Message{{Role: "system", Content: systemPrompt}},
+		MaxContext: maxContext,
 	}
 }
 
 func (h *ChatHistory) Add(role, content string) {
 	h.Messages = append(h.Messages, Message{Role: role, Content: content})
 
-	if h.Limit > 0 {
-		h.Compress(h.Limit)
+	if h.MaxContext > 0 {
+		h.Compress(h.MaxContext)
 	}
 }
 
@@ -50,7 +50,7 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 }
 
 func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
-	basePath, err := paths.GetHistoryPath()
+	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
 		return "", err
 	}
@@ -59,7 +59,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	} else {
 		filename = utils.EnsureSuffix(filepath.Base(filename))
 	}
-	fullPath := filepath.Join(basePath, filename)
+	fullPath := filepath.Join(historyPath, filename)
 
 	data, err := json.MarshalIndent(h.Messages, "", "  ")
 	if err != nil {
@@ -77,7 +77,7 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	filename = utils.EnsureSuffix(filename)
 	historyDir, err := paths.GetHistoryPath()
 	if err != nil {
-		return nil, fmt.Errorf("history dir not found.")
+		return nil, fmt.Errorf("history path not found.")
 	}
 	fullPath := filepath.Join(historyDir, filename)
 
@@ -95,23 +95,45 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 }
 
 func (h *ChatHistory) ClearExceptSystemPrompt() {
-	if len(h.Messages) > 1 {
+	if h.Len() > 1 {
 		h.Messages = h.Messages[:1]
 	}
-	h.limitReached = false
+	h.MaxContextReached = false
+}
+
+func (h *ChatHistory) SetContextSize(max int) error {
+	if max < 5 || max > 100 {
+		return fmt.Errorf("Context size must be between 5 and 100")
+	}
+	if h.MaxContext == max {
+		return nil
+	}
+
+	h.MaxContext = max
+
+	if h.Len() >= max {
+		start := h.Len() - (max - 1)
+		if start < 1 {
+			start = 1
+		}
+		h.Messages = append([]Message{h.Messages[0]}, h.Messages[start:]...)
+	}
+
+	h.MaxContextReached = h.Len() >= h.MaxContext
+	return nil
 }
 
 func (h *ChatHistory) Compress(max int) {
-	if len(h.Messages) < max {
+	if h.Len() < max {
 		return
 	}
 
-	if !h.limitReached {
-		fmt.Println("Message history limit of", h.Limit, "reached.")
-		h.limitReached = true
+	if !h.MaxContextReached {
+		fmt.Println("Context size limit of", h.MaxContext, "reached.")
+		h.MaxContextReached = true
 	}
 
-	keep := h.Messages[len(h.Messages)-(max-1):]
+	keep := h.Messages[h.Len()-(max-1):]
 	h.Messages = append(h.Messages[:1], keep...)
 }
 
@@ -119,12 +141,12 @@ func (h *ChatHistory) Len() int {
 	return len(h.Messages)
 }
 
-func (h *ChatHistory) Max() int {
-	return h.Limit
+func (h *ChatHistory) MaxCtx() int {
+	return h.MaxContext
 }
 
 func (h *ChatHistory) IsEmpty() bool {
-	return len(h.Messages) == 1
+	return h.Len() == 1
 }
 
 func (h *ChatHistory) EstimateTokens() int {

@@ -54,7 +54,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		}
 
 		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
-		messages := fmt.Sprintf("History has %d messages (max. %d)", history.Len(), history.Max())
+		messages := fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx())
 		server := fmt.Sprintf("Server version is %s", serverVersion)
 
 		return types.CommandResult{Output: model + "\n" + messages + "\n" + server}
@@ -106,6 +106,16 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		err = applyToConfig(key, value)
 		if err != nil {
 			return types.CommandResult{Output: "Failed to apply config: " + err.Error()}
+		}
+		if key == "context" {
+			intVal, ok := value.(int)
+			if !ok {
+				return types.CommandResult{Output: "Invalid value: expected integer for context"}
+			}
+			err := history.SetContextSize(intVal)
+			if err != nil {
+				return types.CommandResult{Output: "Failed to update context size: " + err.Error()}
+			}
 		}
 		return types.CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
 	case "/clear":
