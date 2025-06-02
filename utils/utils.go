@@ -12,12 +12,12 @@ import (
 
 // ListHistoryFiles shows all saved sessions in 'history' dir
 func ListHistoryFiles() (string, error) {
-	basePath, err := paths.GetHistoryPath()
+	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
 		return "", err
 	}
 
-	entries, err := os.ReadDir(basePath)
+	entries, err := os.ReadDir(historyPath)
 	if err != nil {
 		return "", err
 	}
