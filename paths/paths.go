@@ -16,11 +16,10 @@ func GetConfigPath() (string, error) {
 	if *args.ConfigPath != "" {
 		if strings.HasPrefix(*args.ConfigPath, "@") {
 			name := strings.TrimPrefix(*args.ConfigPath, "@")
-			suffix := ""
 			if !strings.HasSuffix(name, ".toml") {
-				suffix = ".toml"
+				name += ".toml"
 			}
-			return filepath.Join(configDir, name+suffix), nil
+			return filepath.Join(configDir, name), nil
 		}
 		return *args.ConfigPath, nil
 	}
