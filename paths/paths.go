@@ -64,11 +64,10 @@ func GetHistoryPath() (string, error) {
 		return overrideHistoryPath, nil
 	}
 
-	configPath, err := GetConfigPath()
+	configDir, err := getConfigDir()
 	if err != nil {
 		return "", err
 	}
-	configDir := filepath.Dir(configPath)
 	historyDir := filepath.Join(configDir, "history")
 	err = os.MkdirAll(historyDir, 0755)
 	if err != nil {
