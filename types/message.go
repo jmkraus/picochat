@@ -52,7 +52,7 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("history path not found.")
 	}
 	if filename == "" {
 		filename = utils.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"))
@@ -74,12 +74,12 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 }
 
 func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
-	filename = utils.EnsureSuffix(filename)
-	historyDir, err := paths.GetHistoryPath()
+	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
 		return nil, fmt.Errorf("history path not found.")
 	}
-	fullPath := filepath.Join(historyDir, filename)
+	filename = utils.EnsureSuffix(filepath.Base(filename))
+	fullPath := filepath.Join(historyPath, filename)
 
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
@@ -103,7 +103,7 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 
 func (h *ChatHistory) SetContextSize(max int) error {
 	if max < 5 || max > 100 {
-		return fmt.Errorf("Context size must be between 5 and 100")
+		return fmt.Errorf("context size must be between 5 and 100")
 	}
 	if h.MaxContext == max {
 		return nil

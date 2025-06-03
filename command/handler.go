@@ -87,7 +87,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		}
 		return types.CommandResult{Output: models}
 	case "/set":
-		if strings.TrimSpace(args) == "" {
+		if args == "" {
 			cfg := config.Get()
 
 			list := []string{
@@ -133,10 +133,10 @@ func parseCommandArgs(input string) (string, string) {
 	if len(parts) == 0 {
 		return "", ""
 	}
-	cmd := parts[0]
+	cmd := strings.TrimSpace(parts[0])
 	arg := ""
 	if len(parts) > 1 {
-		arg = strings.Join(parts[1:], " ")
+		arg = strings.TrimSpace(strings.Join(parts[1:], " "))
 	}
 	return cmd, arg
 }
