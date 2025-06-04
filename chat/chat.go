@@ -57,16 +57,20 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 		fullReply.WriteString(res.Message.Content)
 
 		if res.Done {
-			elapsed := time.Since(start)
-			minutes := int(elapsed.Minutes())
-			seconds := int(elapsed.Seconds()) % 60
-			t := fmt.Sprintf("%02d:%02d", minutes, seconds)
+			t := elapsedTime(start)
 			fmt.Println()
-			fmt.Printf("Elapsed (mm:ss): %s; Tokens: prompt_eval_count=%d, eval_count=%d", t, res.PromptEvalCount, res.EvalCount)
+			fmt.Printf("Elapsed (mm:ss): %s; Tokens: prompt_eval_count: %d, eval_count: %d", t, res.PromptEvalCount, res.EvalCount)
 			break
 		}
 	}
 
 	history.Add("assistant", fullReply.String())
 	return nil
+}
+
+func elapsedTime(t time.Time) string {
+	elapsed := time.Since(t)
+	minutes := int(elapsed.Minutes())
+	seconds := int(elapsed.Seconds()) % 60
+	return fmt.Sprintf("%02d:%02d", minutes, seconds)
 }
