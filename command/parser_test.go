@@ -35,6 +35,8 @@ func TestParseArgs_Valid(t *testing.T) {
 func TestParseArgs_Invalid(t *testing.T) {
 	tests := []string{
 		"notakeyvalue",
+		"=nokey",
+		"novalue=",
 		"temperature=abc",
 		"unknown=123",
 		"context=notanint",
