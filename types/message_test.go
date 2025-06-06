@@ -167,3 +167,58 @@ func TestAddAndCompress(t *testing.T) {
 		t.Errorf("Expected first message to be system prompt, got %s", first.Role)
 	}
 }
+
+func TestReplaceMessages(t *testing.T) {
+	h := types.NewHistory("init", 5)
+	h.Add("user", "first")
+
+	newMessages := []types.Message{
+		{Role: "system", Content: "replaced system"},
+		{Role: "user", Content: "replaced message"},
+	}
+	h.Replace(newMessages)
+
+	if h.Len() != 2 {
+		t.Errorf("expected 2 messages after replace, got %d", h.Len())
+	}
+
+	if h.Get()[0].Content != "replaced system" {
+		t.Errorf("expected first message to be replaced system, got %s", h.Get()[0].Content)
+	}
+}
+
+func TestEstimateTokens(t *testing.T) {
+	h := types.NewHistory("short prompt", 5)
+	h.Add("user", "This is a short message")
+	h.Add("assistant", "This is a slightly longer reply that includes a few more words.")
+
+	tokens := h.EstimateTokens()
+	if tokens <= 0 {
+		t.Errorf("expected positive token count, got %d", tokens)
+	}
+}
+
+func TestGetLastMessage(t *testing.T) {
+	h := types.NewHistory("sys", 5)
+	last := h.GetLast()
+	if last.Role != "system" {
+		t.Errorf("expected last message to be system at init, got %s", last.Role)
+	}
+
+	h.Add("user", "msg")
+	last = h.GetLast()
+	if last.Role != "user" || last.Content != "msg" {
+		t.Errorf("unexpected last message: %+v", last)
+	}
+}
+
+func TestIsEmpty(t *testing.T) {
+	h := types.NewHistory("only system", 5)
+	if !h.IsEmpty() {
+		t.Errorf("expected history to be empty (only system prompt)")
+	}
+	h.Add("user", "hi")
+	if h.IsEmpty() {
+		t.Errorf("expected history to be non-empty after user message")
+	}
+}

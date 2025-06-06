@@ -58,3 +58,69 @@ func TestHandleChat(t *testing.T) {
 		t.Errorf("unexpected assistant response: %q", last.Content)
 	}
 }
+
+func TestHandleChat_InvalidURL(t *testing.T) {
+	cfg := &config.Config{
+		URL:   "://invalid-url",
+		Model: "test-model",
+	}
+
+	history := types.NewHistory(cfg.Prompt, 10)
+	history.Add("user", "test")
+
+	err := chat.HandleChat(cfg, history)
+	if err == nil || !strings.Contains(err.Error(), "http") {
+		t.Errorf("expected http error, got: %v", err)
+	}
+}
+
+func brokenStreamingHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintln(w, `{"message":{"content":"OK"}`) // Ungültiges JSON
+}
+
+func TestHandleChat_BrokenStream(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(brokenStreamingHandler))
+	defer server.Close()
+
+	cfg := &config.Config{
+		URL:   server.URL,
+		Model: "test-model",
+	}
+	history := types.NewHistory(cfg.Prompt, 10)
+	history.Add("user", "test")
+
+	err := chat.HandleChat(cfg, history)
+	if err == nil || !strings.Contains(err.Error(), "stream") {
+		t.Errorf("expected stream decoding error, got: %v", err)
+	}
+}
+
+func prematureEOFHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintln(w, `{"message":{"content":"Teilantwort"}}`) // kein done=true
+	// Dann EOF
+}
+
+func TestHandleChat_EOFWithoutDone(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(prematureEOFHandler))
+	defer server.Close()
+
+	cfg := &config.Config{
+		URL:   server.URL,
+		Model: "test-model",
+	}
+	history := types.NewHistory(cfg.Prompt, 10)
+	history.Add("user", "test")
+
+	err := chat.HandleChat(cfg, history)
+	if err != nil {
+		t.Errorf("expected no error despite missing done=true, got: %v", err)
+	}
+
+	// Optional: Test, ob Antwort trotzdem gespeichert wurde
+	last := history.Get()[len(history.Get())-1]
+	if !strings.Contains(last.Content, "Teilantwort") {
+		t.Errorf("expected partial content, got: %v", last.Content)
+	}
+}

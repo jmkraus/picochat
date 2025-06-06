@@ -67,7 +67,7 @@ func GetServerVersion(apiBaseURL string) (string, error) {
 func CleanUrl(apiBaseURL, endPoint string) (string, error) {
 	u, err := url.Parse(apiBaseURL)
 	if err != nil {
-		return "", fmt.Errorf("invalid base URL: %w", err)
+		return "", fmt.Errorf("invalid http url string %w", err)
 	}
 	u.Path = strings.TrimSuffix(u.Path, "/") + "/" + endPoint
 	apiFullURL := u.String()
