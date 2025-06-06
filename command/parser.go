@@ -26,6 +26,13 @@ func ParseArgs(args string) (string, any, error) {
 	key := strings.ToLower(strings.TrimSpace(parts[0]))
 	value := strings.TrimSpace(parts[1])
 
+	if key == "" {
+		return "", nil, errors.New("invalid format, missing key")
+	}
+	if value == "" {
+		return "", nil, errors.New("invalid format, missing value")
+	}
+
 	convertedValue, err := validateAndConvert(key, value)
 	if err != nil {
 		return "", nil, err
