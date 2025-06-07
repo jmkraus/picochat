@@ -45,10 +45,12 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | CMD      | DESCRIPTION |
 | -------- | ------------------------------------------------- |
 | /bye     | Exit the chat |
-| /done    | Terminate the input |
+| /done    | Terminate the input and send |
 | /save    | Save current chat history to a file |
 | /load    | Load chat history from a file |
 | /list    | List available saved history files |
+| /copy    | Copy the last answer to clipboard |
+| /paste   | Get clipboard content as user input and send |
 | /models  | List downloaded models |
 | /show    | Show number of messages in history |
 | /set     | Set session variables |

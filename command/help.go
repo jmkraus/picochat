@@ -5,8 +5,9 @@ import "strings"
 var helpTopics = map[string][]string{
 	"": {
 		"Available Commands:",
-		"  /done, ///   Terminate the input message",
+		"  /done, ///   Terminate the input message and send",
 		"  /copy        Copy the last answer to clipboard",
+		"  /paste       Get clipboard content as user input and send",
 		"  /show        Show system information",
 		"  /load        Load a session",
 		"  /save        Save current session",

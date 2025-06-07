@@ -13,6 +13,13 @@ import (
 	"strings"
 )
 
+func sendPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
+	history.Add("user", prompt)
+	if err := chat.HandleChat(cfg, history); err != nil {
+		fmt.Fprintf(os.Stderr, "Chat error: %v", err)
+	}
+}
+
 func readMultilineInput() (string, bool) {
 	scanner := bufio.NewScanner(os.Stdin)
 	var lines []string
@@ -78,12 +85,12 @@ func main() {
 			if result.Quit {
 				break
 			}
+			if result.Prompt != "" {
+				sendPrompt(result.Prompt, cfg, history)
+			}
 			continue
 		}
 
-		history.Add("user", input)
-		if err := chat.HandleChat(cfg, history); err != nil {
-			fmt.Fprintf(os.Stderr, "Chat error: %v", err)
-		}
+		sendPrompt(input, cfg, history)
 	}
 }

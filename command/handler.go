@@ -80,6 +80,20 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 			}
 		}
 		return types.CommandResult{Output: "Last answer written to clipboard."}
+	case "/paste":
+		text, err := clipboard.ReadAll()
+		if err != nil {
+			return types.CommandResult{Output: "clipboard read failed: " + err.Error()}
+		}
+		text = strings.TrimSpace(text)
+		if text == "" {
+			return types.CommandResult{Output: "clipboard is empty."}
+		}
+
+		return types.CommandResult{
+			Output: fmt.Sprintf("pasted %d characters from clipboard.", len(text)),
+			Prompt: text,
+		}
 	case "/models":
 		models, err := utils.ShowAvailableModels(cfg.URL)
 		if err != nil {

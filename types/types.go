@@ -23,8 +23,8 @@ type StreamResponse struct {
 }
 
 type CommandResult struct {
-	Output     string
-	Quit       bool
-	NewHistory *ChatHistory
-	Error      error
+	Output string
+	Quit   bool
+	Prompt string
+	Error  error
 }
