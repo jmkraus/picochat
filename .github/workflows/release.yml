@@ -27,7 +27,8 @@ jobs:
       - name: Archive binary
         run: |
           cd dist
-          zip picochat-macOS.zip picochat
+          cp ../config.toml .
+          zip picochat-macOS.zip picochat config.toml
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
