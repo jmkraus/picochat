@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func sendPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
+func sendUserPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
 	history.Add("user", prompt)
 	if err := chat.HandleChat(cfg, history); err != nil {
 		fmt.Fprintf(os.Stderr, "Chat error: %v", err)
@@ -86,11 +86,11 @@ func main() {
 				break
 			}
 			if result.Prompt != "" {
-				sendPrompt(result.Prompt, cfg, history)
+				sendUserPrompt(result.Prompt, cfg, history)
 			}
 			continue
 		}
 
-		sendPrompt(input, cfg, history)
+		sendUserPrompt(input, cfg, history)
 	}
 }

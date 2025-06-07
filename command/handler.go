@@ -91,7 +91,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		}
 
 		return types.CommandResult{
-			Output: fmt.Sprintf("pasted %d characters from clipboard.", len(text)),
+			Output: fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
 			Prompt: text,
 		}
 	case "/models":
