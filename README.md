@@ -1,11 +1,36 @@
 # Pico Chat - a CLI Chat Client
 
 ## Purpose
-Unlike similar tools like ollama, the Mac-only app "[Pico AI Homelab](https://picogpt.app/)" doesn't come with a dedicated CLI client.
+Unlike similar tools like ollama, the Mac-only app "[Pico AI Server](https://picogpt.app/)" doesn't come with a dedicated CLI client.
 
 This tool fills the gap and has some additional tricks up its sleeve.
 
 ## Installation
+
+The released binary is unsigned. To use it on your Mac, you have two options:
+
+ 1. Build picochat from the source code
+ 2. Remove the quarantine tag from the binary
+
+### Build picochat
+
+ * add the required libraries to your local Go setup
+
+ ```
+  go get github.com/atotto/clipboard
+  go get github.com/BurntSushi/toml
+  go mod tidy
+  go test ./...
+  go build
+ ```
+
+### Remove the quarantine flag
+
+Go in the target folder where you placed the binary and enter the following:
+
+`sudo xattr -rd com.apple.quarantine ./picochat`
+
+You need to enter your administrator PW to confirm. Then the binary does work.
 
 ## Usage
 
