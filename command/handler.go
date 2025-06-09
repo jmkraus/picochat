@@ -94,12 +94,20 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 			Output: fmt.Sprintf("pasted %d characters from clipboard.", len(text)),
 			Prompt: text,
 		}
+	case "/discard":
+		return types.CommandResult{Output: "Not implemented."}
+	case "/repeat":
+		return types.CommandResult{Output: "Repeating last chat history content.", Repeat: true}
 	case "/models":
-		models, err := utils.ShowAvailableModels(cfg.URL)
-		if err != nil {
-			return types.CommandResult{Output: "Models failed: " + err.Error()}
+		if args == "" {
+			models, err := utils.ShowAvailableModels(cfg.URL)
+			if err != nil {
+				return types.CommandResult{Output: "Models failed: " + err.Error()}
+			}
+			return types.CommandResult{Output: models}
 		}
-		return types.CommandResult{Output: models}
+
+		return types.CommandResult{Output: "Not implemented."}
 	case "/set":
 		if args == "" {
 			cfg := config.Get()

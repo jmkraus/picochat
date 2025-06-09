@@ -20,6 +20,23 @@ func sendPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
 	}
 }
 
+func repeatPrompt(cfg *config.Config, history *types.ChatHistory) {
+	if history.Len() < 2 {
+		fmt.Println("Chat history is empty.")
+		return
+	}
+
+	lastUser := history.GetLast()
+	if lastUser.Role != "user" {
+		fmt.Println("Last entry in history is not a user prompt.")
+		return
+	}
+
+	if err := chat.HandleChat(cfg, history); err != nil {
+		fmt.Fprintf(os.Stderr, "Chat error: %v", err)
+	}
+}
+
 func readMultilineInput() (string, bool) {
 	scanner := bufio.NewScanner(os.Stdin)
 	var lines []string
@@ -84,6 +101,9 @@ func main() {
 			}
 			if result.Quit {
 				break
+			}
+			if result.Repeat {
+				repeatPrompt(cfg, history)
 			}
 			if result.Prompt != "" {
 				sendPrompt(result.Prompt, cfg, history)
