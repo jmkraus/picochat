@@ -104,8 +104,7 @@ func main() {
 			}
 			if result.Repeat {
 				repeatPrompt(cfg, history)
-			}
-			if result.Prompt != "" {
+			} else if result.Prompt != "" {
 				sendPrompt(result.Prompt, cfg, history)
 			}
 			continue
