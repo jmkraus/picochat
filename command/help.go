@@ -15,6 +15,8 @@ var helpTopics = map[string][]string{
 		"  /models      List available (downloaded) models",
 		"  /clear       Clear session context",
 		"  /set         Set session variables",
+		"  /discard     Removes last assistant answer from history",
+		"  /retry       Sends (unchanged) chat history again",
 		"  /bye         Exit",
 		"  /help, /?    Show available commands",
 	},

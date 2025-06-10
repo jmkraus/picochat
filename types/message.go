@@ -37,6 +37,17 @@ func (h *ChatHistory) Add(role, content string) {
 	}
 }
 
+func (h *ChatHistory) Discard() {
+	if h.Len() <= 1 {
+		return // only system prompt in history
+	}
+
+	lastIndex := h.Len() - 1
+	if h.Messages[lastIndex].Role == "assistant" {
+		h.Messages = h.Messages[:lastIndex]
+	}
+}
+
 func (h *ChatHistory) Get() []Message {
 	return h.Messages
 }

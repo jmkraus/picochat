@@ -67,20 +67,22 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 
 ### Commands
 
-| CMD      | DESCRIPTION |
-| -------- | ------------------------------------------------- |
-| /bye     | Exit the chat |
-| /done    | Terminate the input and send |
-| /save    | Save current chat history to a file |
-| /load    | Load chat history from a file |
-| /list    | List available saved history files |
-| /copy    | Copy the last answer to clipboard |
-| /paste   | Get clipboard content as user input and send |
-| /models  | List downloaded models |
-| /show    | Show number of messages in history |
-| /set     | Set session variables |
-| /clear   | Clear history and reinitialize with system prompt |
-| /help    | Show available commands |
+| CMD        | DESCRIPTION |
+| ---------- | ------------------------------------------------- |
+| /done, /// | Terminate the input and send |
+| /copy      | Copy the last answer to clipboard |
+| /paste     | Get clipboard content as user input and send |
+| /show      | Show number of messages in history |
+| /save      | Save current chat history to a file |
+| /load      | Load chat history from a file |
+| /list      | List available saved history files |
+| /models    | List downloaded models |
+| /clear     | Clear history and reinitialize with system prompt |
+| /set       | Set session variables |
+| /discard   | Removes last assistant answer from history |
+| /retry     | Sends (unchanged) chat history again |
+| /bye       | Exit the chat |
+| /help, /?  | Show available commands |
 
 Some commands can have an argument:
 

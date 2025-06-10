@@ -26,5 +26,6 @@ type CommandResult struct {
 	Output string
 	Quit   bool
 	Prompt string
+	Repeat bool
 	Error  error
 }
