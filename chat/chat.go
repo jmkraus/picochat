@@ -43,6 +43,7 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 
 	decoder := json.NewDecoder(resp.Body)
 	var fullReply strings.Builder
+	receivedContent := false
 
 	for {
 		var res types.StreamResponse
@@ -53,8 +54,11 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 			return fmt.Errorf("stream error: %w", err)
 		}
 
-		fmt.Print(res.Message.Content)
-		fullReply.WriteString(res.Message.Content)
+		if res.Message.Content != "" {
+			receivedContent = true
+			fmt.Print(res.Message.Content)
+			fullReply.WriteString(res.Message.Content)
+		}
 
 		if res.Done {
 			t := elapsedTime(start)
@@ -62,6 +66,10 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 			fmt.Printf("Elapsed (mm:ss): %s; Tokens: prompt_eval_count: %d, eval_count: %d", t, res.PromptEvalCount, res.EvalCount)
 			break
 		}
+	}
+
+	if !receivedContent {
+		return fmt.Errorf("no content received — possible config issue or invalid model?")
 	}
 
 	history.Add("assistant", fullReply.String())
