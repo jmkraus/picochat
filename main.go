@@ -16,24 +16,24 @@ import (
 func sendPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
 	history.Add("user", prompt)
 	if err := chat.HandleChat(cfg, history); err != nil {
-		fmt.Fprintf(os.Stderr, "Chat error: %v", err)
+		fmt.Fprintf(os.Stderr, "chat error: %v", err)
 	}
 }
 
 func repeatPrompt(cfg *config.Config, history *types.ChatHistory) {
 	if history.Len() < 2 {
-		fmt.Println("Chat history is empty.")
+		fmt.Println("chat history is empty.")
 		return
 	}
 
 	lastUser := history.GetLast()
 	if lastUser.Role != "user" {
-		fmt.Println("Last entry in history is not a user prompt.")
+		fmt.Println("Last entry in history is not a user prompt. Consider '/discard'.")
 		return
 	}
 
 	if err := chat.HandleChat(cfg, history); err != nil {
-		fmt.Fprintf(os.Stderr, "Chat error: %v", err)
+		fmt.Fprintf(os.Stderr, "chat error: %v", err)
 	}
 }
 
@@ -71,7 +71,7 @@ func main() {
 
 	err := config.Load()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error while loading configuration: %v", err)
+		fmt.Fprintf(os.Stderr, "load configuration failed: %v", err)
 		os.Exit(1)
 	}
 	cfg := config.Get()
@@ -80,7 +80,7 @@ func main() {
 	if *args.HistoryFile != "" {
 		history, err = types.LoadHistoryFromFile(*args.HistoryFile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not load history: %v", err)
+			fmt.Fprintf(os.Stderr, "load history failed: %v", err)
 			os.Exit(1)
 		}
 	} else {
