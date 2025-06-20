@@ -24,8 +24,8 @@ type StreamResponse struct {
 
 type CommandResult struct {
 	Output string
+	Error  string
 	Quit   bool
 	Prompt string
 	Repeat bool
-	Error  error
 }

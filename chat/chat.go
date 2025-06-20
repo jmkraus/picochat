@@ -37,13 +37,12 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 	start := time.Now()
 	resp, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return fmt.Errorf("http error: %w", err)
+		return fmt.Errorf("http request error for model %s: %w", cfg.Model, err)
 	}
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
 	var fullReply strings.Builder
-	receivedContent := false
 
 	for {
 		var res types.StreamResponse
@@ -51,25 +50,23 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 			if err == io.EOF {
 				break
 			}
-			return fmt.Errorf("stream error: %w", err)
+			return fmt.Errorf("stream decoding error for model %s: %w", cfg.Model, err)
 		}
 
 		if res.Message.Content != "" {
-			receivedContent = true
 			fmt.Print(res.Message.Content)
 			fullReply.WriteString(res.Message.Content)
 		}
 
 		if res.Done {
 			t := elapsedTime(start)
-			fmt.Println()
-			fmt.Printf("Elapsed (mm:ss): %s; Tokens: prompt_eval_count: %d, eval_count: %d", t, res.PromptEvalCount, res.EvalCount)
+			fmt.Printf("\nElapsed (mm:ss): %s; Tokens: prompt_eval_count: %d, eval_count: %d", t, res.PromptEvalCount, res.EvalCount)
 			break
 		}
 	}
 
-	if !receivedContent {
-		return fmt.Errorf("no content received — possible config issue or invalid model?")
+	if fullReply.Len() == 0 {
+		return fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
 	}
 
 	history.Add("assistant", fullReply.String())

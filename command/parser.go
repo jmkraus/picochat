@@ -58,14 +58,14 @@ func validateAndConvert(key, value string) (any, error) {
 	case "model", "prompt":
 		return value, nil
 	default:
-		return nil, errors.New("unsupported config key")
+		return nil, fmt.Errorf("unsupported config key %s", key)
 	}
 }
 
 func applyToConfig(key string, value any) error {
 	fieldName, ok := allowedKeys[key]
 	if !ok {
-		return fmt.Errorf("unknown config key: %s", key)
+		return fmt.Errorf("unsupported config key: %s", key)
 	}
 
 	cfg := config.Get()

@@ -8,6 +8,7 @@ import (
 	"picochat/chat"
 	"picochat/command"
 	"picochat/config"
+	"picochat/console"
 	"picochat/types"
 	"picochat/version"
 	"strings"
@@ -16,24 +17,24 @@ import (
 func sendPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
 	history.Add("user", prompt)
 	if err := chat.HandleChat(cfg, history); err != nil {
-		fmt.Fprintf(os.Stderr, "chat error: %v", err)
+		console.Error(err.Error())
 	}
 }
 
 func repeatPrompt(cfg *config.Config, history *types.ChatHistory) {
 	if history.Len() < 2 {
-		fmt.Println("chat history is empty.")
+		console.Warn("chat history is empty.")
 		return
 	}
 
 	lastUser := history.GetLast()
 	if lastUser.Role != "user" {
-		fmt.Println("Last entry in history is not a user prompt. Consider '/discard'.")
+		console.Warn("last entry in history is not a user prompt. consider '/discard'.")
 		return
 	}
 
 	if err := chat.HandleChat(cfg, history); err != nil {
-		fmt.Fprintf(os.Stderr, "chat error: %v", err)
+		console.Error(err.Error())
 	}
 }
 
@@ -65,13 +66,13 @@ func main() {
 	args.Parse()
 
 	if *args.ShowVersion {
-		fmt.Println("picochat version is", version.Version)
+		console.Info(fmt.Sprintf("picochat version is %s", version.Version))
 		os.Exit(0)
 	}
 
 	err := config.Load()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "load configuration failed: %v", err)
+		console.Errorf("load configuration failed: %v", err)
 		os.Exit(1)
 	}
 	cfg := config.Get()
@@ -80,14 +81,14 @@ func main() {
 	if *args.HistoryFile != "" {
 		history, err = types.LoadHistoryFromFile(*args.HistoryFile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "load history failed: %v", err)
+			console.Errorf("load history failed: %v", err)
 			os.Exit(1)
 		}
 	} else {
 		history = types.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	fmt.Println("Chat with Pico AI started. Help with '/?'.")
+	console.Info("Chat with Pico AI started. Help with '/?'.")
 
 	for {
 		fmt.Print("\n>>> ")
@@ -97,7 +98,10 @@ func main() {
 		if isCommand {
 			result := command.Handle(input, history, os.Stdin)
 			if result.Output != "" {
-				fmt.Println(result.Output)
+				console.Info(result.Output)
+			}
+			if result.Error != "" {
+				console.Error(result.Error)
 			}
 			if result.Quit {
 				break

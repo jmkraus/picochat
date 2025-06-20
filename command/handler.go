@@ -25,9 +25,9 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 	case "/save":
 		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
-			return types.CommandResult{Output: "history save failed: " + err.Error()}
+			return types.CommandResult{Error: "history save failed: " + err.Error()}
 		}
-		return types.CommandResult{Output: fmt.Sprintf("History saved as %s", name)}
+		return types.CommandResult{Output: fmt.Sprintf("History saved as '%s'", name)}
 	case "/load":
 		filename := args
 		if filename == "" {
@@ -40,7 +40,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		if len(filename) > 0 {
 			loaded, err := types.LoadHistoryFromFile(filename)
 			if err != nil {
-				return types.CommandResult{Output: "history load failed: " + err.Error()}
+				return types.CommandResult{Error: "history load failed: " + err.Error()}
 			}
 			history.Replace(loaded.Get())
 			return types.CommandResult{Output: "History loaded successfully."}
@@ -50,7 +50,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 	case "/show":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {
-			return types.CommandResult{Output: "fetching server version failed: " + err.Error()}
+			return types.CommandResult{Error: "fetching server version failed: " + err.Error()}
 		}
 
 		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
@@ -61,7 +61,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
-			return types.CommandResult{Output: "listing failed: " + err.Error()}
+			return types.CommandResult{Error: "listing failed: " + err.Error()}
 		}
 		return types.CommandResult{Output: files}
 	case "/copy":
@@ -71,23 +71,23 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		}
 		err := clipboard.WriteAll(lastAnswer)
 		if err != nil {
-			return types.CommandResult{Output: "clipboard failed: " + err.Error()}
+			return types.CommandResult{Error: "clipboard failed: " + err.Error()}
 		}
 		if utils.IsTmuxSession() {
 			err := utils.CopyToTmuxBufferStdin(lastAnswer)
 			if err != nil {
-				return types.CommandResult{Output: "Tmux clipboard failed: " + err.Error()}
+				return types.CommandResult{Error: "tmux clipboard failed: " + err.Error()}
 			}
 		}
 		return types.CommandResult{Output: "Last answer written to clipboard."}
 	case "/paste":
 		text, err := clipboard.ReadAll()
 		if err != nil {
-			return types.CommandResult{Output: "clipboard read failed: " + err.Error()}
+			return types.CommandResult{Error: "clipboard read failed: " + err.Error()}
 		}
 		text = strings.TrimSpace(text)
 		if text == "" {
-			return types.CommandResult{Output: "clipboard is empty."}
+			return types.CommandResult{Error: "clipboard is empty."}
 		}
 
 		return types.CommandResult{
@@ -103,7 +103,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 		if args == "" {
 			models, err := utils.ShowAvailableModels(cfg.URL)
 			if err != nil {
-				return types.CommandResult{Output: "models list failed: " + err.Error()}
+				return types.CommandResult{Error: "models list failed: " + err.Error()}
 			}
 			return types.CommandResult{Output: models}
 		}
@@ -124,20 +124,20 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 
 		key, value, err := ParseArgs(args)
 		if err != nil {
-			return types.CommandResult{Output: "parse args failed: " + err.Error()}
+			return types.CommandResult{Error: "parse args failed: " + err.Error()}
 		}
 		err = applyToConfig(key, value)
 		if err != nil {
-			return types.CommandResult{Output: "apply to config failed: " + err.Error()}
+			return types.CommandResult{Error: "apply to config failed: " + err.Error()}
 		}
 		if key == "context" {
 			intVal, ok := value.(int)
 			if !ok {
-				return types.CommandResult{Output: "value not an integer"}
+				return types.CommandResult{Error: "value not an integer"}
 			}
 			err := history.SetContextSize(intVal)
 			if err != nil {
-				return types.CommandResult{Output: "update context size failed: " + err.Error()}
+				return types.CommandResult{Error: "update context size failed: " + err.Error()}
 			}
 		}
 		return types.CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
@@ -147,7 +147,7 @@ func Handle(commandLine string, history *types.ChatHistory, input io.Reader) typ
 	case "/help", "/?":
 		return types.CommandResult{Output: HelpText(args)}
 	default:
-		return types.CommandResult{Output: "Unknown command."}
+		return types.CommandResult{Error: "unknown command"}
 	}
 }
 
