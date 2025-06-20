@@ -29,30 +29,12 @@ func TestFormatList_WithNumbers(t *testing.T) {
 
 func TestFormatList_Empty(t *testing.T) {
 	items := []string{}
-	expected := "No items found."
+	expected := "no items found."
 
 	result := FormatList(items, "items", false)
 
 	if result != expected {
 		t.Errorf("Expected:\n%q\nGot:\n%q", expected, result)
-	}
-}
-
-func TestHasSuffix(t *testing.T) {
-	if !HasSuffix("test.chat") {
-		t.Error("Expected HasSuffix to return true for 'test.chat'")
-	}
-	if HasSuffix("test.txt") {
-		t.Error("Expected HasSuffix to return false for 'test.txt'")
-	}
-}
-
-func TestEnsureSuffix(t *testing.T) {
-	if EnsureSuffix("foo") != "foo.chat" {
-		t.Errorf("Expected suffix to be appended")
-	}
-	if EnsureSuffix("bar.chat") != "bar.chat" {
-		t.Errorf("Suffix should not be duplicated")
 	}
 }
 

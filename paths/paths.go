@@ -13,18 +13,31 @@ func GetConfigPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	if *args.ConfigPath != "" {
-		if strings.HasPrefix(*args.ConfigPath, "@") {
-			name := strings.TrimPrefix(*args.ConfigPath, "@")
-			if !strings.HasSuffix(name, ".toml") {
-				name += ".toml"
-			}
-			return filepath.Join(configDir, name), nil
+		name, found := strings.CutPrefix(*args.ConfigPath, "@")
+		if !found {
+			return *args.ConfigPath, nil
 		}
-		return *args.ConfigPath, nil
+
+		if !HasSuffix(name, ".toml") {
+			name += ".toml"
+		}
+		return filepath.Join(configDir, name), nil
 	}
 
 	return filepath.Join(configDir, "config.toml"), nil
+}
+
+func HasSuffix(filename string, suffix string) bool {
+	return strings.HasSuffix(filename, suffix)
+}
+
+func EnsureSuffix(filename string, suffix string) string {
+	if !HasSuffix(filename, suffix) {
+		return filename + suffix
+	}
+	return filename
 }
 
 func getConfigDir() (string, error) {
@@ -51,7 +64,7 @@ func getConfigDir() (string, error) {
 		return ex, nil
 	}
 
-	return "", fmt.Errorf("No valid config path found.")
+	return "", fmt.Errorf("no valid config path found.")
 }
 
 var overrideHistoryPath string // for Unit Tests

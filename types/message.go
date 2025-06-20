@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"picochat/console"
 	"picochat/paths"
-	"picochat/utils"
 	"strings"
 	"time"
 )
+
+const suffix string = ".chat"
 
 type Message struct {
 	Role    string `json:"role"`
@@ -66,9 +68,9 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 		return "", fmt.Errorf("history path not found.")
 	}
 	if filename == "" {
-		filename = utils.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"))
+		filename = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), suffix)
 	} else {
-		filename = utils.EnsureSuffix(filepath.Base(filename))
+		filename = paths.EnsureSuffix(filepath.Base(filename), suffix)
 	}
 	fullPath := filepath.Join(historyPath, filename)
 
@@ -89,7 +91,7 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	if err != nil {
 		return nil, fmt.Errorf("history path not found.")
 	}
-	filename = utils.EnsureSuffix(filepath.Base(filename))
+	filename = paths.EnsureSuffix(filepath.Base(filename), suffix)
 	fullPath := filepath.Join(historyPath, filename)
 
 	data, err := os.ReadFile(fullPath)
@@ -140,7 +142,7 @@ func (h *ChatHistory) Compress(max int) {
 	}
 
 	if !h.MaxContextReached {
-		fmt.Println("Context size limit of", h.MaxContext, "reached.")
+		console.Warn(fmt.Sprintf("Context size limit of %d reached.", h.MaxContext))
 		h.MaxContextReached = true
 	}
 

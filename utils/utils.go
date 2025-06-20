@@ -24,13 +24,13 @@ func ListHistoryFiles() (string, error) {
 
 	var result []string
 	for _, entry := range entries {
-		if !entry.IsDir() && HasSuffix(entry.Name()) {
+		if !entry.IsDir() && paths.HasSuffix(entry.Name(), ".chat") {
 			result = append(result, entry.Name())
 		}
 	}
 
 	if len(result) == 0 {
-		return "", fmt.Errorf("No history files found.")
+		return "", fmt.Errorf("no history files found.")
 	}
 
 	return FormatList(result, "history files", true), nil
@@ -44,28 +44,15 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 	}
 
 	if len(models) == 0 {
-		return "", fmt.Errorf("No models available.")
+		return "", fmt.Errorf("no models available.")
 	}
 
 	return FormatList(models, "models", true), nil
 }
 
-const fileSuffix = ".chat"
-
-func HasSuffix(filename string) bool {
-	return strings.HasSuffix(filename, fileSuffix)
-}
-
-func EnsureSuffix(filename string) string {
-	if !HasSuffix(filename) {
-		return filename + fileSuffix
-	}
-	return filename
-}
-
 func FormatList(content []string, heading string, numbered bool) string {
 	if len(content) == 0 {
-		return fmt.Sprintf("No %s found.", strings.ToLower(heading))
+		return fmt.Sprintf("no %s found.", strings.ToLower(heading))
 	}
 
 	var lines []string
