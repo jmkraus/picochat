@@ -36,7 +36,7 @@ func ListHistoryFiles() (string, error) {
 	return FormatList(result, "history files", true), nil
 }
 
-// showAvailableModels lists all models via /tags API call
+// ShowAvailableModels lists all models via /tags API call
 func ShowAvailableModels(baseUrl string) (string, error) {
 	models, err := requests.GetAvailableModels(baseUrl)
 	if err != nil {
