@@ -69,7 +69,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
-			return CommandResult{Error: "listing failed: " + err.Error()}
+			return CommandResult{Error: "listing history files failed: " + err.Error()}
 		}
 		return CommandResult{Output: files}
 	case "/copy":
