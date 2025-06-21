@@ -1,14 +1,14 @@
-package types_test
+package messages_test
 
 import (
 	"fmt"
+	"picochat/messages"
 	"picochat/paths"
-	"picochat/types"
 	"testing"
 )
 
 func TestNewHistory(t *testing.T) {
-	h := types.NewHistory("hello world", 5)
+	h := messages.NewHistory("hello world", 5)
 
 	if len(h.Get()) != 1 {
 		t.Fatalf("expected 1 message, got %d", len(h.Get()))
@@ -24,7 +24,7 @@ func TestNewHistory(t *testing.T) {
 }
 
 func TestAddAndClear(t *testing.T) {
-	h := types.NewHistory("init", 5)
+	h := messages.NewHistory("init", 5)
 
 	h.Add("user", "Hello!")
 	h.Add("assistant", "Hi there!")
@@ -41,7 +41,7 @@ func TestAddAndClear(t *testing.T) {
 }
 
 func TestSaveAndLoad(t *testing.T) {
-	h := types.NewHistory("persist me", 5)
+	h := messages.NewHistory("persist me", 5)
 	h.Add("user", "data")
 
 	// Force temporary directory
@@ -53,7 +53,7 @@ func TestSaveAndLoad(t *testing.T) {
 		t.Fatalf("save failed: %v", err)
 	}
 
-	loaded, err := types.LoadHistoryFromFile(filename)
+	loaded, err := messages.LoadHistoryFromFile(filename)
 	if err != nil {
 		t.Fatalf("load failed: %v", err)
 	}
@@ -64,7 +64,7 @@ func TestSaveAndLoad(t *testing.T) {
 }
 
 func TestCompressKeepsLimitAndPrompt(t *testing.T) {
-	h := types.NewHistory("system prompt", 5)
+	h := messages.NewHistory("system prompt", 5)
 
 	for i := 1; i <= 10; i++ {
 		h.Add("user", fmt.Sprintf("msg %d", i))
@@ -90,7 +90,7 @@ func TestCompressKeepsLimitAndPrompt(t *testing.T) {
 }
 
 func TestSetContextSize(t *testing.T) {
-	h := types.NewHistory("system prompt", 10)
+	h := messages.NewHistory("system prompt", 10)
 
 	// Add 9 messages to fill context
 	for i := 1; i < 10; i++ {
@@ -138,7 +138,7 @@ func TestSetContextSize(t *testing.T) {
 }
 
 func TestAddAndCompress(t *testing.T) {
-	h := types.NewHistory("system prompt", 5)
+	h := messages.NewHistory("system prompt", 5)
 
 	// Add 4 User/Assistant messages → +1 System = 5
 	for i := 1; i <= 4; i++ {
@@ -169,10 +169,10 @@ func TestAddAndCompress(t *testing.T) {
 }
 
 func TestReplaceMessages(t *testing.T) {
-	h := types.NewHistory("init", 5)
+	h := messages.NewHistory("init", 5)
 	h.Add("user", "first")
 
-	newMessages := []types.Message{
+	newMessages := []messages.Message{
 		{Role: "system", Content: "replaced system"},
 		{Role: "user", Content: "replaced message"},
 	}
@@ -188,7 +188,7 @@ func TestReplaceMessages(t *testing.T) {
 }
 
 func TestEstimateTokens(t *testing.T) {
-	h := types.NewHistory("short prompt", 5)
+	h := messages.NewHistory("short prompt", 5)
 	h.Add("user", "This is a short message")
 	h.Add("assistant", "This is a slightly longer reply that includes a few more words.")
 
@@ -199,7 +199,7 @@ func TestEstimateTokens(t *testing.T) {
 }
 
 func TestGetLastMessage(t *testing.T) {
-	h := types.NewHistory("sys", 5)
+	h := messages.NewHistory("sys", 5)
 	last := h.GetLast()
 	if last.Role != "system" {
 		t.Errorf("expected last message to be system at init, got %s", last.Role)
@@ -213,7 +213,7 @@ func TestGetLastMessage(t *testing.T) {
 }
 
 func TestIsEmpty(t *testing.T) {
-	h := types.NewHistory("only system", 5)
+	h := messages.NewHistory("only system", 5)
 	if !h.IsEmpty() {
 		t.Errorf("expected history to be empty (only system prompt)")
 	}

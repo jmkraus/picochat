@@ -1,4 +1,4 @@
-package types
+package messages
 
 type ChatRequest struct {
 	Model    string       `json:"model"`
@@ -20,12 +20,4 @@ type StreamResponse struct {
 	Done            bool    `json:"done"`
 	PromptEvalCount int     `json:"prompt_eval_count"`
 	EvalCount       int     `json:"eval_count"`
-}
-
-type CommandResult struct {
-	Output string
-	Error  string
-	Quit   bool
-	Prompt string
-	Repeat bool
 }

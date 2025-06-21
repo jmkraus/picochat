@@ -5,17 +5,17 @@ import (
 	"os"
 )
 
-const err_prefix string = "× "  // or error: "
-const warn_prefix string = "! " // or "warning: "
+const err_prefix string = "×"  // or error:"
+const warn_prefix string = "!" // or "warning:"
 
 // Error prints an error message to stderr, prefixed with "error:"
 func Error(msg string) {
-	fmt.Fprintf(os.Stderr, "%s%s\n", err_prefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", err_prefix, msg)
 }
 
 // Errorf prints a custom error message to stderr
 func Errorf(msg string, err error) {
-	fmt.Fprintf(os.Stderr, "%s%s: %v\n", err_prefix, msg, err)
+	fmt.Fprintf(os.Stderr, "%s %s: %v\n", err_prefix, msg, err)
 }
 
 // Warn prints a warning message to stderr, prefixed with "warning:"

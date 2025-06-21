@@ -9,19 +9,19 @@ import (
 	"picochat/command"
 	"picochat/config"
 	"picochat/console"
-	"picochat/types"
+	"picochat/messages"
 	"picochat/version"
 	"strings"
 )
 
-func sendPrompt(prompt string, cfg *config.Config, history *types.ChatHistory) {
+func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
 	history.Add("user", prompt)
 	if err := chat.HandleChat(cfg, history); err != nil {
 		console.Error(err.Error())
 	}
 }
 
-func repeatPrompt(cfg *config.Config, history *types.ChatHistory) {
+func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 	if history.Len() < 2 {
 		console.Warn("chat history is empty.")
 		return
@@ -77,15 +77,15 @@ func main() {
 	}
 	cfg := config.Get()
 
-	var history *types.ChatHistory
+	var history *messages.ChatHistory
 	if *args.HistoryFile != "" {
-		history, err = types.LoadHistoryFromFile(*args.HistoryFile)
+		history, err = messages.LoadHistoryFromFile(*args.HistoryFile)
 		if err != nil {
 			console.Errorf("load history failed: %v", err)
 			os.Exit(1)
 		}
 	} else {
-		history = types.NewHistory(cfg.Prompt, cfg.Context)
+		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
 	console.Info("Chat with Pico AI started. Help with '/?'.")
@@ -96,7 +96,7 @@ func main() {
 		input, isCommand := readMultilineInput()
 
 		if isCommand {
-			result := command.Handle(input, history, os.Stdin)
+			result := command.HandleCommand(input, history, os.Stdin)
 			if result.Output != "" {
 				console.Info(result.Output)
 			}

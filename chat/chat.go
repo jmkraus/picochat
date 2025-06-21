@@ -7,18 +7,18 @@ import (
 	"io"
 	"net/http"
 	"picochat/config"
+	"picochat/messages"
 	"picochat/requests"
-	"picochat/types"
 	"strings"
 	"time"
 )
 
-func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
-	reqBody := types.ChatRequest{
+func HandleChat(cfg *config.Config, history *messages.ChatHistory) error {
+	reqBody := messages.ChatRequest{
 		Model:    cfg.Model,
 		Messages: history.Messages,
 		Stream:   true,
-		Options: &types.ChatOptions{
+		Options: &messages.ChatOptions{
 			Temperature: cfg.Temperature,
 			TopP:        cfg.TopP,
 		},
@@ -45,7 +45,7 @@ func HandleChat(cfg *config.Config, history *types.ChatHistory) error {
 	var fullReply strings.Builder
 
 	for {
-		var res types.StreamResponse
+		var res messages.StreamResponse
 		if err := decoder.Decode(&res); err != nil {
 			if err == io.EOF {
 				break

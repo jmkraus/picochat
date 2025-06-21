@@ -9,7 +9,7 @@ import (
 
 	"picochat/chat"
 	"picochat/config"
-	"picochat/types"
+	"picochat/messages"
 )
 
 // Simulated Streaming-Handler (PicoAI)
@@ -38,7 +38,7 @@ func TestHandleChat(t *testing.T) {
 		Prompt: "You are a test bot",
 	}
 
-	history := types.NewHistory(cfg.Prompt, 10)
+	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "Sag Hallo")
 
 	// Simulate HandleChat
@@ -65,7 +65,7 @@ func TestHandleChat_InvalidURL(t *testing.T) {
 		Model: "test-model",
 	}
 
-	history := types.NewHistory(cfg.Prompt, 10)
+	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "test")
 
 	err := chat.HandleChat(cfg, history)
@@ -87,7 +87,7 @@ func TestHandleChat_BrokenStream(t *testing.T) {
 		URL:   server.URL,
 		Model: "test-model",
 	}
-	history := types.NewHistory(cfg.Prompt, 10)
+	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "test")
 
 	err := chat.HandleChat(cfg, history)
@@ -110,7 +110,7 @@ func TestHandleChat_EOFWithoutDone(t *testing.T) {
 		URL:   server.URL,
 		Model: "test-model",
 	}
-	history := types.NewHistory(cfg.Prompt, 10)
+	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "test")
 
 	err := chat.HandleChat(cfg, history)
