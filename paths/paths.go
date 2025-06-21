@@ -19,23 +19,15 @@ func GetConfigPath() (string, error) {
 		if !found {
 			return *args.ConfigPath, nil
 		}
-
-		var suffix = ".toml"
-		if !HasSuffix(name, suffix) {
-			name += suffix
-		}
+		name = EnsureSuffix(name, ".toml")
 		return filepath.Join(configDir, name), nil
 	}
 
 	return filepath.Join(configDir, "config.toml"), nil
 }
 
-func HasSuffix(filename string, suffix string) bool {
-	return strings.HasSuffix(filename, suffix)
-}
-
 func EnsureSuffix(filename string, suffix string) string {
-	if !HasSuffix(filename, suffix) {
+	if !strings.HasSuffix(filename, suffix) {
 		return filename + suffix
 	}
 	return filename

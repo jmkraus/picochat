@@ -24,7 +24,7 @@ func ListHistoryFiles() (string, error) {
 
 	var result []string
 	for _, entry := range entries {
-		if !entry.IsDir() && paths.HasSuffix(entry.Name(), ".chat") {
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".chat") {
 			result = append(result, entry.Name())
 		}
 	}
