@@ -86,22 +86,22 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 
 Some commands can have an argument:
 
-#### \load `<filename>`
+#### /load `<filename>`
 
 Without a filename, an input line shows up, where the name can be entered. If the input is omitted (only _ENTER_), then the load process is cancelled.
 
 Filename is sufficient since the path is invariably set (see above). Suffix can be omitted, it is always `.chat`.
 
-#### \save `<filename>`
+#### /save `<filename>`
 
 Without a filename, the file is stored with a timestamp as filename, e.g. `2025-05-11_20-26-32.chat`.
 
 
-#### \copy
+#### /copy
 
 This command copies the full last answer into the clipboard. However, it removes the `<think>` section from reasoning models.
 
-If `\copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
+If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
 
 
 ### Multiline input
