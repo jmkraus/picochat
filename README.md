@@ -107,7 +107,7 @@ If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` 
 ### Multiline input
 Unlike Ollama, Picochat uses standard input instead of raw input. Besides the simpler implementation, I was also uncomfortable with the approach of multiline input enclosed by """.
 
-Sometimes I decided to enter more text but didn't start with """ so that I had to start from scratch. Therefore I considered a stop command as better solution for me. When entering a user prompt, as much text as desired can be entered or pasted. Press _ENTER_ for newline, then either enter `\done` or `\\\` followed by _ENTER_. Either will terminate the input and send it to the AI server.
+Sometimes I decided to enter more text but didn't start with """ so that I had to start from scratch. Therefore I considered a stop command as better solution for me. When entering a user prompt, as much text as desired can be entered or pasted. Press _ENTER_ for newline, then either enter `/done` or `///` followed by _ENTER_. Either will terminate the input and send it to the AI server.
 
 
 ### Personas
