@@ -76,7 +76,7 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /save      | Save current chat history to a file |
 | /load      | Load chat history from a file |
 | /list      | List available saved history files |
-| /models    | List downloaded models |
+| /models    | List (and switch) downloaded models |
 | /clear     | Clear history and reinitialize with system prompt |
 | /set       | Set session variables |
 | /discard   | Removes last assistant answer from history |
@@ -103,6 +103,9 @@ This command copies the full last answer into the clipboard. However, it removes
 
 If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
 
+#### /models `<index>`
+
+Without an argument, this command lists the available models of the LLM server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
 
 ### Multiline input
 Unlike Ollama, Picochat uses standard input instead of raw input. Besides the simpler implementation, I was also uncomfortable with the approach of multiline input enclosed by """.

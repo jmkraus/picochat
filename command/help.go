@@ -25,6 +25,12 @@ var helpTopics = map[string][]string{
 		"  /copy        Copy the last answer to clipboard",
 		"  /copy code   Copy only code between ``` to clipboard",
 	},
+	"models": {
+		"Available Commands:",
+		"  /models            Lists the available models of the LLM server",
+		"  /models <index>    Loads the model by index number",
+		"  To use the load option, list the available models first & check index",
+	},
 	"load": {
 		"Standard command:",
 		"  /load <filename>   Load the history file with name <filename>",
