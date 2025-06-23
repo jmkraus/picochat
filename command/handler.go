@@ -8,6 +8,7 @@ import (
 	"picochat/messages"
 	"picochat/requests"
 	"picochat/utils"
+	"strconv"
 	"strings"
 
 	"github.com/atotto/clipboard"
@@ -116,7 +117,16 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: models}
 		}
 
-		return CommandResult{Output: "Not implemented."}
+		index, err := strconv.Atoi(args)
+		if err != nil {
+			return CommandResult{Error: "value not an integer"}
+		}
+		model, ok := utils.GetModelsByIndex(index)
+		if !ok {
+			return CommandResult{Error: "no value for given index found"}
+		}
+		err = applyToConfig("model", model)
+		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'", model)}
 	case "/set":
 		if args == "" {
 			cfg := config.Get()

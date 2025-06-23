@@ -20,7 +20,7 @@ func Errorf(msg string, err error) {
 
 // Warn prints a warning message to stderr, prefixed with "warning:"
 func Warn(msg string) {
-	fmt.Fprintf(os.Stderr, "%s%s\n", warn_prefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", warn_prefix, msg)
 }
 
 // Info prints a message to stdout (normal output)
