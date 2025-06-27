@@ -106,7 +106,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 	case "/retry":
 		history.Discard()
-		return CommandResult{Output: "Repeating last chat history content.", Repeat: true}
+		return CommandResult{Output: "Repeating last chat history user prompt.", Repeat: true}
 	case "/models":
 		if args == "" {
 			models, err := utils.ShowAvailableModels(cfg.URL)
@@ -125,7 +125,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: "no value for given index found"}
 		}
 		err = applyToConfig("model", model)
-		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'", model)}
+		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
 	case "/set":
 		if args == "" {
 			cfg := config.Get()

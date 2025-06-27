@@ -69,7 +69,10 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) error {
 		return fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
 	}
 
-	history.Add("assistant", fullReply.String())
+	err = history.Add(messages.RoleAssistant, fullReply.String())
+	if err != nil {
+		return fmt.Errorf("could not add message to history: %w", err)
+	}
 	return nil
 }
 

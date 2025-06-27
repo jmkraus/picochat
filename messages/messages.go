@@ -13,6 +13,12 @@ import (
 
 const suffix string = ".chat"
 
+const (
+	RoleSystem    = "system"
+	RoleUser      = "user"
+	RoleAssistant = "assistant"
+)
+
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
@@ -26,17 +32,26 @@ type ChatHistory struct {
 
 func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 	return &ChatHistory{
-		Messages:   []Message{{Role: "system", Content: systemPrompt}},
+		Messages:   []Message{{Role: RoleSystem, Content: systemPrompt}},
 		MaxContext: maxContext,
 	}
 }
 
-func (h *ChatHistory) Add(role, content string) {
+func (h *ChatHistory) Add(role, content string) error {
+	switch role {
+	case "system", "user", "assistant":
+		// valid role options
+	default:
+		return fmt.Errorf("invalid role: %q", role)
+	}
+
 	h.Messages = append(h.Messages, Message{Role: role, Content: content})
 
 	if h.MaxContext > 0 {
 		h.Compress(h.MaxContext)
 	}
+
+	return nil
 }
 
 func (h *ChatHistory) Discard() {
@@ -45,7 +60,7 @@ func (h *ChatHistory) Discard() {
 	}
 
 	lastIndex := h.Len() - 1
-	if h.Messages[lastIndex].Role == "assistant" {
+	if h.Messages[lastIndex].Role == RoleAssistant {
 		h.Messages = h.Messages[:lastIndex]
 	}
 }
@@ -65,7 +80,7 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
-		return "", fmt.Errorf("history path not found.")
+		return "", fmt.Errorf("history path not found")
 	}
 	if filename == "" {
 		filename = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), suffix)
@@ -89,7 +104,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
-		return nil, fmt.Errorf("history path not found.")
+		return nil, fmt.Errorf("history path not found")
 	}
 	filename = paths.EnsureSuffix(filepath.Base(filename), suffix)
 	fullPath := filepath.Join(historyPath, filename)
@@ -101,7 +116,7 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 
 	var messages []Message
 	if err := json.Unmarshal(data, &messages); err != nil {
-		return nil, fmt.Errorf("could not parse JSON: %w", err)
+		return nil, fmt.Errorf("could not parse json: %w", err)
 	}
 
 	return &ChatHistory{Messages: messages}, nil

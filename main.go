@@ -15,7 +15,7 @@ import (
 )
 
 func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
-	history.Add("user", prompt)
+	history.Add(messages.RoleUser, prompt)
 	if err := chat.HandleChat(cfg, history); err != nil {
 		console.Error(err.Error())
 	}
@@ -27,8 +27,8 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 		return
 	}
 
-	lastUser := history.GetLast()
-	if lastUser.Role != "user" {
+	lastEntry := history.GetLast()
+	if lastEntry.Role != messages.RoleUser {
 		console.Warn("last entry in history is not a user prompt.")
 		return
 	}
@@ -88,7 +88,7 @@ func main() {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	console.Info("Chat with Pico AI started. Help with '/?'.")
+	console.Info("Chat with Pico AI started. Help with '/?'")
 
 	for {
 		fmt.Print("\n>>> ")

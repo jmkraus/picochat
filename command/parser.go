@@ -46,26 +46,26 @@ func validateAndConvert(key, value string) (any, error) {
 	case "temperature", "top_p":
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid float value for %s", key)
+			return nil, fmt.Errorf("invalid float value for key '%s'", key)
 		}
 		return v, nil
 	case "context":
 		v, err := strconv.Atoi(value)
 		if err != nil {
-			return nil, fmt.Errorf("invalid integer value for %s", key)
+			return nil, fmt.Errorf("invalid integer value for key '%s'", key)
 		}
 		return v, nil
 	case "model", "prompt":
 		return value, nil
 	default:
-		return nil, fmt.Errorf("unsupported config key %s", key)
+		return nil, fmt.Errorf("unsupported config key '%s'", key)
 	}
 }
 
 func applyToConfig(key string, value any) error {
 	fieldName, ok := allowedKeys[key]
 	if !ok {
-		return fmt.Errorf("unsupported config key: %s", key)
+		return fmt.Errorf("unsupported config key '%s'", key)
 	}
 
 	cfg := config.Get()
@@ -73,10 +73,10 @@ func applyToConfig(key string, value any) error {
 	field := v.FieldByName(fieldName) // find struct field
 
 	if !field.IsValid() {
-		return fmt.Errorf("field %s does not exist in Config", fieldName)
+		return fmt.Errorf("config key '%s' does not exist", fieldName)
 	}
 	if !field.CanSet() {
-		return fmt.Errorf("cannot set field %s", fieldName)
+		return fmt.Errorf("cannot set config key '%s'", fieldName)
 	}
 
 	valValue := reflect.ValueOf(value)
@@ -85,5 +85,5 @@ func applyToConfig(key string, value any) error {
 		return nil
 	}
 
-	return fmt.Errorf("cannot assign value of type %T to field %s", value, fieldName)
+	return fmt.Errorf("cannot assign value of type %T to config key '%s'", value, fieldName)
 }
