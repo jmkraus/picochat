@@ -29,7 +29,7 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 
 	lastUser := history.GetLast()
 	if lastUser.Role != "user" {
-		console.Warn("last entry in history is not a user prompt. consider '/discard'.")
+		console.Warn("last entry in history is not a user prompt.")
 		return
 	}
 

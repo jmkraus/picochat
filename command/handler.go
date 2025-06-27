@@ -56,7 +56,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		} else {
 			return CommandResult{Output: "Load cancelled."}
 		}
-	case "/show":
+	case "/info":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {
 			return CommandResult{Error: "fetching server version failed: " + err.Error()}
@@ -64,9 +64,10 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
 		messages := fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx())
+		tokens := fmt.Sprintf("Context token estimation: %d", history.EstimateTokens())
 		server := fmt.Sprintf("Server version is %s", serverVersion)
 
-		return CommandResult{Output: model + "\n" + messages + "\n" + server}
+		return CommandResult{Output: model + "\n" + messages + "\n" + tokens + "\n" + server}
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
@@ -103,10 +104,8 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			Output: fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
 			Prompt: text,
 		}
-	case "/discard":
-		history.Discard()
-		return CommandResult{Output: "Last answer removed from chat history."}
 	case "/retry":
+		history.Discard()
 		return CommandResult{Output: "Repeating last chat history content.", Repeat: true}
 	case "/models":
 		if args == "" {

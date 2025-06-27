@@ -72,15 +72,14 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /done, /// | Terminate the input and send |
 | /copy      | Copy the last answer to clipboard |
 | /paste     | Get clipboard content as user input and send |
-| /show      | Show number of messages in history |
+| /info      | Show system information |
 | /save      | Save current chat history to a file |
 | /load      | Load chat history from a file |
 | /list      | List available saved history files |
 | /models    | List (and switch) downloaded models |
 | /clear     | Clear history and reinitialize with system prompt |
 | /set       | Set session variables |
-| /discard   | Removes last assistant answer from history |
-| /retry     | Sends (unchanged) chat history again |
+| /retry     | Sends chat history again, but without last answer |
 | /bye       | Exit the chat |
 | /help, /?  | Show available commands |
 
