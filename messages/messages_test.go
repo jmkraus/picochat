@@ -40,6 +40,27 @@ func TestAddAndClear(t *testing.T) {
 	}
 }
 
+func TestChatHistory_Add_InvalidRole(t *testing.T) {
+	h := &messages.ChatHistory{}
+
+	initialLen := h.Len()
+
+	err := h.Add("alien", "we come in peace")
+
+	if err == nil {
+		t.Fatalf("expected error for invalid role, got nil")
+	}
+
+	if h.Len() != initialLen {
+		t.Errorf("expected message length to remain %d, got %d", initialLen, h.Len())
+	}
+
+	expectedErr := "invalid role 'alien'"
+	if err.Error() != expectedErr {
+		t.Errorf("unexpected error message:\nwant: %q\ngot:  %q", expectedErr, err.Error())
+	}
+}
+
 func TestSaveAndLoad(t *testing.T) {
 	h := messages.NewHistory("persist me", 5)
 	h.Add("user", "data")

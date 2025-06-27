@@ -39,19 +39,17 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 
 func (h *ChatHistory) Add(role, content string) error {
 	switch role {
-	case "system", "user", "assistant":
-		// valid role options
+	case RoleSystem, RoleUser, RoleAssistant:
+		h.Messages = append(h.Messages, Message{Role: role, Content: content})
+
+		if h.MaxContext > 0 {
+			h.Compress(h.MaxContext)
+		}
+
+		return nil
 	default:
-		return fmt.Errorf("invalid role: %q", role)
+		return fmt.Errorf("invalid role '%s'", role)
 	}
-
-	h.Messages = append(h.Messages, Message{Role: role, Content: content})
-
-	if h.MaxContext > 0 {
-		h.Compress(h.MaxContext)
-	}
-
-	return nil
 }
 
 func (h *ChatHistory) Discard() {
