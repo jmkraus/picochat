@@ -78,8 +78,12 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
-		return "", fmt.Errorf("history path not found")
+		return "", fmt.Errorf("history path not found: %w", err)
 	}
+	if historyPath == "" {
+		return "", fmt.Errorf("empty history path returned")
+	}
+
 	if filename == "" {
 		filename = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), suffix)
 	} else {
@@ -102,8 +106,12 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
-		return nil, fmt.Errorf("history path not found")
+		return nil, fmt.Errorf("history path not found: %w", err)
 	}
+	if historyPath == "" {
+		return nil, fmt.Errorf("empty history path returned")
+	}
+
 	filename = paths.EnsureSuffix(filepath.Base(filename), suffix)
 	fullPath := filepath.Join(historyPath, filename)
 

@@ -16,7 +16,7 @@ import (
 
 type CommandResult struct {
 	Output string
-	Error  string
+	Error  error
 	Quit   bool
 	Prompt string
 	Repeat bool
@@ -34,7 +34,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "/save":
 		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
-			return CommandResult{Error: "history save failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("history save failed: %w", err)}
 		}
 		return CommandResult{Output: fmt.Sprintf("History saved as '%s'", name)}
 	case "/load":
@@ -49,7 +49,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if len(filename) > 0 {
 			loaded, err := messages.LoadHistoryFromFile(filename)
 			if err != nil {
-				return CommandResult{Error: "history load failed: " + err.Error()}
+				return CommandResult{Error: fmt.Errorf("history load failed: %w", err)}
 			}
 			history.Replace(loaded.Get())
 			return CommandResult{Output: "History loaded successfully."}
@@ -59,7 +59,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "/info":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {
-			return CommandResult{Error: "fetching server version failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("fetching server version failed: %w", err)}
 		}
 
 		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
@@ -71,7 +71,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "/list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
-			return CommandResult{Error: "listing history files failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("listing history files failed: %w", err)}
 		}
 		return CommandResult{Output: files}
 	case "/copy":
@@ -81,23 +81,23 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		err := clipboard.WriteAll(lastAnswer)
 		if err != nil {
-			return CommandResult{Error: "clipboard failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("clipboard failed: %w", err)}
 		}
 		if utils.IsTmuxSession() {
 			err := utils.CopyToTmuxBufferStdin(lastAnswer)
 			if err != nil {
-				return CommandResult{Error: "tmux clipboard failed: " + err.Error()}
+				return CommandResult{Error: fmt.Errorf("tmux clipboard failed: %w", err)}
 			}
 		}
 		return CommandResult{Output: "Last answer written to clipboard."}
 	case "/paste":
 		text, err := clipboard.ReadAll()
 		if err != nil {
-			return CommandResult{Error: "clipboard read failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("clipboard read failed: %w", err)}
 		}
 		text = strings.TrimSpace(text)
 		if text == "" {
-			return CommandResult{Error: "clipboard is empty."}
+			return CommandResult{Error: fmt.Errorf("clipboard is empty.")}
 		}
 
 		return CommandResult{
@@ -111,18 +111,18 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if args == "" {
 			models, err := utils.ShowAvailableModels(cfg.URL)
 			if err != nil {
-				return CommandResult{Error: "models list failed: " + err.Error()}
+				return CommandResult{Error: fmt.Errorf("models list failed: %w", err)}
 			}
 			return CommandResult{Output: models}
 		}
 
 		index, err := strconv.Atoi(args)
 		if err != nil {
-			return CommandResult{Error: "value not an integer"}
+			return CommandResult{Error: fmt.Errorf("value not an integer")}
 		}
 		model, ok := utils.GetModelsByIndex(index)
 		if !ok {
-			return CommandResult{Error: "no value for given index found"}
+			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
 		err = applyToConfig("model", model)
 		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
@@ -141,20 +141,20 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		key, value, err := ParseArgs(args)
 		if err != nil {
-			return CommandResult{Error: "parse args failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
 		err = applyToConfig(key, value)
 		if err != nil {
-			return CommandResult{Error: "apply to config failed: " + err.Error()}
+			return CommandResult{Error: fmt.Errorf("apply to config failed: %w", err)}
 		}
 		if key == "context" {
 			intVal, ok := value.(int)
 			if !ok {
-				return CommandResult{Error: "value not an integer"}
+				return CommandResult{Error: fmt.Errorf("value not an integer")}
 			}
 			err := history.SetContextSize(intVal)
 			if err != nil {
-				return CommandResult{Error: "update context size failed: " + err.Error()}
+				return CommandResult{Error: fmt.Errorf("update context size failed: %w", err)}
 			}
 		}
 		return CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
@@ -164,7 +164,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "/help", "/?":
 		return CommandResult{Output: HelpText(args)}
 	default:
-		return CommandResult{Error: "unknown command"}
+		return CommandResult{Error: fmt.Errorf("unknown command")}
 	}
 }
 

@@ -17,7 +17,7 @@ import (
 func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
 	history.Add(messages.RoleUser, prompt)
 	if err := chat.HandleChat(cfg, history); err != nil {
-		console.Error(err.Error())
+		console.Error(err)
 	}
 }
 
@@ -34,7 +34,7 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 	}
 
 	if err := chat.HandleChat(cfg, history); err != nil {
-		console.Error(err.Error())
+		console.Error(err)
 	}
 }
 
@@ -100,8 +100,8 @@ func main() {
 			if result.Output != "" {
 				console.Info(result.Output)
 			}
-			if result.Error != "" {
-				console.Error(result.Error)
+			if result.Error != nil {
+				console.Errorf("command handler failed: %v", result.Error)
 			}
 			if result.Quit {
 				break
