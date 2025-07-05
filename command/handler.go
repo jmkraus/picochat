@@ -97,7 +97,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		text = strings.TrimSpace(text)
 		if text == "" {
-			return CommandResult{Error: fmt.Errorf("clipboard is empty.")}
+			return CommandResult{Error: fmt.Errorf("clipboard is empty")}
 		}
 
 		return CommandResult{

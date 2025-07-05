@@ -23,13 +23,13 @@ func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory
 
 func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 	if history.Len() < 2 {
-		console.Warn("chat history is empty.")
+		console.Warn("chat history is empty")
 		return
 	}
 
 	lastEntry := history.GetLast()
 	if lastEntry.Role != messages.RoleUser {
-		console.Warn("last entry in history is not a user prompt.")
+		console.Warn("last entry in history is not a user prompt")
 		return
 	}
 
