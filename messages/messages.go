@@ -97,7 +97,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	}
 
 	if err := os.WriteFile(fullPath, data, 0644); err != nil {
-		return "", fmt.Errorf("could not write file: %w", err)
+		return "", fmt.Errorf("could not write file %s: %w", filename, err)
 	}
 
 	return filename, nil
@@ -122,7 +122,7 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 
 	var messages []Message
 	if err := json.Unmarshal(data, &messages); err != nil {
-		return nil, fmt.Errorf("could not parse json: %w", err)
+		return nil, fmt.Errorf("could not parse json in file %s: %w", filename, err)
 	}
 
 	return &ChatHistory{Messages: messages}, nil

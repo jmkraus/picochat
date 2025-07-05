@@ -51,6 +51,10 @@ func readMultilineInput() (string, bool) {
 			return trimmed, true // input, isCommand
 		}
 
+		if trimmed == "/cancel" {
+			return "", false
+		}
+
 		if trimmed == "/done" || trimmed == "///" {
 			break
 		}
@@ -94,6 +98,11 @@ func main() {
 		fmt.Print("\n>>> ")
 
 		input, isCommand := readMultilineInput()
+
+		if input == "" && !isCommand {
+			fmt.Println("Input canceled.")
+			continue
+		}
 
 		if isCommand {
 			result := command.HandleCommand(input, history, os.Stdin)

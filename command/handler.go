@@ -27,17 +27,19 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
-	case "/done", "///":
+	case "done":
 		return CommandResult{Output: "Use this command for terminating a multi-line input."}
-	case "/bye":
+	case "cancel":
+		return CommandResult{Output: "Use this command for cancelling a multi-line input."}
+	case "bye":
 		return CommandResult{Output: "Chat has ended.", Quit: true}
-	case "/save":
+	case "save":
 		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("history save failed: %w", err)}
 		}
 		return CommandResult{Output: fmt.Sprintf("History saved as '%s'", name)}
-	case "/load":
+	case "load":
 		filename := args
 		if filename == "" {
 			fmt.Print("Enter filename to load: ")
@@ -56,7 +58,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		} else {
 			return CommandResult{Output: "Load cancelled."}
 		}
-	case "/info":
+	case "info":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("fetching server version failed: %w", err)}
@@ -68,13 +70,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		server := fmt.Sprintf("Server version is %s", serverVersion)
 
 		return CommandResult{Output: model + "\n" + messages + "\n" + tokens + "\n" + server}
-	case "/list":
+	case "list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("listing history files failed: %w", err)}
 		}
 		return CommandResult{Output: files}
-	case "/copy":
+	case "copy":
 		lastAnswer := utils.StripReasoning(history.GetLast().Content)
 		if args == "code" {
 			lastAnswer = utils.ExtractCodeBlock(lastAnswer)
@@ -90,7 +92,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			}
 		}
 		return CommandResult{Output: "Last answer written to clipboard."}
-	case "/paste":
+	case "paste":
 		text, err := clipboard.ReadAll()
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("clipboard read failed: %w", err)}
@@ -104,10 +106,10 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			Output: fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
 			Prompt: text,
 		}
-	case "/retry":
+	case "retry":
 		history.Discard()
 		return CommandResult{Output: "Repeating last chat history user prompt.", Repeat: true}
-	case "/models":
+	case "models":
 		if args == "" {
 			models, err := utils.ShowAvailableModels(cfg.URL)
 			if err != nil {
@@ -126,7 +128,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		err = applyToConfig("model", model)
 		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
-	case "/set":
+	case "set":
 		if args == "" {
 			cfg := config.Get()
 
@@ -158,10 +160,10 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			}
 		}
 		return CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
-	case "/clear":
+	case "clear":
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Output: "History cleared (system prompt retained)."}
-	case "/help", "/?":
+	case "help", "?":
 		return CommandResult{Output: HelpText(args)}
 	default:
 		return CommandResult{Error: fmt.Errorf("unknown command")}
@@ -174,6 +176,15 @@ func parseCommandArgs(input string) (string, string) {
 		return "", ""
 	}
 	cmd := strings.TrimSpace(parts[0])
+
+	// replace special abbreviation for done
+	if cmd == "///" {
+		cmd = "/done"
+	}
+
+	// normalize
+	cmd = strings.ToLower(strings.TrimPrefix(cmd, "/"))
+
 	arg := ""
 	if len(parts) > 1 {
 		arg = strings.TrimSpace(strings.Join(parts[1:], " "))
