@@ -35,13 +35,13 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) error {
 	}
 
 	start := time.Now()
-	resp, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
+	response, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("http request error for model %s: %w", cfg.Model, err)
 	}
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
-	decoder := json.NewDecoder(resp.Body)
+	decoder := json.NewDecoder(response.Body)
 	var fullReply strings.Builder
 
 	for {

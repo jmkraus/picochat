@@ -8,6 +8,7 @@ import (
 )
 
 func StripReasoning(answer string) string {
+	// re := regexp.MustCompile(`(?s)(?:<think>.*?</think>|^.*?</think>)`)
 	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
 	cleaned := re.ReplaceAllString(answer, "")
 	return cleaned

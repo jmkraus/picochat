@@ -73,7 +73,7 @@ func applyToConfig(key string, value any) error {
 	field := v.FieldByName(fieldName) // find struct field
 
 	if !field.IsValid() {
-		return fmt.Errorf("config key '%s' does not exist", fieldName)
+		return fmt.Errorf("unsupported config key '%s'", fieldName)
 	}
 	if !field.CanSet() {
 		return fmt.Errorf("cannot set config key '%s'", fieldName)

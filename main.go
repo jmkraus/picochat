@@ -51,16 +51,20 @@ func readMultilineInput() (string, bool) {
 			return trimmed, true // input, isCommand
 		}
 
-		if trimmed == "/cancel" {
+		switch trimmed {
+		case "/cancel":
 			return "", false
+		case "/done", "///":
+			return strings.Join(lines, "\n"), false
+		default:
+			lines = append(lines, line)
+			firstLine = false
 		}
+	}
 
-		if trimmed == "/done" || trimmed == "///" {
-			break
-		}
-
-		lines = append(lines, line)
-		firstLine = false
+	if err := scanner.Err(); err != nil {
+		console.Errorf("reading standard input: %v", err)
+		return "", false
 	}
 
 	return strings.Join(lines, "\n"), false
