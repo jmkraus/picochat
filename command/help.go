@@ -10,6 +10,7 @@ var helpTopics = map[string][]string{
 		"  /copy        Copy the last answer to clipboard",
 		"  /paste       Get clipboard content as user input and send",
 		"  /info        Show system information",
+		"  /message     Output last message again (e.g., after 'load')",
 		"  /load        Load a session",
 		"  /save        Save current session",
 		"  /list        List saved sessions",

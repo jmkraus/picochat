@@ -74,8 +74,9 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /copy      | Copy the last answer to clipboard |
 | /paste     | Get clipboard content as user input and send |
 | /info      | Show system information |
-| /save      | Save current chat history to a file |
+| /message   | Output last message again (e.g., after load) |
 | /load      | Load chat history from a file |
+| /save      | Save current chat history to a file |
 | /list      | List available saved history files |
 | /models    | List (and switch) downloaded models |
 | /clear     | Clear history and reinitialize with system prompt |

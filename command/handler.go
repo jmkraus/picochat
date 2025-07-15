@@ -70,6 +70,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		server := fmt.Sprintf("Server version is %s", serverVersion)
 
 		return CommandResult{Output: model + "\n" + messages + "\n" + tokens + "\n" + server}
+	case "message":
+		lastAnswer := utils.StripReasoning(history.GetLast().Content)
+		return CommandResult{Output: lastAnswer}
 	case "list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {
