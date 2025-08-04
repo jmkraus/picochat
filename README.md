@@ -80,7 +80,7 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /list      | List available saved history files |
 | /models    | List (and switch) downloaded models |
 | /clear     | Clear history and reinitialize with system prompt |
-| /set       | Set session variables |
+| /set       | Set session variables (key=value) |
 | /retry     | Sends chat history again, but without last answer |
 | /bye       | Exit the chat |
 | /help, /?  | Show available commands |
@@ -100,7 +100,7 @@ Without a filename, the file is stored with a timestamp as filename, e.g. `2025-
 
 #### /copy
 
-This command copies the full last answer into the clipboard. However, it removes the `<think>` section from reasoning models.
+This command copies the full last answer into the clipboard. However, it removes the `<think>` section from reasoning models. If the reasoning should be retained, then `/copy think` can be used instead.
 
 If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
 

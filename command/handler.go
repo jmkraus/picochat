@@ -80,7 +80,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Output: files}
 	case "copy":
-		lastAnswer := utils.StripReasoning(history.GetLast().Content)
+		lastAnswer := ""
+		if args == "think" {
+			lastAnswer = history.GetLast().Content
+		} else {
+			lastAnswer = utils.StripReasoning(history.GetLast().Content)
+		}
 		if args == "code" {
 			lastAnswer = utils.ExtractCodeBlock(lastAnswer)
 		}
