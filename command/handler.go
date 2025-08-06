@@ -4,14 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"picochat/clipb"
 	"picochat/config"
 	"picochat/messages"
 	"picochat/requests"
 	"picochat/utils"
 	"strconv"
 	"strings"
-
-	"github.com/atotto/clipboard"
 )
 
 type CommandResult struct {
@@ -89,27 +88,16 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if args == "code" {
 			lastAnswer = utils.ExtractCodeBlock(lastAnswer)
 		}
-		err := clipboard.WriteAll(lastAnswer)
+		err := clipb.PutToClipboard(lastAnswer)
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("clipboard failed: %w", err)}
-		}
-		if utils.IsTmuxSession() {
-			err := utils.CopyToTmuxBufferStdin(lastAnswer)
-			if err != nil {
-				return CommandResult{Error: fmt.Errorf("tmux clipboard failed: %w", err)}
-			}
+			return CommandResult{Error: err}
 		}
 		return CommandResult{Output: "Last answer written to clipboard."}
 	case "paste":
-		text, err := clipboard.ReadAll()
+		text, err := clipb.GetFromClipboard()
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("clipboard read failed: %w", err)}
+			return CommandResult{Error: err}
 		}
-		text = strings.TrimSpace(text)
-		if text == "" {
-			return CommandResult{Error: fmt.Errorf("clipboard is empty")}
-		}
-
 		return CommandResult{
 			Output: fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
 			Prompt: text,

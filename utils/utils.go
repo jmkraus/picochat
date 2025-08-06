@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 )
@@ -47,14 +45,4 @@ func ExtractCodeBlock(s string) string {
 		return match[1]
 	}
 	return ""
-}
-
-func IsTmuxSession() bool {
-	return os.Getenv("TMUX") != ""
-}
-
-func CopyToTmuxBufferStdin(text string) error {
-	cmd := exec.Command("tmux", "load-buffer", "-")
-	cmd.Stdin = strings.NewReader(text)
-	return cmd.Run()
 }
