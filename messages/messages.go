@@ -41,8 +41,16 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 func (h *ChatHistory) Add(role, content string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
-		clearContent := StripReasoning(content)
-		h.Messages = append(h.Messages, Message{Role: role, Content: clearContent, Raw: content})
+		clear := content
+		raw := content
+
+		if role == RoleAssistant {
+			clear = StripReasoning(content)
+		} else {
+			raw = ""
+		}
+
+		h.Messages = append(h.Messages, Message{Role: role, Content: clear, Raw: raw})
 
 		if h.MaxContext > 0 {
 			h.Compress(h.MaxContext)
