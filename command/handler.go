@@ -70,7 +70,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		return CommandResult{Output: model + "\n" + messages + "\n" + tokens + "\n" + server}
 	case "message":
-		lastAnswer := utils.StripReasoning(history.GetLast().Content)
+		lastAnswer := messages.StripReasoning(history.GetLast().Content)
 		return CommandResult{Output: lastAnswer}
 	case "list":
 		files, err := utils.ListHistoryFiles()
@@ -83,10 +83,10 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if args == "think" {
 			lastAnswer = history.GetLast().Content
 		} else {
-			lastAnswer = utils.StripReasoning(history.GetLast().Content)
+			lastAnswer = messages.StripReasoning(history.GetLast().Content)
 		}
 		if args == "code" {
-			lastAnswer = utils.ExtractCodeBlock(lastAnswer)
+			lastAnswer = messages.ExtractCodeBlock(lastAnswer)
 		}
 		err := clipb.PutToClipboard(lastAnswer)
 		if err != nil {
@@ -123,6 +123,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
 		err = applyToConfig("model", model)
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("apply value to config failed: %w", err)}
+		}
 		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
 	case "set":
 		if args == "" {
