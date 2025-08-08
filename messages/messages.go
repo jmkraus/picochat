@@ -22,6 +22,7 @@ const (
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
+	Raw     string `json:"-"`
 }
 
 type ChatHistory struct {
@@ -40,7 +41,8 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 func (h *ChatHistory) Add(role, content string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
-		h.Messages = append(h.Messages, Message{Role: role, Content: content})
+		clearContent := StripReasoning(content)
+		h.Messages = append(h.Messages, Message{Role: role, Content: clearContent, Raw: content})
 
 		if h.MaxContext > 0 {
 			h.Compress(h.MaxContext)

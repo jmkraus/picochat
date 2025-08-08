@@ -81,9 +81,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "copy":
 		lastAnswer := ""
 		if args == "think" {
-			lastAnswer = history.GetLast().Content
+			lastAnswer = history.GetLast().Raw
 		} else {
-			lastAnswer = messages.StripReasoning(history.GetLast().Content)
+			lastAnswer = history.GetLast().Content
 		}
 		if args == "code" {
 			lastAnswer = messages.ExtractCodeBlock(lastAnswer)
