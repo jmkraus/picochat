@@ -55,7 +55,7 @@ func validateAndConvert(key, value string) (any, error) {
 			return nil, fmt.Errorf("invalid integer value for key '%s'", key)
 		}
 		return v, nil
-	case "model", "prompt":
+	case "model":
 		return value, nil
 	default:
 		return nil, fmt.Errorf("unsupported config key '%s'", key)

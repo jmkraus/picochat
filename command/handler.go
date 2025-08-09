@@ -132,6 +132,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			cfg := config.Get()
 
 			list := []string{
+				fmt.Sprintf("model = %s", cfg.Model),
 				fmt.Sprintf("context = %d", cfg.Context),
 				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
 				fmt.Sprintf("top_p = %.2f", cfg.TopP),
@@ -176,9 +177,14 @@ func parseCommandArgs(input string) (string, string) {
 	}
 	cmd := strings.TrimSpace(parts[0])
 
-	// replace special abbreviation for done
-	if cmd == "///" {
+	// replace special abbreviations
+	switch cmd {
+	case "///":
 		cmd = "/done"
+	case "/c":
+		cmd = "/copy"
+	case "/v":
+		cmd = "/paste"
 	}
 
 	// normalize
