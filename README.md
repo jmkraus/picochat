@@ -1,20 +1,20 @@
 # Pico Chat - a CLI Chat Client
 
 ## Purpose
-Unlike similar tools like ollama, the Mac-only app "[Pico AI Server](https://picogpt.app/)" doesn't come with a dedicated CLI client.
+Unlike similar tools such as **Ollama**, the Mac‑only app “Pico AI Server” doesn’t come with a dedicated CLI client.
 
 This tool fills the gap and has some additional tricks up its sleeve.
 
 ## Installation
 
-The released binary is unsigned. To use it on your Mac, you have two options:
+The released binary is unsigned. To use it on a Mac, there are two options:
 
  1. Build picochat from the source code
  2. Remove the quarantine tag from the binary
 
 ### Build picochat
 
- * add the required libraries to your local Go setup
+ Add the required libraries to your local Go setup.
 
  ```
   go get github.com/atotto/clipboard
@@ -26,11 +26,11 @@ The released binary is unsigned. To use it on your Mac, you have two options:
 
 ### Remove the quarantine flag
 
-Go in the target folder where you placed the binary and enter the following:
+Navigate to the target folder where the binary was placed and enter the following:
 
 `sudo xattr -rd com.apple.quarantine ./picochat`
 
-You need to enter your administrator PW to confirm. Then the binary does work.
+Enter the administrator password to confirm. Then the binary works.
 
 ## Usage
 
@@ -48,20 +48,20 @@ picochat expects a configuration file. If no specific name is given, it looks fo
 
 The lookup for the configuration file is in the following order:
 
- 1. Full path is given with `-config` arg
- 2. Environment variable `CONFIG_PATH` is set
- 3. Environment variable  `XDG_CONFIG_HOME` is set (looking for /picochat)
- 4. User Home Dir (looking for .config/picochat)
- 5. Same folder where the executable is placed
+ 1. Full path is given with the `-config` argument.
+ 2. Environment variable `CONFIG_PATH` is set.
+ 3. Environment variable  `XDG_CONFIG_HOME` is set (searches for /picochat).
+ 4. User home directory (searches for .config/picochat).
+ 5. Same folder where the executable is placed.
 
 The history files (see below) are invariably stored in a subfolder of the picochat config folder, e.g. `.config/picochat/history`.
 
 Picochat currently supports four configurable values in the config file:
 
- * Link to the core api endpoint (default usually `http://localhost:11434/api`)
+ * Link to the core **API** endpoint (default usually `http://localhost:11434/api`).
  * Model name (must be already downloaded!)
  * Context size (must be a value between 5 and 100) - this is the number of messages!
- * System prompt ("Persona") where a specific skill or background can be specified
+ * System prompt ("Persona") where a specific skill or background can be specified.
 
 Since Pico AI currently doesn't report token counts, it is difficult to calculate a proper context size. Maybe this changes in the future, but for now the context size is limited by the number of total messages, where the oldest ones are dropped when the limit is reached.
 
@@ -89,9 +89,9 @@ Some commands can have an argument:
 
 #### /load `<filename>`
 
-Without a filename, an input line shows up, where the name can be entered. If the input is omitted (only _ENTER_), then the load process is cancelled.
+Without a filename, an input line appears, where the name can be entered. If the input is omitted (only _ENTER_), then the load process is cancelled.
 
-Filename is sufficient since the path is invariably set (see above). Suffix can be omitted, it is always `.chat`.
+The filename is sufficient because the path is invariably set (see above). Suffix can be omitted, it is always `.chat`.
 
 #### /save `<filename>`
 
@@ -106,7 +106,7 @@ If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` 
 
 #### /models `<index>`
 
-Without an argument, this command lists the available models of the LLM server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
+Without an argument, this command lists the available models of the **LLM** server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
 
 ### Multiline input
 Picochat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
@@ -117,17 +117,17 @@ Multiline input can be cancelled at any time by entering `/cancel`, returning th
 
 ### Personas
 
-Picochat allows basic persona handling: Store different configuration files in your config-path, e.g. "generic.toml" or "developer.toml" with specific system prompts.
+Picochat allows basic persona handling: Store different configuration files in the config path, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
 
-You can load this configuration using a shortcut, such as `picochat -config @developer`. The path and ".toml" suffix can be omitted since they are implied by the '@' symbol. Then picochat starts with the specified configuration file.
+This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because they are implied by the '@' symbol. Picochat then starts with the specified configuration file.
 
 
 ## Acknowledgements
 
-Big shoutout to the providers of the libraries I used for this project:
+Big shoutout to the providers of the libraries used in this project:
 
- * [The TOML library by BurntSushi](https://github.com/BurntSushi/toml)
- * [Atotto's clipboard library for Go](https://github.com/atotto/clipboard)
+ * [The TOML library by BurntSushi](https://github.com/BurntSushi/toml).
+ * [Atotto's clipboard library for Go](https://github.com/atotto/clipboard).
 
 
 ## License
