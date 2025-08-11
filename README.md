@@ -71,8 +71,8 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | ---------- | ------------------------------------------------- |
 | /done, /// | Terminate the input and send |
 | /cancel    | Cancel multi-line input and return to prompt |
-| /copy      | Copy the last answer to clipboard |
-| /paste     | Get clipboard content as user input and send |
+| /copy, /c  | Copy the last answer to clipboard |
+| /paste, /v | Get clipboard content as user input and send |
 | /info      | Show system information |
 | /message   | Output last message again (e.g., after load) |
 | /load      | Load chat history from a file |
@@ -109,11 +109,11 @@ If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` 
 Without an argument, this command lists the available models of the LLM server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
 
 ### Multiline input
-Unlike Ollama, Picochat uses standard input instead of raw input. Besides the simpler implementation, I was also uncomfortable with the approach of multiline input enclosed by """.
+Picochat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
 
-Sometimes I decided to enter more text but didn't start with """ so that I had to start from scratch. Therefore I considered a stop command as better solution for me. When entering a user prompt, as much text as desired can be entered or pasted. Press _ENTER_ for newline, then either enter `/done` or `///` followed by _ENTER_. Either will terminate the input and send it to the AI server.
+Users can enter or paste as much text as needed for a prompt. Input is terminated by entering `/done` or `///` on a new line.
 
-With the command `/cancel` a multiline input can be cancelled. Picochat returns to the prompt without sending anything.
+Multiline input can be cancelled at any time by entering `/cancel`, returning the user to the prompt without sending the input.
 
 ### Personas
 
