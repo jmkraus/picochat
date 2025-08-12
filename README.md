@@ -1,7 +1,7 @@
 # Pico Chat - a CLI Chat Client
 
 ## Purpose
-Unlike similar tools such as **Ollama**, the Mac‑only app “Pico AI Server” doesn’t come with a dedicated CLI client.
+The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, does not include a dedicated CLI client.
 
 This tool fills the gap and has some additional tricks up its sleeve.
 
