@@ -5,32 +5,33 @@ import (
 	"strings"
 )
 
-func StripReasoning(input string) string {
+func StripReasoning(s string) string {
 	// 1st case: correct pair <think>...</think>
 	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
-	if re.MatchString(input) {
-		cleaned := re.ReplaceAllString(input, "")
+	if re.MatchString(s) {
+		cleaned := re.ReplaceAllString(s, "")
 		return TrimEmptyLines(cleaned)
 	}
 
 	// 2nd case: only </think> exists
-	if idx := strings.Index(input, "</think>"); idx != -1 {
-		cleaned := input[idx+len("</think>"):]
+	if idx := strings.Index(s, "</think>"); idx != -1 {
+		cleaned := s[idx+len("</think>"):]
 		return TrimEmptyLines(cleaned)
 	}
 
 	// 3rd case: no changes
-	return input
+	return s
 }
 
 func TrimEmptyLines(s string) string {
 	lines := strings.Split(s, "\n")
 
-	// Anfang: leere Zeilen entfernen
+	// before
 	for len(lines) > 0 && strings.TrimSpace(lines[0]) == "" {
 		lines = lines[1:]
 	}
-	// Ende: leere Zeilen entfernen
+
+	// after
 	for len(lines) > 0 && strings.TrimSpace(lines[len(lines)-1]) == "" {
 		lines = lines[:len(lines)-1]
 	}
@@ -38,11 +39,11 @@ func TrimEmptyLines(s string) string {
 	return strings.Join(lines, "\n")
 }
 
-func ExtractCodeBlock(s string) string {
+func ExtractCodeBlock(s string) (string, bool) {
 	re := regexp.MustCompile("(?s)```\\w*\\n(.*?)```")
 	match := re.FindStringSubmatch(s)
 	if len(match) >= 2 {
-		return match[1]
+		return match[1], true
 	}
-	return ""
+	return "", false
 }

@@ -86,7 +86,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			lastAnswer = history.GetLast().Content
 		}
 		if args == "code" {
-			lastAnswer = messages.ExtractCodeBlock(lastAnswer)
+			codeBlock, found := messages.ExtractCodeBlock(lastAnswer)
+			if found {
+				lastAnswer = codeBlock
+			} else {
+				return CommandResult{Output: "Nothing to copy."}
+			}
 		}
 		err := clipb.PutToClipboard(lastAnswer)
 		if err != nil {
