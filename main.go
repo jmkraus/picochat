@@ -59,6 +59,10 @@ func readMultilineInput() (string, bool) {
 		default:
 			lines = append(lines, line)
 			firstLine = false
+			result, suffix := strings.CutSuffix(trimmed, "///")
+			if suffix {
+				return result, false
+			}
 		}
 	}
 

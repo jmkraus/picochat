@@ -60,7 +60,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) error {
 
 		if res.Done {
 			t := elapsedTime(start)
-			fmt.Printf("\nElapsed (mm:ss): %s; Tokens: prompt_eval_count: %d, eval_count: %d", t, res.PromptEvalCount, res.EvalCount)
+			fmt.Printf("\nElapsed (mm:ss): %s; Tokens: prompt_eval_count: %d, eval_count: %d\n", t, res.PromptEvalCount, res.EvalCount)
 			break
 		}
 	}

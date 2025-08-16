@@ -111,7 +111,7 @@ Without an argument, this command lists the available models of the **LLM** serv
 ### Multiline input
 Picochat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
 
-Users can enter or paste as much text as needed for a prompt. Input is terminated by entering `/done` or `///` on a new line.
+Users can enter or paste as much text as needed for a prompt. Input is terminated by entering `/done` or `///` on a new line. Single lines can also be terminated by `///` in the same line.
 
 Multiline input can be cancelled at any time by entering `/cancel`, returning the user to the prompt without sending the input.
 

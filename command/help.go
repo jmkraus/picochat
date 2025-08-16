@@ -44,6 +44,12 @@ var helpTopics = map[string][]string{
 		"  /save <filename>   Save the history file with name <filename>",
 		"  If <filename> is omitted, the filename is set as current timestamp.",
 	},
+	"set": {
+		"Available Commands:",
+		"  /set             Show available parameters and current settings",
+		"  /set <key=val>   Set the parameter <key> to new setting <val>",
+		"  Example: /set temperature=0.9",
+	},
 }
 
 func HelpText(topic string) string {

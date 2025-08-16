@@ -163,7 +163,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "clear":
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Output: "History cleared (system prompt retained)."}
-	case "help", "?":
+	case "help":
 		return CommandResult{Output: HelpText(args)}
 	default:
 		return CommandResult{Error: fmt.Errorf("unknown command")}
@@ -185,6 +185,8 @@ func parseCommandArgs(input string) (string, string) {
 		cmd = "/copy"
 	case "/v":
 		cmd = "/paste"
+	case "/?":
+		cmd = "/help"
 	}
 
 	// normalize
