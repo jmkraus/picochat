@@ -233,6 +233,48 @@ func TestGetLastMessage(t *testing.T) {
 	}
 }
 
+func TestGetLastRole(t *testing.T) {
+	h := messages.NewHistory("init", 5)
+	h.Add("user", "hello")
+	h.Add("assistant", "hi")
+	h.Add("user", "bye")
+
+	t.Run("find last user", func(t *testing.T) {
+		msg, ok := h.GetLastRole("user")
+		if !ok {
+			t.Fatalf("expected to find user message, got none")
+		}
+		if msg.Content != "bye" {
+			t.Errorf("expected last user message 'bye', got %q", msg.Content)
+		}
+	})
+
+	t.Run("find last assistant", func(t *testing.T) {
+		msg, ok := h.GetLastRole("assistant")
+		if !ok {
+			t.Fatalf("expected to find assistant message, got none")
+		}
+		if msg.Content != "hi" {
+			t.Errorf("expected assistant message 'hi', got %q", msg.Content)
+		}
+	})
+
+	t.Run("role not found", func(t *testing.T) {
+		_, ok := h.GetLastRole("foobar")
+		if ok {
+			t.Errorf("expected no match for 'foobar', but got one")
+		}
+	})
+
+	t.Run("empty history", func(t *testing.T) {
+		empty := messages.NewHistory("empty", 5)
+		_, ok := empty.GetLastRole("user")
+		if ok {
+			t.Errorf("expected no match in empty history, but got one")
+		}
+	})
+}
+
 func TestIsEmpty(t *testing.T) {
 	h := messages.NewHistory("only system", 5)
 	if !h.IsEmpty() {
