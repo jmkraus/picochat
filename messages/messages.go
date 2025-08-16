@@ -82,9 +82,9 @@ func (h *ChatHistory) GetLast() Message {
 }
 
 func (h *ChatHistory) GetLastRole(role string) (Message, bool) {
-	for i := h.Len(); i > 0; i-- {
-		if h.Messages[i-1].Role == role {
-			return h.Messages[i-1], true
+	for i := h.Len() - 1; i >= 0; i-- {
+		if h.Messages[i].Role == role {
+			return h.Messages[i], true
 		}
 	}
 	return Message{}, false

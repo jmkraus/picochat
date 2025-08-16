@@ -6,6 +6,7 @@ import (
 	"picochat/paths"
 	"picochat/requests"
 	"strings"
+	"unicode"
 )
 
 // Global cache for list selections (/list, /models)
@@ -59,7 +60,7 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 	}
 
 	SetModelsList(models)
-	return FormatList(models, "models", true), nil
+	return FormatList(models, "Language models", true), nil
 }
 
 // Filled by /list command
@@ -104,5 +105,14 @@ func FormatList(content []string, heading string, numbered bool) string {
 		}
 	}
 
-	return fmt.Sprintf("Available %s:\n%s", strings.ToLower(heading), strings.Join(lines, "\n"))
+	return fmt.Sprintf("%s:\n%s", capitalize(heading), strings.Join(lines, "\n"))
+}
+
+func capitalize(s string) string {
+	if s == "" {
+		return ""
+	}
+	runes := []rune(strings.ToLower(s))
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }

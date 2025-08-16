@@ -6,7 +6,7 @@ import (
 
 func TestFormatList_WithBullets(t *testing.T) {
 	items := []string{"first.chat", "second.chat"}
-	expected := "Available history files:\n - first.chat\n - second.chat"
+	expected := "History files:\n - first.chat\n - second.chat"
 
 	result := FormatList(items, "history files", false)
 
@@ -17,9 +17,9 @@ func TestFormatList_WithBullets(t *testing.T) {
 
 func TestFormatList_WithNumbers(t *testing.T) {
 	items := []string{"model-a", "model-b", "model-c"}
-	expected := "Available models:\n(01) model-a\n(02) model-b\n(03) model-c"
+	expected := "Language models:\n(01) model-a\n(02) model-b\n(03) model-c"
 
-	result := FormatList(items, "models", true)
+	result := FormatList(items, "language models", true)
 
 	if result != expected {
 		t.Errorf("Expected:\n%q\nGot:\n%q", expected, result)

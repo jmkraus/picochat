@@ -4,7 +4,6 @@ import "strings"
 
 var helpTopics = map[string][]string{
 	"": {
-		"Available Commands:",
 		"  /done, ///   Terminate the input message and send",
 		"  /cancel      Cancel multi-line input and return to prompt",
 		"  /copy, /c    Copy the last answer to clipboard",
@@ -22,36 +21,30 @@ var helpTopics = map[string][]string{
 		"  /help, /?    Show available commands",
 	},
 	"copy": {
-		"Available Commands:",
 		"  /copy         Copy the last answer to clipboard",
 		"  /copy think   Copy the last answer to clipboard & retain reasoning",
 		"  /copy code    Copy only code snipped between ``` to clipboard",
 	},
 	"load": {
-		"Standard command:",
 		"  /load <filename>   Load the history file with name <filename>",
 		"  If <filename> is omitted, the filename is requested by input line.",
 		"  If no filename is entered, the load is cancelled.",
 	},
 	"message": {
-		"Available Commands:",
 		"  /message           Shows the last entry in the chat history",
 		"  /message <role>    Shows the last entry of the given role",
 		"  Valid roles: system, user, assistant",
 	},
 	"models": {
-		"Available Commands:",
 		"  /models            Lists the available models of the LLM server",
 		"  /models <index>    Loads the model by index number",
 		"  To use the load option, list the available models first & check index",
 	},
 	"save": {
-		"Standard command:",
 		"  /save <filename>   Save the history file with name <filename>",
 		"  If <filename> is omitted, the filename is set as current timestamp.",
 	},
 	"set": {
-		"Available Commands:",
 		"  /set             Show available parameters and current settings",
 		"  /set <key=val>   Set the parameter <key> to new setting <val>",
 		"  Example: /set temperature=0.9",
@@ -62,7 +55,8 @@ func HelpText(topic string) string {
 	topic = strings.ToLower(strings.TrimSpace(topic))
 
 	if lines, ok := helpTopics[topic]; ok {
-		return strings.Join(lines, "\n")
+		help := append([]string{"Available commands:"}, lines...)
+		return strings.Join(help, "\n")
 	}
 	return "No help available for: " + topic + "\nUse /help for a list of commands."
 }

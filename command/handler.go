@@ -63,12 +63,14 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("fetching server version failed: %w", err)}
 		}
 
-		model := fmt.Sprintf("Current model is '%s'", cfg.Model)
-		messages := fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx())
-		tokens := fmt.Sprintf("Context token estimation: %d", history.EstimateTokens())
-		server := fmt.Sprintf("Server version is %s", serverVersion)
+		list := []string{
+			fmt.Sprintf("Current model is '%s'", cfg.Model),
+			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),
+			fmt.Sprintf("Context token estimation: %d", history.EstimateTokens()),
+			fmt.Sprintf("Server version is %s", serverVersion),
+		}
 
-		return CommandResult{Output: model + "\n" + messages + "\n" + tokens + "\n" + server}
+		return CommandResult{Output: utils.FormatList(list, "Server info", false)}
 	case "message":
 		switch args {
 		case "system", "user", "assistant":
@@ -172,7 +174,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			}
 			err := history.SetContextSize(intVal)
 			if err != nil {
-				return CommandResult{Error: fmt.Errorf("update context size failed: %w", err)}
+				return CommandResult{Error: fmt.Errorf("set context size failed: %w", err)}
 			}
 		}
 		return CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
