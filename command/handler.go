@@ -70,8 +70,19 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		return CommandResult{Output: model + "\n" + messages + "\n" + tokens + "\n" + server}
 	case "message":
-		lastAnswer := history.GetLast().Content
-		return CommandResult{Output: lastAnswer}
+		switch args {
+		case "system", "user", "assistant":
+			msg, found := history.GetLastRole(args)
+			if found {
+				return CommandResult{Output: msg.Content}
+			} else {
+				return CommandResult{Output: fmt.Sprintf("No matching history for role type '%s' found.", args)}
+			}
+		default:
+			msg := history.GetLast().Content
+			return CommandResult{Output: msg}
+
+		}
 	case "list":
 		files, err := utils.ListHistoryFiles()
 		if err != nil {

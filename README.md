@@ -74,7 +74,7 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /copy, /c  | Copy the last answer to clipboard |
 | /paste, /v | Get clipboard content as user input and send |
 | /info      | Show system information |
-| /message   | Output last message again (e.g., after load) |
+| /message   | Show last message again (e.g., after load) |
 | /load      | Load chat history from a file |
 | /save      | Save current chat history to a file |
 | /list      | List available saved history files |
@@ -107,6 +107,22 @@ If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` 
 #### /models `<index>`
 
 Without an argument, this command lists the available models of the **LLM** server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
+
+#### /set `<key=value>`
+
+Without an argument, the command lists the available parameters and show their current values.
+
+With the optional argument the parameter values can be changed for the current session, e.g., `/set top_p=0.3`.
+
+The Values are not persistent and cannot be stored. For permanent changes, the config.toml entries must be edited.
+
+#### /message `<role>`
+
+Without the argument, the last entry of the chat history (usually an assistant answer) will be shown.
+
+With one of the possible roles (system, user, assistant), the specific last entry of the chat history can be chosen.
+
+E.g., when entering `/message user`, then the last user question will be displayed again.
 
 ### Multiline input
 Picochat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.

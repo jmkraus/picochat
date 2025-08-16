@@ -10,7 +10,7 @@ var helpTopics = map[string][]string{
 		"  /copy, /c    Copy the last answer to clipboard",
 		"  /paste, /v   Get clipboard content as user input and send",
 		"  /info        Show system information",
-		"  /message     Output last message again (e.g., after 'load')",
+		"  /message     Show last message again",
 		"  /load        Load a session",
 		"  /save        Save current session",
 		"  /list        List saved sessions",
@@ -27,17 +27,23 @@ var helpTopics = map[string][]string{
 		"  /copy think   Copy the last answer to clipboard & retain reasoning",
 		"  /copy code    Copy only code snipped between ``` to clipboard",
 	},
-	"models": {
-		"Available Commands:",
-		"  /models            Lists the available models of the LLM server",
-		"  /models <index>    Loads the model by index number",
-		"  To use the load option, list the available models first & check index",
-	},
 	"load": {
 		"Standard command:",
 		"  /load <filename>   Load the history file with name <filename>",
 		"  If <filename> is omitted, the filename is requested by input line.",
 		"  If no filename is entered, the load is cancelled.",
+	},
+	"message": {
+		"Available Commands:",
+		"  /message           Shows the last entry in the chat history",
+		"  /message <role>    Shows the last entry of the given role",
+		"  Valid roles: system, user, assistant",
+	},
+	"models": {
+		"Available Commands:",
+		"  /models            Lists the available models of the LLM server",
+		"  /models <index>    Loads the model by index number",
+		"  To use the load option, list the available models first & check index",
 	},
 	"save": {
 		"Standard command:",

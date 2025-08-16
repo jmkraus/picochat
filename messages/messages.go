@@ -78,7 +78,16 @@ func (h *ChatHistory) Get() []Message {
 }
 
 func (h *ChatHistory) GetLast() Message {
-	return h.Get()[h.Len()-1]
+	return h.Messages[h.Len()-1]
+}
+
+func (h *ChatHistory) GetLastRole(role string) (Message, bool) {
+	for i := h.Len(); i > 0; i-- {
+		if h.Messages[i-1].Role == role {
+			return h.Messages[i-1], true
+		}
+	}
+	return Message{}, false
 }
 
 func (h *ChatHistory) Replace(newMessages []Message) {
