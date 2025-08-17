@@ -1,6 +1,9 @@
 package command
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 var helpTopics = map[string][]string{
 	"": {
@@ -23,7 +26,7 @@ var helpTopics = map[string][]string{
 	"copy": {
 		"  /copy         Copy the last answer to clipboard",
 		"  /copy think   Copy the last answer to clipboard & retain reasoning",
-		"  /copy code    Copy only code snipped between ``` to clipboard",
+		"  /copy code    Copy only code snippets between ``` to clipboard",
 	},
 	"load": {
 		"  /load <filename>   Load the history file with name <filename>",
@@ -45,9 +48,9 @@ var helpTopics = map[string][]string{
 		"  If <filename> is omitted, the filename is set as current timestamp.",
 	},
 	"set": {
-		"  /set             Show available parameters and current settings",
-		"  /set <key=val>   Set the parameter <key> to new setting <val>",
-		"  Example: /set temperature=0.9",
+		"  /set               Show available parameters and current settings",
+		"  /set <key=value>   Set the parameter <key> to new setting <value>",
+		"  Example: /set temperature=0.7",
 	},
 }
 
@@ -58,5 +61,5 @@ func HelpText(topic string) string {
 		help := append([]string{"Available commands:"}, lines...)
 		return strings.Join(help, "\n")
 	}
-	return "No help available for: " + topic + "\nUse /help for a list of commands."
+	return fmt.Sprintf("No help available for: %s. Use /help for a list of commands.", topic)
 }
