@@ -11,21 +11,21 @@ func TestIsTmuxSession(t *testing.T) {
 	defer os.Setenv("TMUX", prev)
 
 	os.Unsetenv("TMUX")
-	if IsTmuxSession() {
+	if isTmuxSession() {
 		t.Error("Expected false when TMUX not set")
 	}
 
 	os.Setenv("TMUX", "/tmp/tmux-1234/default,1234,0")
-	if !IsTmuxSession() {
+	if !isTmuxSession() {
 		t.Error("Expected true when TMUX is set")
 	}
 }
 
 func TestCopyToTmuxBufferStdin(t *testing.T) {
-	if !IsTmuxSession() {
+	if !isTmuxSession() {
 		t.Skip("Skipping test because not in tmux session")
 	}
-	err := CopyToTmuxBufferStdin("Hello tmux")
+	err := copyToTmuxBufferStdin("Hello tmux")
 	if err != nil {
 		t.Errorf("Failed to copy to tmux buffer: %v", err)
 	}

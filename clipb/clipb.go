@@ -9,11 +9,11 @@ import (
 	"github.com/atotto/clipboard"
 )
 
-func IsTmuxSession() bool {
+func isTmuxSession() bool {
 	return os.Getenv("TMUX") != ""
 }
 
-func CopyToTmuxBufferStdin(text string) error {
+func copyToTmuxBufferStdin(text string) error {
 	cmd := exec.Command("tmux", "load-buffer", "-")
 	cmd.Stdin = strings.NewReader(text)
 	return cmd.Run()
@@ -34,12 +34,12 @@ func GetFromClipboard() (string, error) {
 func PutToClipboard(text string) error {
 	err := clipboard.WriteAll(text)
 	if err != nil {
-		return fmt.Errorf("clipboard failed: %w", err)
+		return fmt.Errorf("clipboard write failed: %w", err)
 	}
-	if IsTmuxSession() {
-		err := CopyToTmuxBufferStdin(text)
+	if isTmuxSession() {
+		err := copyToTmuxBufferStdin(text)
 		if err != nil {
-			return fmt.Errorf("tmux clipboard failed: %w", err)
+			return fmt.Errorf("tmux clipboard write failed: %w", err)
 		}
 	}
 	return nil
