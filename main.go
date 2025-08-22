@@ -100,7 +100,7 @@ func main() {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	console.Info("Chat with Pico AI started. Help with '/?'")
+	console.Info("PicoChat started. Help with '/?'")
 
 	for {
 		fmt.Print("\n>>> ")

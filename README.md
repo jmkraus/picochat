@@ -1,4 +1,4 @@
-# Pico Chat - a CLI Chat Client
+# PicoChat - a CLI Chat Client
 
 ## Purpose
 The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, does not include a dedicated CLI client.
@@ -9,10 +9,10 @@ This tool fills the gap and has some additional tricks up its sleeve.
 
 The released binary is unsigned. To use it on a Mac, there are two options:
 
- 1. Build picochat from the source code
+ 1. Build PicoChat from the source code
  2. Remove the quarantine tag from the binary
 
-### Build picochat
+### Build PicoChat
 
  Add the required libraries to your local Go setup.
 
@@ -44,7 +44,7 @@ Enter the administrator password to confirm. Then the binary works.
 
 ### Configuration files
 
-picochat expects a configuration file. If no specific name is given, it looks for a file `config.toml`
+PicoChat expects a configuration file. If no specific name is given, it looks for a file `config.toml`
 
 The lookup for the configuration file is in the following order:
 
@@ -54,14 +54,16 @@ The lookup for the configuration file is in the following order:
  4. User home directory (searches for .config/picochat).
  5. Same folder where the executable is placed.
 
-The history files (see below) are invariably stored in a subfolder of the picochat config folder, e.g. `.config/picochat/history`.
+The history files (see below) are invariably stored in a subfolder of the PicoChat config folder, e.g. `.config/picochat/history`.
 
-Picochat currently supports four configurable values in the config file:
+PicoChat currently supports the following configurable values in the config file:
 
- * Link to the core **API** endpoint (default usually `http://localhost:11434/api`).
- * Model name (must be already downloaded!)
- * Context size (must be a value between 5 and 100) - this is the number of messages!
- * System prompt ("Persona") where a specific skill or background can be specified.
+ * link to the core **API** endpoint (default usually `http://localhost:11434/api`).
+ * model name (must be already downloaded!)
+ * temperature
+ * top_p
+ * context size (must be a value between 5 and 100) - this is the number of messages!
+ * system prompt ("Persona") where a specific skill or background can be specified.
 
 Since Pico AI currently doesn't report token counts, it is difficult to calculate a proper context size. Maybe this changes in the future, but for now the context size is limited by the number of total messages, where the oldest ones are dropped when the limit is reached.
 
@@ -125,7 +127,7 @@ With one of the possible roles (system, user, assistant), the specific last entr
 E.g., when entering `/message user`, then the last user question will be displayed again.
 
 ### Multiline input
-Picochat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
+PicoChat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
 
 Users can enter or paste as much text as needed for a prompt. Input is terminated by entering `/done` or `///` on a new line. Single lines can also be terminated by `///` in the same line.
 
@@ -133,9 +135,9 @@ Multiline input can be cancelled at any time by entering `/cancel`, returning th
 
 ### Personas
 
-Picochat allows basic persona handling: Store different configuration files in the config path, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
+PicoChat allows basic persona handling: Store different configuration files in the config path, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
 
-This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because they are implied by the '@' symbol. Picochat then starts with the specified configuration file.
+This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because they are implied by the '@' symbol. PicoChat then starts with the specified configuration file.
 
 
 ## Acknowledgements
