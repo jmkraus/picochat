@@ -16,8 +16,12 @@ import (
 
 func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
 	history.Add(messages.RoleUser, prompt)
-	if err := chat.HandleChat(cfg, history); err != nil {
+
+	msg, err := chat.HandleChat(cfg, history)
+	if err != nil {
 		console.Error(err)
+	} else {
+		console.Info(msg)
 	}
 }
 
@@ -33,8 +37,11 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 		return
 	}
 
-	if err := chat.HandleChat(cfg, history); err != nil {
+	msg, err := chat.HandleChat(cfg, history)
+	if err != nil {
 		console.Error(err)
+	} else {
+		console.Info(msg)
 	}
 }
 
