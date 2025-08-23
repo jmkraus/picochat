@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"picochat/config"
 	"picochat/messages"
@@ -80,20 +81,31 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) (string, erro
 	return msg, nil
 }
 
+// elapsedTime returns the elapsed time in seconds and a formatted
+// "MM:SS" string.  All calculations are performed in whole seconds
+// to avoid floating‑point rounding differences.
 func elapsedTime(t time.Time) (int, string) {
 	elapsed := time.Since(t)
-	minutes := int(elapsed.Minutes())
-	seconds := int(elapsed.Seconds()) % 60
-	return int(elapsed.Seconds()), fmt.Sprintf("%02d:%02d", minutes, seconds)
+
+	totalSeconds := int(elapsed.Seconds())
+
+	minutes := totalSeconds / 60
+	seconds := totalSeconds % 60
+
+	return totalSeconds, fmt.Sprintf("%02d:%02d", minutes, seconds)
 }
 
+// tokenSpeed calculates the average number of tokens processed per
+// unit of time (t).  It returns 0 when t is zero to avoid division by
+// zero.  The result is rounded to one decimal place.
 func tokenSpeed(t int, s string) float64 {
 	if t == 0 {
 		return 0
 	}
 
 	tokens := messages.CalculateTokens(s)
-	result := float64(tokens) / float64(t)
+	speed := float64(tokens) / float64(t)
+	roundFactor := 10.0
 
-	return float64(int(result*10+0.5)) / 10
+	return math.Round(speed*roundFactor) / roundFactor
 }
