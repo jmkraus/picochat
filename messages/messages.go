@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"picochat/console"
 	"picochat/paths"
-	"strings"
 	"time"
 )
 
@@ -210,12 +209,7 @@ func (h *ChatHistory) EstimateTokens() int {
 		if text == "" {
 			text = msg.Content
 		}
-		total += calculateTokens(text)
+		total += CalculateTokens(text)
 	}
 	return total
-}
-
-func calculateTokens(s string) int {
-	words := strings.Fields(s)
-	return int(float64(len(words)) * 1.3)
 }
