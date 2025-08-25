@@ -48,7 +48,7 @@ func ExtractCodeBlock(s string) (string, bool) {
 	return "", false
 }
 
-func CalculateTokens(s string) int {
+func CalculateTokens(s string) float64 {
 	words := strings.Fields(s)
-	return int(float64(len(words)) * 1.3)
+	return float64(len(words)) * 1.3
 }

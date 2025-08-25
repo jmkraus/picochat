@@ -201,8 +201,8 @@ func (h *ChatHistory) IsEmpty() bool {
 	return h.Len() == 1
 }
 
-func (h *ChatHistory) EstimateTokens() int {
-	total := 0
+func (h *ChatHistory) EstimateTokens() float64 {
+	total := 0.0
 	for _, msg := range h.Messages {
 		// use raw data (incl. reasoning) if available
 		text := msg.Raw

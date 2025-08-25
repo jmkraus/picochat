@@ -215,7 +215,7 @@ func TestEstimateTokens(t *testing.T) {
 
 	tokens := h.EstimateTokens()
 	if tokens <= 0 {
-		t.Errorf("expected positive token count, got %d", tokens)
+		t.Errorf("expected positive token count, got %.1f", tokens)
 	}
 }
 
