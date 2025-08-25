@@ -63,6 +63,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) (string, erro
 
 		if res.Done {
 			seconds, elapsed = elapsedTime(start)
+			fmt.Println()
 			break
 		}
 	}
@@ -99,7 +100,7 @@ func elapsedTime(t time.Time) (int, string) {
 // unit of time (t).  It returns 0 when t is zero to avoid division by
 // zero.  The result is rounded to one decimal place.
 func tokenSpeed(t int, s string) float64 {
-	if t == 0 {
+	if (t == 0) || (s == "") {
 		return 0
 	}
 
