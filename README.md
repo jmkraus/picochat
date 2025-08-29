@@ -57,7 +57,7 @@ How can I improve the following GoLang code?↵
 package main↵
 import "fmt"↵
 func main() {↵
-    fmt.Println("Hallo, World!")↵
+    fmt.Println("Hello, World!")↵
 }↵
 /done↵
 ```
@@ -132,7 +132,7 @@ Without a filename, the file is stored with a timestamp as filename, e.g. `2025-
 
 This command copies the entire last answer to the clipboard but removes the `<think>` section from reasoning models. If the reasoning should be retained, then `/copy think` can be used instead.
 
-If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
+If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text. If no codeblock is found, then the copy command is canceled.
 
 #### /models `<index>`
 
