@@ -1,22 +1,22 @@
 # PicoChat - a CLI Chat Client
 
 ## Purpose
-The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, does not include a dedicated CLI client.
+The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, does not provide a dedicated CLI client.
 
-This tool fills the gap and has some additional tricks up its sleeve.
+This tool fills that gap and offers some additional features.
 
 ## Installation
 
-The released binary is unsigned. To use it on a Mac, there are two options:
+The released binary is neither notarized nor signed. To use it on a Mac, there are two options:
 
- 1. Build PicoChat from the source code
- 2. Remove the quarantine tag from the binary
+ 1. Build PicoChat from the sources
+ 2. Remove the quarantine flag from the binary
 
 ### Build PicoChat
 
  Add the required libraries to your local Go setup.
 
- ```
+ ```text
   go get github.com/atotto/clipboard
   go get github.com/BurntSushi/toml
   go mod tidy
@@ -26,13 +26,41 @@ The released binary is unsigned. To use it on a Mac, there are two options:
 
 ### Remove the quarantine flag
 
-Navigate to the target folder where the binary was placed and enter the following:
+Navigate to the folder containing the binary and enter the following:
 
 `sudo xattr -rd com.apple.quarantine ./picochat`
 
-Enter the administrator password to confirm. Then the binary works.
+Enter the administrator password to confirm. After that, the binary can be started without a warning.
 
 ## Usage
+
+### Entering a prompt
+PicoChat uses standard input, unlike Ollama’s raw input method. This approach was chosen for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
+
+Users can enter or paste as much text as needed for a prompt. Input ends when typing `/done` or `///` on a new line. Single-line input can also be ended by `///` on the same line.
+
+Multiline input can be canceled at any time by entering `/cancel`, which returns the user to the prompt without sending the input. Here are a few examples (↵ indicates a RETURN):
+
+#### Single line
+```text
+Hello are you there? ///↵
+```
+
+```text
+Hello are you there?↵
+/done↵
+```
+
+#### Multi line
+```text
+How can I improve the following GoLang code?↵
+package main↵
+import "fmt"↵
+func main() {↵
+    fmt.Println("Hallo, World!")↵
+}↵
+/done↵
+```
 
 ### Command line args
 
@@ -44,7 +72,7 @@ Enter the administrator password to confirm. Then the binary works.
 
 ### Configuration files
 
-PicoChat expects a configuration file. If no specific name is given, it looks for a file `config.toml`
+PicoChat expects a configuration file. If no specific name is given, it looks for a file named `config.toml`
 
 The lookup for the configuration file is in the following order:
 
@@ -54,7 +82,7 @@ The lookup for the configuration file is in the following order:
  4. User home directory (searches for .config/picochat).
  5. Same folder where the executable is placed.
 
-The history files (see below) are invariably stored in a subfolder of the PicoChat config folder, e.g. `.config/picochat/history`.
+History files (see below) are always stored in a subdirectory of the PicoChat config folder, e.g. `.config/picochat/history`.
 
 PicoChat currently supports the following configurable values in the config file:
 
@@ -65,7 +93,7 @@ PicoChat currently supports the following configurable values in the config file
  * context size (must be a value between 5 and 100) - this is the number of messages!
  * system prompt ("Persona") where a specific skill or background can be specified.
 
-Since Pico AI currently doesn't report token counts, it is difficult to calculate a proper context size. Maybe this changes in the future, but for now the context size is limited by the number of total messages, where the oldest ones are dropped when the limit is reached.
+Since Pico AI currently does not report token counts, it is difficult to calculate a proper context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
 
 ### Commands
 
@@ -91,9 +119,9 @@ Some commands can have an argument:
 
 #### /load `<filename>`
 
-Without a filename, an input line appears, where the name can be entered. If the input is omitted (only _ENTER_), then the load process is cancelled.
+Without a filename, an input line appears, where the name can be entered. If the input is omitted (just pressing _ENTER_), the load process is canceled.
 
-The filename is sufficient because the path is invariably set (see above). Suffix can be omitted, it is always `.chat`.
+The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted, as it defaults to `.chat`.
 
 #### /save `<filename>`
 
@@ -102,7 +130,7 @@ Without a filename, the file is stored with a timestamp as filename, e.g. `2025-
 
 #### /copy
 
-This command copies the full last answer into the clipboard. However, it removes the `<think>` section from reasoning models. If the reasoning should be retained, then `/copy think` can be used instead.
+This command copies the entire last answer to the clipboard but removes the `<think>` section from reasoning models. If the reasoning should be retained, then `/copy think` can be used instead.
 
 If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text.
 
@@ -116,7 +144,7 @@ Without an argument, the command lists the available parameters and show their c
 
 With the optional argument the parameter values can be changed for the current session, e.g., `/set top_p=0.3`.
 
-The Values are not persistent and cannot be stored. For permanent changes, the config.toml entries must be edited.
+These values are not persistent and cannot be saved. For permanent changes, edit the entries in `config.toml`.
 
 #### /message `<role>`
 
@@ -124,32 +152,25 @@ Without the argument, the last entry of the chat history (usually an assistant a
 
 With one of the possible roles (system, user, assistant), the specific last entry of the chat history can be chosen.
 
-E.g., when entering `/message user`, then the last user question will be displayed again.
-
-### Multiline input
-PicoChat utilizes standard input, unlike Ollama’s raw input method. This approach was preferred for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
-
-Users can enter or paste as much text as needed for a prompt. Input is terminated by entering `/done` or `///` on a new line. Single lines can also be terminated by `///` in the same line.
-
-Multiline input can be cancelled at any time by entering `/cancel`, returning the user to the prompt without sending the input.
+For example, `/message user` displays the last user question again.
 
 ### Personas
 
-PicoChat allows basic persona handling: Store different configuration files in the config path, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
+PicoChat supports basic persona handling: it is possible to store different configuration files in the config path, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
 
 This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because they are implied by the '@' symbol. PicoChat then starts with the specified configuration file.
 
 
 ## Acknowledgements
 
-Big shoutout to the providers of the libraries used in this project:
+Special thanks to the developers of the libraries used in this project:
 
- * [The TOML library by BurntSushi](https://github.com/BurntSushi/toml).
- * [Atotto's clipboard library for Go](https://github.com/atotto/clipboard).
+ * [BurntSushi's TOML library](https://github.com/BurntSushi/toml).
+ * [Atotto's Go clipboard library](https://github.com/atotto/clipboard).
 
 
 ## License
 
-This project is distributed under the MIT license.
+This project is licensed under the MIT license.
 
 JMK 2025
