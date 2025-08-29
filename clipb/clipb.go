@@ -19,7 +19,7 @@ func copyToTmuxBufferStdin(text string) error {
 	return cmd.Run()
 }
 
-func GetFromClipboard() (string, error) {
+func ReadClipboard() (string, error) {
 	text, err := clipboard.ReadAll()
 	if err != nil {
 		return "", fmt.Errorf("clipboard read failed: %w", err)
@@ -31,7 +31,7 @@ func GetFromClipboard() (string, error) {
 	return text, nil
 }
 
-func PutToClipboard(text string) error {
+func WriteClipboard(text string) error {
 	err := clipboard.WriteAll(text)
 	if err != nil {
 		return fmt.Errorf("clipboard write failed: %w", err)

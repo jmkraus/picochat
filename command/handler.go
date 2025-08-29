@@ -93,11 +93,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Output: files}
 	case "copy":
-		lastAnswer := ""
+		lastAnswer := history.GetLast().Content
 		if args == "think" {
 			lastAnswer = history.GetLast().Raw
-		} else {
-			lastAnswer = history.GetLast().Content
 		}
 		if args == "code" {
 			codeBlock, found := messages.ExtractCodeBlock(lastAnswer)
@@ -107,13 +105,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Output: "Nothing to copy."}
 			}
 		}
-		err := clipb.PutToClipboard(lastAnswer)
+		err := clipb.WriteClipboard(lastAnswer)
 		if err != nil {
 			return CommandResult{Error: err}
 		}
 		return CommandResult{Output: "Last answer written to clipboard."}
 	case "paste":
-		text, err := clipb.GetFromClipboard()
+		text, err := clipb.ReadClipboard()
 		if err != nil {
 			return CommandResult{Error: err}
 		}
