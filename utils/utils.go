@@ -44,7 +44,7 @@ func ListHistoryFiles() (string, error) {
 		return "", fmt.Errorf("no history files found.")
 	}
 
-	SetHistoryList(history)
+	setHistoryList(history)
 	return FormatList(history, "history files", true), nil
 }
 
@@ -59,12 +59,12 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 		return "", fmt.Errorf("no models available.")
 	}
 
-	SetModelsList(models)
+	setModelsList(models)
 	return FormatList(models, "Language models", true), nil
 }
 
 // Filled by /list command
-func SetHistoryList(list []string) {
+func setHistoryList(list []string) {
 	HistoryList = list
 	HistoryMap = make(map[int]string)
 	for i, name := range list {
@@ -78,7 +78,7 @@ func GetHistoryByIndex(i int) (string, bool) {
 }
 
 // Filled by /models command
-func SetModelsList(list []string) {
+func setModelsList(list []string) {
 	ModelsList = list
 	ModelsMap = make(map[int]string)
 	for i, name := range list {
