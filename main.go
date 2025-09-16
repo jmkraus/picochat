@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/term"
 	"os"
 	"picochat/args"
 	"picochat/chat"
@@ -12,6 +13,7 @@ import (
 	"picochat/messages"
 	"picochat/version"
 	"strings"
+	"syscall"
 )
 
 func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
@@ -46,6 +48,66 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 }
 
 func readMultilineInput() (string, bool) {
+	// Terminal in Raw Mode schalten
+	oldState, err := term.MakeRaw(int(syscall.Stdin))
+	if err != nil {
+		panic(err)
+	}
+	defer term.Restore(int(syscall.Stdin), oldState)
+
+	in := os.Stdin
+	var lines []string
+	var currentLine []rune
+
+	enterCount := 0
+
+	for {
+		b := make([]byte, 1)
+		_, err := in.Read(b)
+		if err != nil {
+			break
+		}
+
+		switch b[0] {
+		case 27: // ESC
+			return "", false
+		case 13: // Enter (CR)
+			if enterCount == 1 {
+				// Double Enter -> done
+				lines = append(lines, string(currentLine))
+				return strings.Join(lines, "\n"), true
+			}
+			enterCount++
+			lines = append(lines, string(currentLine))
+			currentLine = []rune{}
+			fmt.Print("\n")
+		case 10: // LF (Unix Enter)
+			// sometimes just \n -> treat like  CR
+			if enterCount == 1 {
+				lines = append(lines, string(currentLine))
+				return strings.Join(lines, "\n"), true
+			}
+			enterCount++
+			lines = append(lines, string(currentLine))
+			currentLine = []rune{}
+			fmt.Print("\n")
+		case 127: // Backspace
+			if len(currentLine) > 0 {
+				currentLine = currentLine[:len(currentLine)-1]
+				fmt.Print("\b \b")
+			}
+			enterCount = 0
+		default:
+			currentLine = append(currentLine, rune(b[0]))
+			fmt.Print(string(b))
+			enterCount = 0
+		}
+	}
+
+	return strings.Join(lines, "\n"), true
+}
+
+func oldReadMultilineInput() (string, bool) {
 	scanner := bufio.NewScanner(os.Stdin)
 	var lines []string
 	firstLine := true
