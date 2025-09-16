@@ -80,7 +80,7 @@ func readMultilineInput() (string, bool) {
 			enterCount++
 			lines = append(lines, string(currentLine))
 			currentLine = []rune{}
-			fmt.Print("\n")
+			fmt.Print("\r\n")
 		case 10: // LF (Unix Enter)
 			// sometimes just \n -> treat like  CR
 			if enterCount == 1 {
@@ -177,7 +177,7 @@ func main() {
 		input, isCommand := readMultilineInput()
 
 		if input == "" && !isCommand {
-			console.Info("Input canceled.")
+			console.Info("\nInput canceled.")
 			continue
 		}
 
