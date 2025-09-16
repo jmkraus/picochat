@@ -115,7 +115,7 @@ func main() {
 		input, isCommand := readMultilineInput()
 
 		if input == "" && !isCommand {
-			fmt.Println("Input canceled.")
+			console.Info("Input canceled.")
 			continue
 		}
 
