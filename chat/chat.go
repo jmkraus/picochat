@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func HandleChat(cfg *config.Config, history *messages.ChatHistory) (string, error) {
+func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (string, error) {
 	reqBody := messages.ChatRequest{
 		Model:    cfg.Model,
 		Messages: history.Messages,
@@ -47,6 +47,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) (string, erro
 
 	seconds := 0
 	elapsed := "--:--"
+	firstToken := true
 	for {
 		var res messages.StreamResponse
 		if err := decoder.Decode(&res); err != nil {
@@ -57,6 +58,11 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory) (string, erro
 		}
 
 		if res.Message.Content != "" {
+			if firstToken {
+				close(stop)           // stop Spinner
+				fmt.Print("\r\033[K") // delete to EOL
+				firstToken = false
+			}
 			fmt.Print(res.Message.Content)
 			fullReply.WriteString(res.Message.Content)
 		}
