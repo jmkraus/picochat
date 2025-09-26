@@ -8,6 +8,7 @@ import (
 	"math"
 	"net/http"
 	"picochat/config"
+	"picochat/console"
 	"picochat/messages"
 	"picochat/requests"
 	"strings"
@@ -59,8 +60,8 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 		if res.Message.Content != "" {
 			if firstToken {
-				close(stop)           // stop Spinner
-				fmt.Print("\r\033[K") // delete to EOL
+				close(stop) // stop Spinner
+				console.ClearLine()
 				firstToken = false
 			}
 			fmt.Print(res.Message.Content)

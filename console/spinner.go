@@ -6,8 +6,13 @@ import (
 )
 
 func StartSpinner(stop <-chan struct{}) {
-	frames := []rune{'|', '/', '-', '\\'}
+	frames := []rune{'⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'}
 	i := 0
+
+	// disable cursor
+	fmt.Print("\033[?25l")
+	defer fmt.Print("\033[?25h") // safe enable cursor at return
+
 	for {
 		select {
 		case <-stop:
@@ -18,4 +23,8 @@ func StartSpinner(stop <-chan struct{}) {
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
+}
+
+func ClearLine() {
+	fmt.Print("\r\033[K") // delete to EOL
 }

@@ -28,6 +28,12 @@ func streamingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// dummyHandleChat calls HandleChat and instantly closes the Stop-Channel.
+func dummyHandleChat(cfg *config.Config, history *messages.ChatHistory) (string, error) {
+	stop := make(chan struct{})
+	return HandleChat(cfg, history, stop)
+}
+
 func TestHandleChat(t *testing.T) {
 	// Starting fake server
 	server := httptest.NewServer(http.HandlerFunc(streamingHandler))
@@ -43,7 +49,7 @@ func TestHandleChat(t *testing.T) {
 	history.Add("user", "Say Hello")
 
 	// Simulate HandleChat
-	_, err := HandleChat(cfg, history)
+	_, err := dummyHandleChat(cfg, history)
 	if err != nil {
 		t.Fatalf("HandleChat returned error: %v", err)
 	}
@@ -69,7 +75,7 @@ func TestHandleChat_InvalidURL(t *testing.T) {
 	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "test")
 
-	_, err := HandleChat(cfg, history)
+	_, err := dummyHandleChat(cfg, history)
 	if err == nil || !strings.Contains(err.Error(), "http") {
 		t.Errorf("expected http error, got: %v", err)
 	}
@@ -91,7 +97,7 @@ func TestHandleChat_BrokenStream(t *testing.T) {
 	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "test")
 
-	_, err := HandleChat(cfg, history)
+	_, err := dummyHandleChat(cfg, history)
 	if err == nil || !strings.Contains(err.Error(), "stream") {
 		t.Errorf("expected stream decoding error, got: %v", err)
 	}
@@ -114,7 +120,7 @@ func TestHandleChat_EOFWithoutDone(t *testing.T) {
 	history := messages.NewHistory(cfg.Prompt, 10)
 	history.Add("user", "test")
 
-	_, err := HandleChat(cfg, history)
+	_, err := dummyHandleChat(cfg, history)
 	if err != nil {
 		t.Errorf("expected no error despite missing done=true, got: %v", err)
 	}
