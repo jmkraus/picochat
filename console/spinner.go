@@ -25,6 +25,11 @@ func StartSpinner(stop <-chan struct{}) {
 	}
 }
 
+func StopSpinner(stop chan struct{}) {
+	close(stop)
+	ClearLine()
+}
+
 func ClearLine() {
 	fmt.Print("\r\033[K") // delete to EOL
 }
