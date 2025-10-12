@@ -80,15 +80,16 @@ func main() {
 	for {
 		fmt.Print("\n>>> ")
 
-		input, isCommand := console.ReadMultilineInput()
+		input := console.ReadMultilineInput()
+		fmt.Println()
 
-		if input == "" && !isCommand {
-			console.Info("\nInput canceled.")
+		if input.Text == "" && !input.IsCommand {
+			console.Info("Input canceled.")
 			continue
 		}
 
-		if isCommand {
-			result := command.HandleCommand(input, history, os.Stdin)
+		if input.IsCommand {
+			result := command.HandleCommand(input.Text, history, os.Stdin)
 			if result.Output != "" {
 				console.Info(result.Output)
 			}
@@ -106,6 +107,6 @@ func main() {
 			continue
 		}
 
-		sendPrompt(input, cfg, history)
+		sendPrompt(input.Text, cfg, history)
 	}
 }

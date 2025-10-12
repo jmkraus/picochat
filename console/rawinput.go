@@ -2,14 +2,20 @@ package console
 
 import (
 	"fmt"
-	"golang.org/x/term"
 	"os"
 	"strings"
 	"syscall"
+
+	"golang.org/x/term"
 )
 
-func ReadMultilineInput() (string, bool) {
-	// Switch terminal to raw mode
+type InputResult struct {
+	Text      string
+	IsCommand bool
+	Aborted   bool
+}
+
+func ReadMultilineInput() InputResult {
 	oldState, err := term.MakeRaw(int(syscall.Stdin))
 	if err != nil {
 		panic(err)
@@ -20,8 +26,6 @@ func ReadMultilineInput() (string, bool) {
 	var lines []string
 	var currentLine []rune
 
-	enterCount := 0
-
 	for {
 		b := make([]byte, 1)
 		_, err := in.Read(b)
@@ -30,55 +34,65 @@ func ReadMultilineInput() (string, bool) {
 		}
 
 		switch b[0] {
-		case 27: // ESC
-			// Catch ESC sequence
-			next := make([]byte, 2)
-			n, _ := in.Read(next)
+		case 3: // Ctrl+C
+			fmt.Print("^C")
+			return InputResult{Aborted: true}
+
+		case 4: // Ctrl+D (EOF) → Eingabe fertig
+			fmt.Print("\r\n")
+			lines = append(lines, string(currentLine))
+			return InputResult{Text: strings.Join(lines, "\n")}
+
+		case 27: // ESC oder Escape-Sequenzen
+			// Setze Stdin kurz auf non-blocking
+			fd := int(in.Fd())
+			oldMode := syscall.SetNonblock(fd, true)
+
+			buf := make([]byte, 2)
+			n, _ := in.Read(buf)
+
+			// Setze blocking wieder zurück
+			syscall.SetNonblock(fd, false)
+			_ = oldMode // Rückgabewert uninteressant hier
+
 			if n == 0 {
-				// ESC only -> cancel
-				return "", false
+				// Reines ESC → sofort abbrechen
+				return InputResult{Aborted: true}
 			}
-			if next[0] == '[' {
-				// Detected cursor key -> ignore
-				switch next[1] {
+
+			if buf[0] == '[' && n > 1 {
+				// Pfeiltasten (z. B. ESC[A, ESC[B, ESC[C, ESC[D])
+				switch buf[1] {
 				case 'A', 'B', 'C', 'D':
-					// Arrow Up/Down/Right/Left -> skip
 					continue
 				}
 			}
-			// If not cursor key, but "true ESC key": cancel
-			return "", false
-		case 13, 10: // Enter
-			line := strings.TrimSpace(string(currentLine))
 
-			if len(lines) == 0 && strings.HasPrefix(line, "/") {
-				// First row is a command
-				fmt.Print("\r\n")
-				return line, true
-			}
+			// Irgendeine andere Escape-Sequenz → ignorieren oder abbrechen
+			return InputResult{Aborted: true}
 
-			if enterCount == 1 && line == "" {
-				// Double Enter -> done
-				lines = append(lines, line)
-				return strings.Join(lines, "\n"), false
-			}
-
-			enterCount++
-			lines = append(lines, line)
-			currentLine = []rune{}
-			fmt.Print("\r\n")
 		case 127: // Backspace
 			if len(currentLine) > 0 {
 				currentLine = currentLine[:len(currentLine)-1]
 				fmt.Print("\b \b")
 			}
-			enterCount = 0
+
+		case 13, 10: // Enter
+			line := string(currentLine)
+
+			// Sofortiger Command
+			if len(lines) == 0 && strings.HasPrefix(line, "/") {
+				return InputResult{Text: line, IsCommand: true}
+			}
+
+			lines = append(lines, line)
+			currentLine = []rune{}
+			fmt.Print("\r\n")
+
 		default:
 			currentLine = append(currentLine, rune(b[0]))
 			fmt.Print(string(b))
-			enterCount = 0
 		}
 	}
-
-	return strings.Join(lines, "\n"), true
+	return InputResult{Text: strings.Join(lines, "\n")}
 }
