@@ -27,10 +27,6 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
-	case "done":
-		return CommandResult{Output: "Use this command for terminating a multi-line input."}
-	case "cancel":
-		return CommandResult{Output: "Use this command for cancelling a multi-line input."}
 	case "bye":
 		return CommandResult{Output: "Chat has ended.", Quit: true}
 	case "save":
@@ -196,8 +192,6 @@ func parseCommandArgs(input string) (string, string) {
 
 	// replace special abbreviations
 	switch cmd {
-	case "///":
-		cmd = "/done"
 	case "/c":
 		cmd = "/copy"
 	case "/v":
