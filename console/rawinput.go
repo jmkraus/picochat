@@ -13,12 +13,13 @@ type InputResult struct {
 	Text      string
 	IsCommand bool
 	Aborted   bool
+	Error     error
 }
 
 func ReadMultilineInput() InputResult {
 	oldState, err := term.MakeRaw(int(syscall.Stdin))
 	if err != nil {
-		panic(err)
+		return InputResult{Error: fmt.Errorf("Switching to terminal raw mode failed.")}
 	}
 	defer term.Restore(int(syscall.Stdin), oldState)
 

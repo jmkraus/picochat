@@ -81,14 +81,17 @@ func main() {
 		fmt.Print("\n>>> ")
 
 		input := console.ReadMultilineInput()
-		fmt.Println()
+		if input.Error != nil {
+			console.Error(input.Error)
+		}
 
 		if input.Text == "" && !input.IsCommand {
-			console.Info("Input canceled.")
+			console.Info("\nInput canceled.")
 			continue
 		}
 
 		if input.IsCommand {
+			fmt.Println()
 			result := command.HandleCommand(input.Text, history, os.Stdin)
 			if result.Output != "" {
 				console.Info(result.Output)
