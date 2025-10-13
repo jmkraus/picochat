@@ -35,31 +35,29 @@ Enter the administrator password to confirm. After that, the binary can be start
 ## Usage
 
 ### Entering a prompt
-PicoChat uses standard input, unlike Ollama’s raw input method. This approach was chosen for its simpler implementation and to avoid issues with multiline input enclosed in triple quotes.
 
-Users can enter or paste as much text as needed for a prompt. Input ends when typing `/done` or `///` on a new line. Single-line input can also be ended by `///` on the same line.
+PicoChat uses a raw input mode for entering prompts.
+This provides a more natural multiline editing experience than the triple-quote (""") approach used by other applications, while still keeping the implementation simple and terminal-friendly.
 
-Multiline input can be canceled at any time by entering `/cancel`, which returns the user to the prompt without sending the input. Here are a few examples (↵ indicates a RETURN):
+Users can type or paste as much text as needed for a prompt.
+Input is submitted by pressing Ctrl+D (End-of-File).
+This method ensures that pasted text — including blank lines or code blocks — is handled safely without triggering unintended input termination.
+
+Input can be canceled at any time by pressing Esc, which immediately returns the user to the main prompt without sending the text.
+
+Here are a few examples (↵ indicates pressing Enter):
 
 #### Single line
 ```text
-Hello are you there? ///↵
-```
-
-```text
-Hello are you there?↵
-/done↵
+>>> Tell me a joke! [Ctrl]+D
 ```
 
 #### Multi line
 ```text
-How can I improve the following GoLang code?↵
-package main↵
-import "fmt"↵
-func main() {↵
-    fmt.Println("Hello, World!")↵
-}↵
-/done↵
+>>> Hello, PicoChat! ↵
+How are you today? ↵
+↵
+[Ctrl]+D        ← Send prompt
 ```
 
 ### Command line args
@@ -99,8 +97,8 @@ Since Pico AI currently does not report token counts, it is difficult to calcula
 
 | CMD        | DESCRIPTION |
 | ---------- | ------------------------------------------------- |
-| /done, /// | Terminate the input and send |
-| /cancel    | Cancel multi-line input and return to prompt |
+| [Ctrl] + D | Submit multiline input (EOF) |
+| [Esc]      | Cancel multiline input and return to prompt |
 | /copy, /c  | Copy the last answer to clipboard |
 | /paste, /v | Get clipboard content as user input and send |
 | /info      | Show system information |
