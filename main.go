@@ -12,6 +12,10 @@ import (
 	"picochat/version"
 )
 
+var (
+	isQuiet bool
+)
+
 func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
 	stop := make(chan struct{})
 	go console.StartSpinner(stop)
@@ -22,7 +26,9 @@ func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory
 	if err != nil {
 		console.Error(err)
 	} else {
-		console.Info(msg)
+		if !isQuiet {
+			console.Info(msg)
+		}
 	}
 }
 
@@ -51,13 +57,14 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 
 func main() {
 	args.Parse()
+	isQuiet = *args.Quiet
 
 	if *args.ShowVersion {
 		console.Info(fmt.Sprintf("picochat version is %s", version.Version))
 		os.Exit(0)
 	}
 
-	err := config.Load()
+	cfgName, err := config.Load()
 	if err != nil {
 		console.Errorf("load configuration failed: %v", err)
 		os.Exit(1)
@@ -75,7 +82,10 @@ func main() {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	console.Info("PicoChat started. Help with '/?'")
+	if !isQuiet {
+		console.Info(fmt.Sprintf("Configuration file used: %s", cfgName))
+		console.Info("PicoChat started. Help with '/?'")
+	}
 
 	for {
 		fmt.Print("\n>>> ")
@@ -85,8 +95,12 @@ func main() {
 			console.Error(input.Error)
 		}
 
-		if input.Text == "" && !input.IsCommand {
+		if input.Aborted {
 			console.Info("\nInput canceled.")
+			continue
+		}
+
+		if input.Text == "" && !input.IsCommand {
 			continue
 		}
 
@@ -111,5 +125,10 @@ func main() {
 		}
 
 		sendPrompt(input.Text, cfg, history)
+
+		if input.EOF {
+			break
+		}
+
 	}
 }

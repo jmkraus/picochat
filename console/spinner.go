@@ -13,6 +13,8 @@ func StartSpinner(stop <-chan struct{}) {
 	fmt.Print("\033[?25l")
 	defer fmt.Print("\033[?25h") // safe enable cursor at return
 
+	ClearLine()
+
 	for {
 		select {
 		case <-stop:

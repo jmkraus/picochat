@@ -60,12 +60,23 @@ How are you today? ↵
 [Ctrl]+D        ← Send prompt
 ```
 
+#### Via Pipe
+It's also possible to use PicoChat in scripts via Pipe, e.g.:
+```
+echo "Write a Haiku about Cheese" | picochat -quiet
+```
+
+The -quiet arg is optional and suppresses all app messages, so that only the LLM response is displayed.
+
+NOTE: This has been currently tested on macOS only. It might not work on other platforms.
+
 ### Command line args
 
 | ARG      | DESCRIPTION                    |
 | -------- | ------------------------------ |
 | -config  | Loads a configuration file     |
 | -history | Loads the specific session     |
+| -quiet   | Suppresses all app messages    |
 | -version | Shows version number and quits |
 
 ### Configuration files

@@ -11,11 +11,12 @@ import (
 var (
 	instance *Config
 	once     sync.Once
+	cfgName  string
 	loadErr  error
 )
 
 // Load reads and caches the configuration once.
-func Load() error {
+func Load() (string, error) {
 	once.Do(func() {
 		path, err := paths.GetConfigPath()
 		if err != nil {
@@ -23,7 +24,7 @@ func Load() error {
 			return
 		}
 
-		fmt.Println("Configuration file used:", path)
+		cfgName = path
 
 		var cfg = Config{
 			Temperature: 0.7,
@@ -42,14 +43,14 @@ func Load() error {
 		}
 
 		if cfg.Context != 0 && (cfg.Context < 5 || cfg.Context > 100) {
-			loadErr = fmt.Errorf("Context size must be between 5 and 100")
+			loadErr = fmt.Errorf("context size must be between 5 and 100")
 			return
 		}
 
 		instance = &cfg
 	})
 
-	return loadErr
+	return cfgName, loadErr
 }
 
 func Get() *Config {

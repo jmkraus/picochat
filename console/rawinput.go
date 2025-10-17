@@ -2,6 +2,7 @@ package console
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"syscall"
@@ -13,17 +14,29 @@ type InputResult struct {
 	Text      string
 	IsCommand bool
 	Aborted   bool
+	EOF       bool
 	Error     error
 }
 
 func ReadMultilineInput() InputResult {
-	oldState, err := term.MakeRaw(int(syscall.Stdin))
-	if err != nil {
-		return InputResult{Error: fmt.Errorf("Switching to terminal raw mode failed.")}
-	}
-	defer term.Restore(int(syscall.Stdin), oldState)
-
 	in := os.Stdin
+	fd := int(in.Fd())
+	if !term.IsTerminal(fd) {
+		// stdin is not an interactive console → pipe or file
+		data, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return InputResult{Error: fmt.Errorf("error reading stdin: %v", err)}
+		}
+		text := strings.TrimRight(string(data), "\n")
+		return InputResult{Text: text, EOF: true}
+	} else {
+		oldState, err := term.MakeRaw(fd)
+		if err != nil {
+			return InputResult{Error: fmt.Errorf("error enabling raw input mode: %v", err)}
+		}
+		defer term.Restore(fd, oldState)
+	}
+
 	var lines []string
 	var currentLine []rune
 
@@ -36,25 +49,25 @@ func ReadMultilineInput() InputResult {
 
 		switch b[0] {
 		case 3: // Ctrl+C
-			fmt.Print("^C")
+			fmt.Print("\r\n")
 			return InputResult{Aborted: true}
 
 		case 4: // Ctrl+D (EOF) → input finished
 			fmt.Print("\r\n")
-			lines = append(lines, string(currentLine))
-			return InputResult{Text: strings.Join(lines, "\n")}
+			if len(currentLine) > 0 {
+				lines = append(lines, string(currentLine))
+			}
+			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
 
 		case 27: // ESC or escape sequences
 			// Temporarily set Stdin to non-blocking
-			fd := int(in.Fd())
-			oldMode := syscall.SetNonblock(fd, true)
+			_ = syscall.SetNonblock(fd, true) // ToDo: check err response
 
 			buf := make([]byte, 2)
 			n, _ := in.Read(buf)
 
 			// Restore blocking mode
-			syscall.SetNonblock(fd, false)
-			_ = oldMode // return value not relevant here
+			_ = syscall.SetNonblock(fd, false)
 
 			if n == 0 {
 				// Plain ESC → abort immediately
