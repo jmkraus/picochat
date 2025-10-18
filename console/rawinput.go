@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"syscall"
 
 	"golang.org/x/term"
 )
@@ -61,13 +60,13 @@ func ReadMultilineInput() InputResult {
 
 		case 27: // ESC or escape sequences
 			// Temporarily set Stdin to non-blocking
-			_ = syscall.SetNonblock(fd, true) // ToDo: check err response
+			_ = setNonblock(fd, true) // ToDo: check err response
 
 			buf := make([]byte, 2)
 			n, _ := in.Read(buf)
 
 			// Restore blocking mode
-			_ = syscall.SetNonblock(fd, false)
+			_ = setNonblock(fd, false)
 
 			if n == 0 {
 				// Plain ESC → abort immediately
