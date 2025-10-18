@@ -66,9 +66,9 @@ It's also possible to use PicoChat in scripts via Pipe, e.g.:
 echo "Write a Haiku about Cheese" | picochat -quiet
 ```
 
-The -quiet arg is optional and suppresses all app messages, so that only the LLM response is displayed.
+The `-quiet` argument is optional and suppresses all app messages, so that only the LLM response is displayed.
 
-NOTE: This has been currently tested on macOS only. It might not work on other platforms.
+NOTE: This has been currently tested on macOS only. It might have issues on other platforms.
 
 ### Command line args
 
