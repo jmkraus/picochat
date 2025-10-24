@@ -69,7 +69,18 @@ func CleanUrl(apiBaseURL, endPoint string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid http url string %w", err)
 	}
-	u.Path = strings.TrimSuffix(u.Path, "/") + "/" + endPoint
+
+	// Remove trailing slash for unified processing
+	path := strings.TrimSuffix(u.Path, "/")
+
+	// Check if /api is already part of the path
+	if !strings.HasSuffix(path, "/api") {
+		// /api does not exist and must be added
+		path = path + "/api"
+	}
+
+	// Add endpoint
+	u.Path = path + "/" + endPoint
 	apiFullURL := u.String()
 
 	return apiFullURL, nil
