@@ -107,11 +107,12 @@ func main() {
 		if input.IsCommand {
 			fmt.Println()
 			result := command.HandleCommand(input.Text, history, os.Stdin)
-			if result.Output != "" {
-				console.Info(result.Output)
-			}
 			if result.Error != nil {
 				console.Errorf("command handler failed: %v", result.Error)
+			}
+			console.AddCommandToHistory(input.Text)
+			if result.Output != "" {
+				console.Info(result.Output)
 			}
 			if result.Quit {
 				break

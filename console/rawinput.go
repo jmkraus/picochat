@@ -9,12 +9,10 @@ import (
 	"golang.org/x/term"
 )
 
-type InputResult struct {
-	Text      string
-	IsCommand bool
-	Aborted   bool
-	EOF       bool
-	Error     error
+var cmdHistory = &CommandHistory{}
+
+func AddCommandToHistory(cmd string) {
+	cmdHistory.Add(cmd)
 }
 
 func ReadMultilineInput() InputResult {
@@ -60,13 +58,19 @@ func ReadMultilineInput() InputResult {
 
 		case 27: // ESC or escape sequences
 			// Temporarily set Stdin to non-blocking
-			_ = setNonblock(fd, true) // ToDo: check err response
+			err = setNonblock(fd, true)
+			if err != nil {
+				return InputResult{Error: fmt.Errorf("could not set stdin to non-blocking mode: %w", err)}
+			}
 
-			buf := make([]byte, 2)
+			buf := make([]byte, 3)
 			n, _ := in.Read(buf)
 
-			// Restore blocking mode
-			_ = setNonblock(fd, false)
+			// Revert back to Stdin blocking mode
+			err = setNonblock(fd, false)
+			if err != nil {
+				return InputResult{Error: fmt.Errorf("could not unset stdin to blocking mode: %w", err)}
+			}
 
 			if n == 0 {
 				// Plain ESC → abort immediately
@@ -76,7 +80,21 @@ func ReadMultilineInput() InputResult {
 			if buf[0] == '[' && n > 1 {
 				// Arrow keys (e.g. ESC[A, ESC[B, ESC[C, ESC[D])
 				switch buf[1] {
-				case 'A', 'B', 'C', 'D':
+				case 'A': // Up
+					recalled := cmdHistory.Prev()
+					if recalled != "" {
+						fmt.Print("\r\033[K")
+						fmt.Printf(">>> %s", recalled)
+						currentLine = []rune(recalled)
+					}
+					continue
+				case 'B': // Down
+					recalled := cmdHistory.Next()
+					fmt.Print("\r\033[K")
+					fmt.Printf(">>> %s", recalled)
+					currentLine = []rune(recalled)
+					continue
+				case 'C', 'D':
 					continue
 				}
 			}
