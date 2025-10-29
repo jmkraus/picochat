@@ -2,60 +2,83 @@ package console
 
 import "testing"
 
-func TestCommandHistory(t *testing.T) {
-	h := &CommandHistory{}
-
-	// --- Test Add ---
-	h.add("/help")
-	h.add("/models")
-	h.add("/info")
-
-	if len(h.entries) != 3 {
-		t.Fatalf("expected 3 entries, got %d", len(h.entries))
+func TestCommandHistory_Internal(t *testing.T) {
+	tests := []struct {
+		name     string
+		commands []string
+		wantPrev []string
+		wantNext []string
+	}{
+		{
+			name:     "basic history navigation",
+			commands: []string{"/help", "/models", "/info"},
+			wantPrev: []string{"/info", "/models", "/help", "/help"}, // Prev stops at oldest
+			wantNext: []string{"/models", "/info", ""},               // Next stops at newest
+		},
 	}
 
-	// Duplicate add check
-	h.add("/info")
-	if len(h.entries) != 3 {
-		t.Fatalf("duplicate add should not increase length, got %d", len(h.entries))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := &CommandHistory{}
+			for _, c := range tt.commands {
+				h.add(c)
+			}
+
+			for i, expected := range tt.wantPrev {
+				got := h.prev()
+				if got != expected {
+					t.Errorf("Prev[%d]: expected %q, got %q", i, expected, got)
+				}
+			}
+
+			for i, expected := range tt.wantNext {
+				got := h.next()
+				if got != expected {
+					t.Errorf("Next[%d]: expected %q, got %q", i, expected, got)
+				}
+			}
+		})
+	}
+}
+
+func TestCommandHistory_Global(t *testing.T) {
+	tests := []struct {
+		name     string
+		commands []string
+		wantPrev []string
+		wantNext []string
+	}{
+		{
+			name:     "global history behaves like instance history",
+			commands: []string{"/start", "/status", "/stop"},
+			wantPrev: []string{"/stop", "/status", "/start", "/start"},
+			wantNext: []string{"/status", "/stop", ""},
+		},
 	}
 
-	// --- Test Prev ---
-	prev := h.prev()
-	if prev != "/info" {
-		t.Errorf("expected /info, got %s", prev)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Reset global history between test cases
+			cmdHistory.entries = nil
+			cmdHistory.index = 0
 
-	prev = h.prev()
-	if prev != "/models" {
-		t.Errorf("expected /models, got %s", prev)
-	}
+			for _, c := range tt.commands {
+				AddCommand(c)
+			}
 
-	prev = h.prev()
-	if prev != "/help" {
-		t.Errorf("expected /help, got %s", prev)
-	}
+			for i, expected := range tt.wantPrev {
+				got := PrevCommand()
+				if got != expected {
+					t.Errorf("Prev[%d]: expected %q, got %q", i, expected, got)
+				}
+			}
 
-	// Prev at beginning should stay on first
-	prev = h.prev()
-	if prev != "/help" {
-		t.Errorf("expected /help when at beginning, got %s", prev)
-	}
-
-	// --- Test Next ---
-	next := h.next()
-	if next != "/models" {
-		t.Errorf("expected /models, got %s", next)
-	}
-
-	next = h.next()
-	if next != "/info" {
-		t.Errorf("expected /info, got %s", next)
-	}
-
-	// Next beyond end → should reset index and return empty
-	next = h.next()
-	if next != "" {
-		t.Errorf("expected empty string after end, got %s", next)
+			for i, expected := range tt.wantNext {
+				got := NextCommand()
+				if got != expected {
+					t.Errorf("Next[%d]: expected %q, got %q", i, expected, got)
+				}
+			}
+		})
 	}
 }
