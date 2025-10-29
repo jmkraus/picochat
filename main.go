@@ -110,7 +110,7 @@ func main() {
 			if result.Error != nil {
 				console.Errorf("command handler failed: %v", result.Error)
 			}
-			console.AddCommandToHistory(input.Text)
+			console.AddCommand(input.Text)
 			if result.Output != "" {
 				console.Info(result.Output)
 			}

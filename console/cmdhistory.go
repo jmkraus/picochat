@@ -1,6 +1,20 @@
 package console
 
-func (h *CommandHistory) Add(cmd string) {
+var cmdHistory = &CommandHistory{}
+
+func AddCommand(cmd string) {
+	cmdHistory.add(cmd)
+}
+
+func PrevCommand() string {
+	return cmdHistory.prev()
+}
+
+func NextCommand() string {
+	return cmdHistory.next()
+}
+
+func (h *CommandHistory) add(cmd string) {
 	if cmd == "" {
 		return
 	}
@@ -11,7 +25,7 @@ func (h *CommandHistory) Add(cmd string) {
 	h.index = len(h.entries)
 }
 
-func (h *CommandHistory) Prev() string {
+func (h *CommandHistory) prev() string {
 	if len(h.entries) == 0 {
 		return ""
 	}
@@ -21,7 +35,7 @@ func (h *CommandHistory) Prev() string {
 	return h.entries[h.index]
 }
 
-func (h *CommandHistory) Next() string {
+func (h *CommandHistory) next() string {
 	if len(h.entries) == 0 {
 		return ""
 	}

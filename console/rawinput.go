@@ -9,12 +9,6 @@ import (
 	"golang.org/x/term"
 )
 
-var cmdHistory = &CommandHistory{}
-
-func AddCommandToHistory(cmd string) {
-	cmdHistory.Add(cmd)
-}
-
 func ReadMultilineInput() InputResult {
 	in := os.Stdin
 	fd := int(in.Fd())
@@ -81,7 +75,7 @@ func ReadMultilineInput() InputResult {
 				// Arrow keys (e.g. ESC[A, ESC[B, ESC[C, ESC[D])
 				switch buf[1] {
 				case 'A': // Up
-					recalled := cmdHistory.Prev()
+					recalled := PrevCommand()
 					if recalled != "" {
 						fmt.Print("\r\033[K")
 						fmt.Printf(">>> %s", recalled)
@@ -89,7 +83,7 @@ func ReadMultilineInput() InputResult {
 					}
 					continue
 				case 'B': // Down
-					recalled := cmdHistory.Next()
+					recalled := NextCommand()
 					fmt.Print("\r\033[K")
 					fmt.Printf(">>> %s", recalled)
 					currentLine = []rune(recalled)
