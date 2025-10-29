@@ -110,7 +110,7 @@ Since Pico AI currently does not report token counts, it is difficult to calcula
 | ----------- | ------------------------------------------------- |
 | [Ctrl] + D  | Submit multiline input (EOF) |
 | [Esc]       | Cancel multiline input and return to prompt |
-| [Up]/[Down] | Prompt command history |
+| [Up]/[Down] | Browse prompt command history |
 | /copy, /c   | Copy the last answer to clipboard |
 | /paste, /v  | Get clipboard content as user input and send |
 | /info       | Show system information |
