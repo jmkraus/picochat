@@ -104,10 +104,11 @@ func ReadMultilineInput() InputResult {
 
 		case 13, 10: // Enter
 			line := string(currentLine)
+			trimLine := strings.TrimSpace(line)
 
 			// Input is a command
-			if len(lines) == 0 && strings.HasPrefix(strings.TrimSpace(line), "/") {
-				return InputResult{Text: strings.TrimSpace(line), IsCommand: true}
+			if len(lines) == 0 && strings.HasPrefix(trimLine, "/") {
+				return InputResult{Text: trimLine, IsCommand: true}
 			}
 
 			lines = append(lines, line)
