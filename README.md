@@ -171,6 +171,16 @@ PicoChat supports basic persona handling: it is possible to store different conf
 This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because they are implied by the '@' symbol. PicoChat then starts with the specified configuration file.
 
 
+### Known issues
+
+While everything should work as expected on macOS, PicoChat is completely untested on Linux and only minimally tested on Windows.
+
+* On Windows, the Esc key must be pressed twice to cancel a prompt input. Alternatively, Ctrl + C can be used.
+* The command history flickers on Windows when you switch between entries using Up + Down keys.
+* Since Pico AI is not available on Windows, other tools (e.g., ollama) have to be used instead. These may differ in their behavior in some details.
+* Specific ollama features (e.g., new "thinking" output) are not supported.
+
+
 ## Acknowledgements
 
 Special thanks to the developers of the libraries used in this project:
