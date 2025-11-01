@@ -135,7 +135,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if !ok {
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
-		err = applyToConfig("model", model)
+		err = config.ApplyToConfig("model", model)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("apply value to config failed: %w", err)}
 		}
@@ -158,7 +158,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
-		err = applyToConfig(key, value)
+		err = config.ApplyToConfig(key, value)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("apply to config failed: %w", err)}
 		}

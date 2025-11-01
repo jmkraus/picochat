@@ -12,10 +12,6 @@ import (
 	"picochat/version"
 )
 
-var (
-	isQuiet bool
-)
-
 func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
 	stop := make(chan struct{})
 	go console.StartSpinner(stop)
@@ -26,7 +22,7 @@ func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory
 	if err != nil {
 		console.Error(err)
 	} else {
-		if !isQuiet {
+		if !cfg.Quiet {
 			console.Info(msg)
 		}
 	}
@@ -57,7 +53,6 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 
 func main() {
 	args.Parse()
-	isQuiet = *args.Quiet
 
 	if *args.ShowVersion {
 		console.Info(fmt.Sprintf("picochat version is %s", version.Version))
@@ -70,6 +65,10 @@ func main() {
 		os.Exit(1)
 	}
 	cfg := config.Get()
+	if *args.Quiet {
+		// only override config if arg actively set
+		config.ApplyToConfig("quiet", true)
+	}
 
 	var history *messages.ChatHistory
 	if *args.HistoryFile != "" {
@@ -82,7 +81,7 @@ func main() {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	if !isQuiet {
+	if !cfg.Quiet {
 		console.Info(fmt.Sprintf("Configuration file used: %s", cfgName))
 		console.Info("PicoChat started. Help with '/?'")
 	}

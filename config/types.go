@@ -7,4 +7,5 @@ type Config struct {
 	Prompt      string
 	Temperature float64
 	TopP        float64
+	Quiet       bool
 }

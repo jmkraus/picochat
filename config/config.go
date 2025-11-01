@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"picochat/paths"
+	"reflect"
 	"sync"
 
 	"github.com/BurntSushi/toml"
@@ -14,6 +15,14 @@ var (
 	cfgName  string
 	loadErr  error
 )
+
+var allowedKeys = map[string]string{
+	"temperature": "Temperature",
+	"top_p":       "TopP",
+	"context":     "Context",
+	"model":       "Model",
+	"quiet":       "Quiet",
+}
 
 // Load reads and caches the configuration once.
 func Load() (string, error) {
@@ -30,6 +39,7 @@ func Load() (string, error) {
 			Temperature: 0.7,
 			TopP:        0.9,
 			Context:     20,
+			Quiet:       false,
 		}
 
 		if _, err := toml.DecodeFile(path, &cfg); err != nil {
@@ -53,6 +63,34 @@ func Load() (string, error) {
 	return cfgName, loadErr
 }
 
+// Get returns the instance of the loaded configuration
 func Get() *Config {
 	return instance
+}
+
+// ApplyToConfig allows changing a specific parameter after loading.
+func ApplyToConfig(key string, value any) error {
+	fieldName, ok := allowedKeys[key]
+	if !ok {
+		return fmt.Errorf("unsupported config key '%s'", key)
+	}
+
+	cfg := Get()
+	v := reflect.ValueOf(cfg).Elem()  // dereference pointer to Config struct
+	field := v.FieldByName(fieldName) // find struct field
+
+	if !field.IsValid() {
+		return fmt.Errorf("unsupported config key '%s'", fieldName)
+	}
+	if !field.CanSet() {
+		return fmt.Errorf("cannot set config key '%s'", fieldName)
+	}
+
+	valValue := reflect.ValueOf(value)
+	if valValue.Type().ConvertibleTo(field.Type()) {
+		field.Set(valValue.Convert(field.Type()))
+		return nil
+	}
+
+	return fmt.Errorf("cannot assign value of type %T to config key '%s'", value, fieldName)
 }
