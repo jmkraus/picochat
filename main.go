@@ -87,7 +87,9 @@ func main() {
 	}
 
 	for {
-		fmt.Print("\n>>> ")
+		if !cfg.Quiet {
+			fmt.Print("\n>>> ")
+		}
 
 		input := console.ReadMultilineInput()
 		if input.Error != nil {

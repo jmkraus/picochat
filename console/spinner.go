@@ -3,9 +3,16 @@ package console
 import (
 	"fmt"
 	"time"
+
+	"picochat/config"
 )
 
 func StartSpinner(stop <-chan struct{}) {
+	cfg := config.Get()
+	if cfg.Quiet {
+		return
+	}
+
 	frames := []rune{'⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'}
 	i := 0
 
@@ -28,6 +35,11 @@ func StartSpinner(stop <-chan struct{}) {
 }
 
 func StopSpinner(stop chan struct{}) {
+	cfg := config.Get()
+	if cfg.Quiet {
+		return
+	}
+
 	close(stop)
 	ClearLine()
 }
