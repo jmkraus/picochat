@@ -22,6 +22,19 @@ type CommandResult struct {
 	Repeat bool
 }
 
+// HandleCommand processes a command line input, performs the requested action,
+// and returns a CommandResult containing the outcome of the command.
+//
+// Parameters:
+//
+//	commandLine - the raw command line string entered by the user.
+//	history     - the chat history to operate on.
+//	input       - an io.Reader used for interactive prompts.
+//
+// Returns:
+//
+//	CommandResult - a struct containing output, error, quit flag, prompt,
+//	and repeat flag for the command.
 func HandleCommand(commandLine string, history *messages.ChatHistory, input io.Reader) CommandResult {
 	cfg := config.Get()
 
@@ -183,6 +196,17 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	}
 }
 
+// parseCommandArgs splits the input string into a command and its arguments,
+// normalizes the command, and handles special abbreviations.
+//
+// Parameters:
+//
+//	input - the raw input string entered by the user.
+//
+// Returns:
+//
+//	cmd  - the normalized command string without leading slash.
+//	arg  - the remaining arguments as a single string.
 func parseCommandArgs(input string) (string, string) {
 	parts := strings.Fields(input)
 	if len(parts) == 0 {

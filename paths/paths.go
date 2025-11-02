@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+// GetConfigPath returns the path to the configuration file.
+// Parameters:
+//   none
+// Returns:
+//   string - the configuration file path
+//   error - error if any
 func GetConfigPath() (string, error) {
 	configDir, err := getConfigDir()
 	if err != nil {
@@ -26,6 +32,12 @@ func GetConfigPath() (string, error) {
 	return filepath.Join(configDir, "config.toml"), nil
 }
 
+// EnsureSuffix ensures that the filename ends with the given suffix.
+// Parameters:
+//   filename string - the original filename
+//   suffix string - the suffix to ensure
+// Returns:
+//   string - the filename with the suffix ensured
 func EnsureSuffix(filename string, suffix string) string {
 	if !strings.HasSuffix(filename, suffix) {
 		return filename + suffix
@@ -33,6 +45,12 @@ func EnsureSuffix(filename string, suffix string) string {
 	return filename
 }
 
+// getConfigDir determines the configuration directory using various fallbacks.
+// Parameters:
+//   none
+// Returns:
+//   string - the configuration directory path
+//   error - error if any
 func getConfigDir() (string, error) {
 	// Fallback 1: $CONFIG_PATH
 	if env := os.Getenv("CONFIG_PATH"); env != "" {
@@ -61,10 +79,22 @@ func getConfigDir() (string, error) {
 }
 
 var overrideHistoryPath string // for Unit Tests
+
+// OverrideHistoryPath sets a custom history path for testing purposes.
+// Parameters:
+//   path string - the custom history path
+// Returns:
+//   none
 func OverrideHistoryPath(path string) {
 	overrideHistoryPath = path
 }
 
+// GetHistoryPath returns the path to the history directory.
+// Parameters:
+//   none
+// Returns:
+//   string - the history directory path
+//   error - error if any
 func GetHistoryPath() (string, error) {
 	if overrideHistoryPath != "" {
 		return overrideHistoryPath, nil
@@ -82,6 +112,12 @@ func GetHistoryPath() (string, error) {
 	return historyDir, nil
 }
 
+// fallbackToXDGOrHome returns the XDG config directory or the home config directory.
+// Parameters:
+//   none
+// Returns:
+//   string - the config directory path
+//   error - error if any
 func fallbackToXDGOrHome() (string, error) {
 	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
 	if xdgConfigHome != "" {
@@ -96,6 +132,12 @@ func fallbackToXDGOrHome() (string, error) {
 	return filepath.Join(homeDir, ".config", "picochat"), nil
 }
 
+// fallbackToExecutableDir returns the directory of the executable.
+// Parameters:
+//   none
+// Returns:
+//   string - the executable directory path
+//   error - error if any
 func fallbackToExecutableDir() (string, error) {
 	ex, err := os.Executable()
 	if err != nil {

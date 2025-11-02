@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+// StripReasoning removes <think>...</think> tags from the input string and trims empty lines.
+// Parameters:
+//   s string - the input string.
+// Returns:
+//   string - the cleaned string.
 func StripReasoning(s string) string {
 	// 1st case: correct pair <think>...</think>
 	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
@@ -23,6 +28,11 @@ func StripReasoning(s string) string {
 	return s
 }
 
+// TrimEmptyLines removes leading and trailing empty lines from the input string.
+// Parameters:
+//   s string - the input string.
+// Returns:
+//   string - the string without leading or trailing empty lines.
 func TrimEmptyLines(s string) string {
 	lines := strings.Split(s, "\n")
 
@@ -39,6 +49,12 @@ func TrimEmptyLines(s string) string {
 	return strings.Join(lines, "\n")
 }
 
+// ExtractCodeBlock extracts the first code block from a string formatted with triple backticks.
+// Parameters:
+//   s string - the input string containing code blocks.
+// Returns:
+//   string - the extracted code block content.
+//   bool - true if a code block was found, false otherwise.
 func ExtractCodeBlock(s string) (string, bool) {
 	re := regexp.MustCompile("(?s)```\\w*\\n(.*?)```")
 	match := re.FindStringSubmatch(s)
@@ -48,6 +64,11 @@ func ExtractCodeBlock(s string) (string, bool) {
 	return "", false
 }
 
+// CalculateTokens estimates the number of tokens in a string based on word count.
+// Parameters:
+//   s string - the input string.
+// Returns:
+//   float64 - the estimated token count.
 func CalculateTokens(s string) float64 {
 	words := strings.Fields(s)
 	return float64(len(words)) * 1.3
