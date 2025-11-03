@@ -11,10 +11,13 @@ import (
 
 // GetAvailableModels fetches model names from the /tags endpoint.
 // Parameters:
-//   apiBaseURL string - Base URL of the API.
+//
+//	apiBaseURL string - Base URL of the API.
+//
 // Returns:
-//   []string - Slice of model names.
-//   error - Error if fetching or decoding fails.
+//
+//	[]string - Slice of model names.
+//	error - Error if fetching or decoding fails.
 func GetAvailableModels(apiBaseURL string) ([]string, error) {
 	tagsURL, err := CleanUrl(apiBaseURL, "tags")
 	if err != nil {
@@ -47,10 +50,13 @@ func GetAvailableModels(apiBaseURL string) ([]string, error) {
 
 // GetServerVersion retrieves the server version from the /version endpoint.
 // Parameters:
-//   apiBaseURL string - Base URL of the API.
+//
+//	apiBaseURL string - Base URL of the API.
+//
 // Returns:
-//   string - Server version.
-//   error - Error if request or decoding fails.
+//
+//	string - Server version.
+//	error - Error if request or decoding fails.
 func GetServerVersion(apiBaseURL string) (string, error) {
 	versionURL, err := CleanUrl(apiBaseURL, "version")
 	if err != nil {
@@ -77,11 +83,14 @@ func GetServerVersion(apiBaseURL string) (string, error) {
 
 // CleanUrl constructs a full API URL by ensuring the base URL includes the /api path and appending the specified endpoint.
 // Parameters:
-//   apiBaseURL string - Base API URL.
-//   endPoint string - API endpoint to append.
+//
+//	apiBaseURL string - Base API URL.
+//	endPoint string - API endpoint to append.
+//
 // Returns:
-//   string - Full URL string.
-//   error - Error if base URL is invalid.
+//
+//	string - Full URL string.
+//	error - Error if base URL is invalid.
 func CleanUrl(apiBaseURL, endPoint string) (string, error) {
 	u, err := url.Parse(apiBaseURL)
 	if err != nil {

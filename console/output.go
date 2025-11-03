@@ -13,7 +13,9 @@ const warn_prefix string = "!" // or "warning:"
 //
 //	err: error to be printed
 //
-// Returns: none
+// Returns:
+//
+//	none
 func Error(err error) {
 	Errorf("%v", err)
 }
@@ -24,7 +26,9 @@ func Error(err error) {
 //	format: format string
 //	args: arguments for the format string
 //
-// Returns: none
+// Returns:
+//
+//	none
 func Errorf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
 	fmt.Fprintf(os.Stderr, "%s %s\n", err_prefix, msg)
@@ -35,7 +39,9 @@ func Errorf(format string, args ...any) {
 //
 //	msg: warning message to be printed
 //
-// Returns: none
+// Returns:
+//
+//	none
 func Warn(msg string) {
 	fmt.Fprintf(os.Stderr, "%s %s\n", warn_prefix, msg)
 }
@@ -45,7 +51,9 @@ func Warn(msg string) {
 //
 //	msg: message to be printed
 //
-// Returns: none
+// Returns:
+//
+//	none
 func Info(msg string) {
 	fmt.Fprintln(os.Stdout, msg)
 }

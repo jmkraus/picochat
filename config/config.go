@@ -27,11 +27,13 @@ var allowedKeys = map[string]string{
 // Load reads and caches the configuration once.
 //
 // Parameters:
-//   none
+//
+//	none
 //
 // Returns:
-//   string: the path to the configuration file
-//   error: an error if loading fails
+//
+//	string: the path to the configuration file
+//	error: an error if loading fails
 func Load() (string, error) {
 	once.Do(func() {
 		path, err := paths.GetConfigPath()
@@ -73,10 +75,12 @@ func Load() (string, error) {
 // Get returns the instance of the loaded configuration.
 //
 // Parameters:
-//   none
+//
+//	none
 //
 // Returns:
-//   *Config: pointer to the loaded configuration
+//
+//	*Config: pointer to the loaded configuration
 func Get() *Config {
 	return instance
 }
@@ -84,11 +88,13 @@ func Get() *Config {
 // ApplyToConfig allows changing a specific parameter after loading.
 //
 // Parameters:
-//   key string: the configuration key to modify
-//   value any: the new value for the key
+//
+//	key string: the configuration key to modify
+//	value any: the new value for the key
 //
 // Returns:
-//   error: an error if the key is unsupported or the value cannot be set
+//
+//	error: an error if the key is unsupported or the value cannot be set
 func ApplyToConfig(key string, value any) error {
 	fieldName, ok := allowedKeys[key]
 	if !ok {

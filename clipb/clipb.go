@@ -10,19 +10,27 @@ import (
 )
 
 // isTmuxSession returns whether the current process is running inside a tmux session.
+//
 // Parameters:
-//   <none>
+//
+//	<none>
+//
 // Returns:
-//   <bool>
+//
+//	bool - app is running in a tmux session (true / false)
 func isTmuxSession() bool {
 	return os.Getenv("TMUX") != ""
 }
 
 // copyToTmuxBufferStdin loads the given text into the tmux buffer via stdin.
+//
 // Parameters:
-//   text string - the text to load into the tmux buffer
+//
+//	text string - the text to load into the tmux buffer
+//
 // Returns:
-//   <error>
+//
+//	error - any error encountered while writing the tmux buffer
 func copyToTmuxBufferStdin(text string) error {
 	cmd := exec.Command("tmux", "load-buffer", "-")
 	cmd.Stdin = strings.NewReader(text)
@@ -30,11 +38,15 @@ func copyToTmuxBufferStdin(text string) error {
 }
 
 // ReadClipboard reads the current contents of the system clipboard.
+//
 // Parameters:
-//   <none>
+//
+//	<none>
+//
 // Returns:
-//   string - the clipboard contents
-//   error - any error encountered while reading the clipboard
+//
+//	string - the clipboard contents
+//	error - any error encountered while reading the clipboard
 func ReadClipboard() (string, error) {
 	text, err := clipboard.ReadAll()
 	if err != nil {
@@ -49,10 +61,14 @@ func ReadClipboard() (string, error) {
 
 // WriteClipboard writes the given text to the system clipboard and, if running inside tmux,
 // also copies it to the tmux buffer.
+//
 // Parameters:
-//   text string - the text to write to the clipboard
+//
+//	text string - the text to write to the clipboard
+//
 // Returns:
-//   error - any error encountered while writing to the clipboard or tmux buffer
+//
+//	error - any error encountered while writing to the clipboard or tmux buffer
 func WriteClipboard(text string) error {
 	err := clipboard.WriteAll(text)
 	if err != nil {

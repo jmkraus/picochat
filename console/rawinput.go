@@ -12,8 +12,13 @@ import (
 // ReadMultilineInput reads multiline input from stdin. It handles raw mode, escape sequences,
 // command detection, and returns an InputResult containing the entered text, flags for EOF,
 // Aborted, IsCommand, and any error.
-// Parameters: none.
-// Returns: InputResult.
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	InputResult
 func ReadMultilineInput() InputResult {
 	in := os.Stdin
 	fd := int(in.Fd())

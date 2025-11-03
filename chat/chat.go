@@ -20,13 +20,15 @@ import (
 // and token speed.
 //
 // Parameters:
-//   cfg      - configuration containing model, URL, and other settings
-//   history  - chat history to send and update
-//   stop     - channel used to stop the spinner when the first token arrives
+//
+//	cfg      - configuration containing model, URL, and other settings
+//	history  - chat history to send and update
+//	stop     - channel used to stop the spinner when the first token arrives
 //
 // Returns:
-//   string  - summary message with elapsed time and token speed
-//   error   - error encountered during the request or processing
+//
+//	string  - summary message with elapsed time and token speed
+//	error   - error encountered during the request or processing
 func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (string, error) {
 	reqBody := messages.ChatRequest{
 		Model:    cfg.Model,
@@ -106,11 +108,13 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 // to avoid floating‑point rounding differences.
 //
 // Parameters:
-//   t - start time
+//
+//	t - start time
 //
 // Returns:
-//   int    - total elapsed seconds
-//   string - formatted elapsed time "MM:SS"
+//
+//	int    - total elapsed seconds
+//	string - formatted elapsed time "MM:SS"
 func elapsedTime(t time.Time) (int, string) {
 	elapsed := time.Since(t)
 
@@ -127,11 +131,13 @@ func elapsedTime(t time.Time) (int, string) {
 // zero.  The result is rounded to one decimal place.
 //
 // Parameters:
-//   t - elapsed time in seconds
-//   s - string containing the full reply
+//
+//	t - elapsed time in seconds
+//	s - string containing the full reply
 //
 // Returns:
-//   float64 - tokens per second
+//
+//	float64 - tokens per second
 func tokenSpeed(t int, s string) float64 {
 	if (t == 0) || (s == "") {
 		return 0

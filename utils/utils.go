@@ -22,8 +22,13 @@ var (
 )
 
 // ListHistoryFiles shows all saved sessions in 'history' dir
-// Parameters: None
-// Returns: (string, error)
+// Parameters:
+//
+//	None
+//
+// Returns:
+//
+//	(string, error)
 func ListHistoryFiles() (string, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
@@ -51,8 +56,13 @@ func ListHistoryFiles() (string, error) {
 }
 
 // ShowAvailableModels lists all models via /tags API call
-// Parameters: baseUrl string
-// Returns: (string, error)
+// Parameters:
+//
+//	baseUrl string
+//
+// Returns:
+//
+//	(string, error)
 func ShowAvailableModels(baseUrl string) (string, error) {
 	models, err := requests.GetAvailableModels(baseUrl)
 	if err != nil {
@@ -68,8 +78,13 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 }
 
 // Filled by /list command
-// Parameters: list []string
-// Returns: None
+// Parameters:
+//
+//	list []string - List of stored history sessions
+//
+// Returns:
+//
+//	None
 func setHistoryList(list []string) {
 	HistoryList = list
 	HistoryMap = make(map[int]string)
@@ -84,8 +99,13 @@ func GetHistoryByIndex(i int) (string, bool) {
 }
 
 // Filled by /models command
-// Parameters: list []string
-// Returns: None
+// Parameters:
+//
+//	list []string - List of available Models
+//
+// Returns:
+//
+//	None
 func setModelsList(list []string) {
 	ModelsList = list
 	ModelsMap = make(map[int]string)

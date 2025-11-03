@@ -5,9 +5,12 @@ var cmdHistory = &CommandHistory{}
 // AddCommand adds a command to the history.
 //
 // Parameters:
-//   cmd string - the command to add
+//
+//	cmd string - the command to add
+//
 // Returns:
-//   none
+//
+//	none
 func AddCommand(cmd string) {
 	cmdHistory.add(cmd)
 }
@@ -15,9 +18,12 @@ func AddCommand(cmd string) {
 // PrevCommand returns the previous command in the history.
 //
 // Parameters:
-//   none
+//
+//	none
+//
 // Returns:
-//   string - the previous command
+//
+//	string - the previous command
 func PrevCommand() string {
 	return cmdHistory.prev()
 }
@@ -25,9 +31,12 @@ func PrevCommand() string {
 // NextCommand returns the next command in the history.
 //
 // Parameters:
-//   none
+//
+//	none
+//
 // Returns:
-//   string - the next command
+//
+//	string - the next command
 func NextCommand() string {
 	return cmdHistory.next()
 }
@@ -35,9 +44,12 @@ func NextCommand() string {
 // add adds a command to the history.
 //
 // Parameters:
-//   cmd string - the command to add
+//
+//	cmd string - the command to add
+//
 // Returns:
-//   none
+//
+//	none
 func (h *CommandHistory) add(cmd string) {
 	if cmd == "" {
 		return
@@ -52,9 +64,12 @@ func (h *CommandHistory) add(cmd string) {
 // prev returns the previous command in the history.
 //
 // Parameters:
-//   none
+//
+//	none
+//
 // Returns:
-//   string - the previous command
+//
+//	string - the previous command
 func (h *CommandHistory) prev() string {
 	if len(h.entries) == 0 {
 		return ""
@@ -68,9 +83,12 @@ func (h *CommandHistory) prev() string {
 // next returns the next command in the history.
 //
 // Parameters:
-//   none
+//
+//	none
+//
 // Returns:
-//   string - the next command
+//
+//	string - the next command
 func (h *CommandHistory) next() string {
 	if len(h.entries) == 0 {
 		return ""
