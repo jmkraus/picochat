@@ -22,13 +22,14 @@ var (
 )
 
 // ListHistoryFiles shows all saved sessions in 'history' dir
+//
 // Parameters:
 //
 //	None
 //
 // Returns:
 //
-//	(string, error)
+//	(string, error) - formatted list of history files or an error
 func ListHistoryFiles() (string, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
@@ -56,13 +57,14 @@ func ListHistoryFiles() (string, error) {
 }
 
 // ShowAvailableModels lists all models via /tags API call
+//
 // Parameters:
 //
-//	baseUrl string
+//	baseUrl string - Base URL for the API
 //
 // Returns:
 //
-//	(string, error)
+//	(string, error) - formatted list of available models or an error
 func ShowAvailableModels(baseUrl string) (string, error) {
 	models, err := requests.GetAvailableModels(baseUrl)
 	if err != nil {
@@ -78,6 +80,7 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 }
 
 // Filled by /list command
+//
 // Parameters:
 //
 //	list []string - List of stored history sessions
@@ -93,12 +96,22 @@ func setHistoryList(list []string) {
 	}
 }
 
+// GetHistoryByIndex retrieves a history session by its index
+//
+// Parameters:
+//
+//	i int - Index of the history session
+//
+// Returns:
+//
+//	(string, bool) - session name and a boolean indicating success
 func GetHistoryByIndex(i int) (string, bool) {
 	val, ok := HistoryMap[i]
 	return val, ok
 }
 
 // Filled by /models command
+//
 // Parameters:
 //
 //	list []string - List of available Models
@@ -114,11 +127,31 @@ func setModelsList(list []string) {
 	}
 }
 
+// GetModelsByIndex retrieves a model by its index
+//
+// Parameters:
+//
+//	i int - Index of the model
+//
+// Returns:
+//
+//	(string, bool) - model name and a boolean indicating success
 func GetModelsByIndex(i int) (string, bool) {
 	val, ok := ModelsMap[i]
 	return val, ok
 }
 
+// FormatList formats a list of items with an optional heading and numbering
+//
+// Parameters:
+//
+//	content []string - Items to format
+//	heading string   - Heading for the list
+//	numbered bool   - Whether to number the items
+//
+// Returns:
+//
+//	string - formatted list
 func FormatList(content []string, heading string, numbered bool) string {
 	if len(content) == 0 {
 		return fmt.Sprintf("no %s found.", strings.ToLower(heading))
@@ -136,6 +169,15 @@ func FormatList(content []string, heading string, numbered bool) string {
 	return fmt.Sprintf("%s:\n%s", capitalize(heading), strings.Join(lines, "\n"))
 }
 
+// capitalize capitalizes the first letter of a string
+//
+// Parameters:
+//
+//	s string - Input string
+//
+// Returns:
+//
+//	string - String with first letter capitalized
 func capitalize(s string) string {
 	if s == "" {
 		return ""
