@@ -18,7 +18,7 @@ func TestParseArgs_Valid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		key, val, err := ParseArgs(tt.input)
+		key, val, err := parseArgs(tt.input)
 		if err != nil {
 			t.Errorf("unexpected error for input %q: %v", tt.input, err)
 			continue
@@ -43,7 +43,7 @@ func TestParseArgs_Invalid(t *testing.T) {
 	}
 
 	for _, input := range tests {
-		_, _, err := ParseArgs(input)
+		_, _, err := parseArgs(input)
 		if err == nil {
 			t.Errorf("expected error for input %q, got nil", input)
 		}
