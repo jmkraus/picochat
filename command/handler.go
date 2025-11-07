@@ -36,7 +36,10 @@ type CommandResult struct {
 //	CommandResult - a struct containing output, error, quit flag, prompt,
 //	and repeat flag for the command.
 func HandleCommand(commandLine string, history *messages.ChatHistory, input io.Reader) CommandResult {
-	cfg := config.Get()
+	cfg, err := config.Get()
+	if err != nil {
+		return CommandResult{Error: fmt.Errorf("config read failed: %w", err)}
+	}
 
 	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
@@ -155,8 +158,6 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
 	case "set":
 		if args == "" {
-			cfg := config.Get()
-
 			list := []string{
 				fmt.Sprintf("model = %s", cfg.Model),
 				fmt.Sprintf("context = %d", cfg.Context),

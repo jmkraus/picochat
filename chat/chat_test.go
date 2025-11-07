@@ -5,7 +5,6 @@ import (
 	"math"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -13,15 +12,6 @@ import (
 	"picochat/config"
 	"picochat/messages"
 )
-
-func TestMain(m *testing.M) {
-	_, err := config.Load()
-	if err != nil {
-		fmt.Println("failed to load config:", err)
-		os.Exit(1)
-	}
-	os.Exit(m.Run())
-}
 
 // Simulated Streaming-Handler (PicoAI)
 func streamingHandler(w http.ResponseWriter, r *http.Request) {

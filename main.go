@@ -59,12 +59,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	cfgName, err := config.Load()
+	cfg, err := config.Get()
 	if err != nil {
 		console.Errorf("load configuration failed: %v", err)
 		os.Exit(1)
 	}
-	cfg := config.Get()
+
 	if *args.Quiet {
 		// only override config if arg actively set
 		config.ApplyToConfig("quiet", true)
@@ -82,7 +82,7 @@ func main() {
 	}
 
 	if !cfg.Quiet {
-		console.Info(fmt.Sprintf("Configuration file used: %s", cfgName))
+		console.Info(fmt.Sprintf("Configuration file used: %s", cfg.FilePath))
 		console.Info("PicoChat started. Help with '/?'")
 	}
 

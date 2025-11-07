@@ -12,7 +12,6 @@ import (
 var (
 	instance *Config
 	once     sync.Once
-	cfgName  string
 	loadErr  error
 )
 
@@ -24,7 +23,7 @@ var allowedKeys = map[string]string{
 	"quiet":       "Quiet",
 }
 
-// Load reads and caches the configuration once.
+// Load reads and caches the configuration.
 //
 // Parameters:
 //
@@ -32,47 +31,41 @@ var allowedKeys = map[string]string{
 //
 // Returns:
 //
-//	string: the path to the configuration file
-//	error: an error if loading fails
-func Load() (string, error) {
-	once.Do(func() {
-		path, err := paths.GetConfigPath()
-		if err != nil {
-			loadErr = err
-			return
-		}
+//	none
+func load() {
+	path, err := paths.GetConfigPath()
+	if err != nil {
+		loadErr = err
+		return
+	}
 
-		cfgName = path
+	var cfg = Config{
+		Temperature: 0.7,
+		TopP:        0.9,
+		Context:     20,
+		Quiet:       false,
+	}
 
-		var cfg = Config{
-			Temperature: 0.7,
-			TopP:        0.9,
-			Context:     20,
-			Quiet:       false,
-		}
+	if _, err := toml.DecodeFile(path, &cfg); err != nil {
+		loadErr = fmt.Errorf("failed to decode TOML file %q: %w", path, err)
+		return
+	}
 
-		if _, err := toml.DecodeFile(path, &cfg); err != nil {
-			loadErr = fmt.Errorf("failed to decode TOML file %q: %w", path, err)
-			return
-		}
+	if cfg.URL == "" || cfg.Model == "" || cfg.Prompt == "" {
+		loadErr = fmt.Errorf("required fields URL, Model, or Prompt are missing in config")
+		return
+	}
 
-		if cfg.URL == "" || cfg.Model == "" || cfg.Prompt == "" {
-			loadErr = fmt.Errorf("required fields URL, Model, or Prompt are missing in config")
-			return
-		}
+	if cfg.Context != 0 && (cfg.Context < 5 || cfg.Context > 100) {
+		loadErr = fmt.Errorf("context size must be between 5 and 100")
+		return
+	}
 
-		if cfg.Context != 0 && (cfg.Context < 5 || cfg.Context > 100) {
-			loadErr = fmt.Errorf("context size must be between 5 and 100")
-			return
-		}
-
-		instance = &cfg
-	})
-
-	return cfgName, loadErr
+	cfg.FilePath = path
+	instance = &cfg
 }
 
-// Get returns the instance of the loaded configuration.
+// Get loads the configuration once and returns the instance of the loaded configuration.
 //
 // Parameters:
 //
@@ -80,28 +73,34 @@ func Load() (string, error) {
 //
 // Returns:
 //
-//	*Config: pointer to the loaded configuration
-func Get() *Config {
-	return instance
+//	*Config - pointer to the loaded configuration
+//	 error  - an error if the loading of the config file failed
+func Get() (*Config, error) {
+	once.Do(load)
+	return instance, loadErr
 }
 
 // ApplyToConfig allows changing a specific parameter after loading.
 //
 // Parameters:
 //
-//	key string: the configuration key to modify
-//	value any: the new value for the key
+//	key (string) - the configuration key to modify
+//	value (any)  - the new value for the key
 //
 // Returns:
 //
-//	error: an error if the key is unsupported or the value cannot be set
+//	error - an error if the key is unsupported or the value cannot be set
 func ApplyToConfig(key string, value any) error {
+	cfg, err := Get()
+	if err != nil {
+		return fmt.Errorf("cannot apply config change: %w", err)
+	}
+
 	fieldName, ok := allowedKeys[key]
 	if !ok {
 		return fmt.Errorf("unsupported config key '%s'", key)
 	}
 
-	cfg := Get()
 	v := reflect.ValueOf(cfg).Elem()  // dereference pointer to Config struct
 	field := v.FieldByName(fieldName) // find struct field
 

@@ -7,8 +7,21 @@ import (
 	"picochat/config"
 )
 
+// StartSpinner starts a spinner animation until a signal is received on the stop channel.
+// Parameters:
+//
+//	stop <-chan struct{} – placeholder for input channel
+//
+// Returns:
+//
+//	none
 func StartSpinner(stop <-chan struct{}) {
-	cfg := config.Get()
+	cfg, err := config.Get()
+	if err != nil {
+		//TODO: needs better err handling
+		return
+	}
+
 	if cfg.Quiet {
 		return
 	}
@@ -34,8 +47,21 @@ func StartSpinner(stop <-chan struct{}) {
 	}
 }
 
+// StopSpinner stops the spinner animation and clears the line.
+// Parameters:
+//
+//	stop chan struct{} – placeholder for input channel to signal stop
+//
+// Returns:
+//
+//	none
 func StopSpinner(stop chan struct{}) {
-	cfg := config.Get()
+	cfg, err := config.Get()
+	if err != nil {
+		//TODO: needs better err handling
+		return
+	}
+
 	if cfg.Quiet {
 		return
 	}
@@ -44,6 +70,14 @@ func StopSpinner(stop chan struct{}) {
 	ClearLine()
 }
 
+// ClearLine clears the current terminal line.
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	none
 func ClearLine() {
 	fmt.Print("\r\033[K") // delete to EOL
 }

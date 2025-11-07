@@ -8,4 +8,6 @@ type Config struct {
 	Temperature float64
 	TopP        float64
 	Quiet       bool
+
+	FilePath string `toml:"-"`
 }
