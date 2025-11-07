@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ParseArgs parses a string of the form "key=value" and returns the key, converted value, and error.
+// parseArgs parses a string of the form "key=value" and returns the key, converted value, and error.
 // Parameters:
 //
 //	args - the input string to parse.
