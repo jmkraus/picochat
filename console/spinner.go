@@ -3,26 +3,19 @@ package console
 import (
 	"fmt"
 	"time"
-
-	"picochat/config"
 )
 
 // StartSpinner starts a spinner animation until a signal is received on the stop channel.
 // Parameters:
 //
-//	stop <-chan struct{} – placeholder for input channel
+//	quiet (bool)           - Suppress Spinner in quiet mode (true / false)
+//	stop (<-chan struct{}) – placeholder for input channel
 //
 // Returns:
 //
 //	none
-func StartSpinner(stop <-chan struct{}) {
-	cfg, err := config.Get()
-	if err != nil {
-		//TODO: needs better err handling
-		return
-	}
-
-	if cfg.Quiet {
+func StartSpinner(quiet bool, stop <-chan struct{}) {
+	if quiet {
 		return
 	}
 
@@ -33,7 +26,7 @@ func StartSpinner(stop <-chan struct{}) {
 	fmt.Print("\033[?25l")
 	defer fmt.Print("\033[?25h") // safe enable cursor at return
 
-	ClearLine()
+	fmt.Print("\r\033[K") // delete to EOL
 
 	for {
 		select {
@@ -50,34 +43,17 @@ func StartSpinner(stop <-chan struct{}) {
 // StopSpinner stops the spinner animation and clears the line.
 // Parameters:
 //
-//	stop chan struct{} – placeholder for input channel to signal stop
+//	quiet (bool)         - Suppress Spinner in quiet mode (true / false)
+//	stop (chan struct{}) – placeholder for input channel to signal stop
 //
 // Returns:
 //
 //	none
-func StopSpinner(stop chan struct{}) {
-	cfg, err := config.Get()
-	if err != nil {
-		//TODO: needs better err handling
-		return
-	}
-
-	if cfg.Quiet {
+func StopSpinner(quiet bool, stop chan struct{}) {
+	if quiet {
 		return
 	}
 
 	close(stop)
-	ClearLine()
-}
-
-// ClearLine clears the current terminal line.
-// Parameters:
-//
-//	none
-//
-// Returns:
-//
-//	none
-func ClearLine() {
 	fmt.Print("\r\033[K") // delete to EOL
 }

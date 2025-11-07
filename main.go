@@ -14,7 +14,7 @@ import (
 
 func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
 	stop := make(chan struct{})
-	go console.StartSpinner(stop)
+	go console.StartSpinner(quiet, stop)
 
 	history.Add(messages.RoleUser, prompt)
 
@@ -35,7 +35,7 @@ func repeatPrompt(quiet bool, history *messages.ChatHistory) {
 	}
 
 	stop := make(chan struct{})
-	go console.StartSpinner(stop)
+	go console.StartSpinner(quiet, stop)
 
 	lastEntry := history.GetLast()
 	if lastEntry.Role != messages.RoleUser {

@@ -79,7 +79,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 		if res.Message.Content != "" {
 			if firstToken {
-				console.StopSpinner(stop)
+				console.StopSpinner(cfg.Quiet, stop)
 				firstToken = false
 			}
 			fmt.Print(res.Message.Content)
@@ -94,7 +94,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	}
 
 	if fullReply.Len() == 0 {
-		console.StopSpinner(stop)
+		console.StopSpinner(cfg.Quiet, stop)
 		return "", fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
 	}
 
