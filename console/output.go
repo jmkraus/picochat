@@ -11,7 +11,7 @@ const warn_prefix string = "!" // or "warning:"
 // Error is a simplified wrapper for Errorf
 // Parameters:
 //
-//	err: error to be printed
+//	err (error) - error to be printed
 //
 // Returns:
 //
@@ -23,8 +23,8 @@ func Error(err error) {
 // Errorf prints a custom error message to stderr
 // Parameters:
 //
-//	format: format string
-//	args: arguments for the format string
+//	format (string) - format string
+//	args (any)      - arguments for the format string
 //
 // Returns:
 //
@@ -37,7 +37,7 @@ func Errorf(format string, args ...any) {
 // Warn prints a warning message to stderr, prefixed with "warning:"
 // Parameters:
 //
-//	msg: warning message to be printed
+//	msg (string) - warning message to be printed
 //
 // Returns:
 //
@@ -49,7 +49,7 @@ func Warn(msg string) {
 // Info prints a message to stdout (normal output)
 // Parameters:
 //
-//	msg: message to be printed
+//	msg (string) - message to be printed
 //
 // Returns:
 //

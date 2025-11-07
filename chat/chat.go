@@ -132,8 +132,8 @@ func elapsedTime(t time.Time) (int, string) {
 //
 // Parameters:
 //
-//	t - elapsed time in seconds
-//	s - string containing the full reply
+//	t (int)    - elapsed time in seconds
+//	s (string) - string containing the full reply
 //
 // Returns:
 //

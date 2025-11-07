@@ -34,8 +34,8 @@ type ChatHistory struct {
 //
 // Parameters:
 //
-//	systemPrompt string
-//	maxContext int
+//	systemPrompt (string) - The system prompt as specified in the config file
+//	maxContext (int)      - Maximum number of messages in the chat session
 //
 // Returns:
 //
@@ -51,8 +51,8 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 //
 // Parameters:
 //
-//	role string
-//	content string
+//	role (string)    - Role of the stored message (System, User, Assistant)
+//	content (string) - Message body
 //
 // Returns:
 //
@@ -85,7 +85,11 @@ func (h *ChatHistory) Add(role, content string) error {
 //
 // Parameters:
 //
+//	none
+//
 // Returns:
+//
+//	none
 func (h *ChatHistory) Discard() {
 	if h.Len() <= 1 {
 		return // only system prompt in history
@@ -101,9 +105,11 @@ func (h *ChatHistory) Discard() {
 //
 // Parameters:
 //
+//	none
+//
 // Returns:
 //
-//	[]Message
+//	[]Message - Array of struct containing the full message history
 func (h *ChatHistory) Get() []Message {
 	return h.Messages
 }
@@ -112,9 +118,11 @@ func (h *ChatHistory) Get() []Message {
 //
 // Parameters:
 //
+//	none
+//
 // Returns:
 //
-//	Message
+//	Message - Struct containing the last message in the history session
 func (h *ChatHistory) GetLast() Message {
 	return h.Messages[h.Len()-1]
 }
@@ -123,12 +131,12 @@ func (h *ChatHistory) GetLast() Message {
 //
 // Parameters:
 //
-//	role string
+//	role (string) - Role of the message (System, User, Assistant)
 //
 // Returns:
 //
-//	Message
-//	bool
+//	Message - Struct containing the message
+//	bool    - Status if the search was successful (true or false)
 func (h *ChatHistory) GetLastRole(role string) (Message, bool) {
 	for i := h.Len() - 1; i >= 0; i-- {
 		if h.Messages[i].Role == role {
@@ -145,6 +153,8 @@ func (h *ChatHistory) GetLastRole(role string) (Message, bool) {
 //	newMessages []Message
 //
 // Returns:
+//
+//	none
 func (h *ChatHistory) Replace(newMessages []Message) {
 	h.Messages = newMessages
 }
@@ -226,7 +236,11 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 //
 // Parameters:
 //
+//	none
+//
 // Returns:
+//
+//	none
 func (h *ChatHistory) ClearExceptSystemPrompt() {
 	if h.Len() > 1 {
 		h.Messages = h.Messages[:1]
@@ -238,7 +252,7 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 //
 // Parameters:
 //
-//	max int
+//	max (int) - new maximum context size for the current history session
 //
 // Returns:
 //
@@ -272,6 +286,8 @@ func (h *ChatHistory) SetContextSize(max int) error {
 //	max int
 //
 // Returns:
+//
+//	none
 func (h *ChatHistory) Compress(max int) {
 	if h.Len() < max {
 		return
@@ -290,6 +306,8 @@ func (h *ChatHistory) Compress(max int) {
 //
 // Parameters:
 //
+//	none
+//
 // Returns:
 //
 //	int
@@ -300,6 +318,8 @@ func (h *ChatHistory) Len() int {
 // MaxCtx returns the maximum context size.
 //
 // Parameters:
+//
+//	none
 //
 // Returns:
 //
@@ -312,6 +332,8 @@ func (h *ChatHistory) MaxCtx() int {
 //
 // Parameters:
 //
+//	none
+//
 // Returns:
 //
 //	bool
@@ -322,6 +344,8 @@ func (h *ChatHistory) IsEmpty() bool {
 // EstimateTokens estimates the total token count of the history.
 //
 // Parameters:
+//
+//	none
 //
 // Returns:
 //

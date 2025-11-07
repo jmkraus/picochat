@@ -25,11 +25,12 @@ var (
 //
 // Parameters:
 //
-//	None
+//	none
 //
 // Returns:
 //
-//	(string, error) - formatted list of history files or an error
+//	string - formatted list of history files
+//	error
 func ListHistoryFiles() (string, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
@@ -60,11 +61,12 @@ func ListHistoryFiles() (string, error) {
 //
 // Parameters:
 //
-//	baseUrl string - Base URL for the API
+//	baseUrl (string) - Base URL for the API
 //
 // Returns:
 //
-//	(string, error) - formatted list of available models or an error
+//	string - formatted list of available models
+//	error
 func ShowAvailableModels(baseUrl string) (string, error) {
 	models, err := requests.GetAvailableModels(baseUrl)
 	if err != nil {
@@ -83,11 +85,11 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 //
 // Parameters:
 //
-//	list []string - List of stored history sessions
+//	list ([]string) - List of stored history sessions
 //
 // Returns:
 //
-//	None
+//	none
 func setHistoryList(list []string) {
 	HistoryList = list
 	HistoryMap = make(map[int]string)
@@ -100,11 +102,12 @@ func setHistoryList(list []string) {
 //
 // Parameters:
 //
-//	i int - Index of the history session
+//	i (int) - Index of the history session
 //
 // Returns:
 //
-//	(string, bool) - session name and a boolean indicating success
+//	string - session name
+//	bool   - boolean indicating success
 func GetHistoryByIndex(i int) (string, bool) {
 	val, ok := HistoryMap[i]
 	return val, ok
@@ -114,11 +117,11 @@ func GetHistoryByIndex(i int) (string, bool) {
 //
 // Parameters:
 //
-//	list []string - List of available Models
+//	list ([]string) - List of available Models
 //
 // Returns:
 //
-//	None
+//	none
 func setModelsList(list []string) {
 	ModelsList = list
 	ModelsMap = make(map[int]string)
@@ -131,11 +134,12 @@ func setModelsList(list []string) {
 //
 // Parameters:
 //
-//	i int - Index of the model
+//	i (int) - Index of the model
 //
 // Returns:
 //
-//	(string, bool) - model name and a boolean indicating success
+//	string - model name
+//	bool   - boolean indicating success
 func GetModelsByIndex(i int) (string, bool) {
 	val, ok := ModelsMap[i]
 	return val, ok
@@ -145,9 +149,9 @@ func GetModelsByIndex(i int) (string, bool) {
 //
 // Parameters:
 //
-//	content []string - Items to format
-//	heading string   - Heading for the list
-//	numbered bool   - Whether to number the items
+//	content ([]string) - Items to format
+//	heading (string)   - Heading for the list
+//	numbered (bool)    - Whether to number the items
 //
 // Returns:
 //
@@ -173,7 +177,7 @@ func FormatList(content []string, heading string, numbered bool) string {
 //
 // Parameters:
 //
-//	s string - Input string
+//	s (string) - Input string
 //
 // Returns:
 //

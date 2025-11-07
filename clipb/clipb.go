@@ -13,7 +13,7 @@ import (
 //
 // Parameters:
 //
-//	<none>
+//	none
 //
 // Returns:
 //
@@ -41,12 +41,12 @@ func copyToTmuxBufferStdin(text string) error {
 //
 // Parameters:
 //
-//	<none>
+//	none
 //
 // Returns:
 //
 //	string - the clipboard contents
-//	error - any error encountered while reading the clipboard
+//	error  - any error encountered while reading the clipboard
 func ReadClipboard() (string, error) {
 	text, err := clipboard.ReadAll()
 	if err != nil {

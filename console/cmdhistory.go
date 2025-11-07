@@ -6,7 +6,7 @@ var cmdHistory = &CommandHistory{}
 //
 // Parameters:
 //
-//	cmd string - the command to add
+//	cmd (string) - the command to add
 //
 // Returns:
 //
@@ -45,7 +45,7 @@ func NextCommand() string {
 //
 // Parameters:
 //
-//	cmd string - the command to add
+//	cmd (string) - the command to add
 //
 // Returns:
 //

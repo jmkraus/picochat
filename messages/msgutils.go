@@ -8,7 +8,7 @@ import (
 // StripReasoning removes <think>...</think> tags from the input string and trims empty lines.
 // Parameters:
 //
-//	s string - the input string.
+//	s (string) - the input string.
 //
 // Returns:
 //
@@ -34,7 +34,7 @@ func StripReasoning(s string) string {
 // TrimEmptyLines removes leading and trailing empty lines from the input string.
 // Parameters:
 //
-//	s string - the input string.
+//	s (string) - the input string.
 //
 // Returns:
 //
@@ -58,7 +58,7 @@ func TrimEmptyLines(s string) string {
 // ExtractCodeBlock extracts the first code block from a string formatted with triple backticks.
 // Parameters:
 //
-//	s string - the input string containing code blocks.
+//	s (string) - the input string containing code blocks.
 //
 // Returns:
 //
@@ -76,7 +76,7 @@ func ExtractCodeBlock(s string) (string, bool) {
 // CalculateTokens estimates the number of tokens in a string based on word count.
 // Parameters:
 //
-//	s string - the input string.
+//	s (string) - the input string.
 //
 // Returns:
 //

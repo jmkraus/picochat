@@ -10,13 +10,13 @@ import (
 // ParseArgs parses a string of the form "key=value" and returns the key, converted value, and error.
 // Parameters:
 //
-//	args: the input string to parse.
+//	args - the input string to parse.
 //
 // Returns:
 //
-//	key: the parsed key in lower case.
-//	value: the parsed and converted value.
-//	error: any error encountered during parsing or conversion.
+//	key   - the parsed key in lower case.
+//	value - the parsed and converted value.
+//	error - any error encountered during parsing or conversion.
 func ParseArgs(args string) (string, any, error) {
 	parts := strings.SplitN(args, "=", 2)
 	if len(parts) != 2 {
@@ -44,13 +44,13 @@ func ParseArgs(args string) (string, any, error) {
 // validateAndConvert validates the key and converts the value to the appropriate type.
 // Parameters:
 //
-//	key: the configuration key.
-//	value: the string representation of the value.
+//	key   - the configuration key.
+//	value - the string representation of the value.
 //
 // Returns:
 //
-//	any: the converted value.
-//	error: any error encountered during validation or conversion.
+//	any   - the converted value.
+//	error - any error encountered during validation or conversion.
 func validateAndConvert(key, value string) (any, error) {
 	switch key {
 	case "temperature", "top_p":

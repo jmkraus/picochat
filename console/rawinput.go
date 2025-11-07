@@ -18,7 +18,7 @@ import (
 //
 // Returns:
 //
-//	InputResult
+//	InputResult - A structure containing the entered text and flags indicating specific states
 func ReadMultilineInput() InputResult {
 	in := os.Stdin
 	fd := int(in.Fd())
