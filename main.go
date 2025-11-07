@@ -18,7 +18,7 @@ func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
 
 	history.Add(messages.RoleUser, prompt)
 
-	msg, err := chat.HandleChat(history, stop)
+	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
 		console.Error(err)
 	} else {
@@ -43,7 +43,7 @@ func repeatPrompt(quiet bool, history *messages.ChatHistory) {
 		return
 	}
 
-	msg, err := chat.HandleChat(history, stop)
+	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
 		console.Error(err)
 	} else {

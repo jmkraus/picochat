@@ -21,6 +21,7 @@ import (
 //
 // Parameters:
 //
+//	cfg      - (optional) config data for unit tests, can be nil by default
 //	history  - chat history to send and update
 //	stop     - channel used to stop the spinner when the first token arrives
 //
@@ -28,8 +29,8 @@ import (
 //
 //	string  - summary message with elapsed time and token speed
 //	error   - error encountered during the request or processing
-func HandleChat(history *messages.ChatHistory, stop chan struct{}) (string, error) {
-	cfg, err := config.Get()
+func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (string, error) {
+	cfg, err := getConfig(cfg)
 	if err != nil {
 		return "", fmt.Errorf("config load failed: %w", err)
 	}
@@ -152,4 +153,21 @@ func tokenSpeed(t int, s string) float64 {
 	roundFactor := 10.0
 
 	return math.Round(speed*roundFactor) / roundFactor
+}
+
+// getConfig is a factory function to ensure a properly loaded config.
+//
+// Parameters:
+//
+//	cfg - a config struct or nil
+//
+// Returns:
+//
+//	config.Config - a struct filled with config data
+//	error         - an error if anything went wrong
+func getConfig(cfg *config.Config) (*config.Config, error) {
+	if cfg != nil {
+		return cfg, nil
+	}
+	return config.Get()
 }
