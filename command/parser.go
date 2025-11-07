@@ -17,7 +17,7 @@ import (
 //	key   - the parsed key in lower case.
 //	value - the parsed and converted value.
 //	error - any error encountered during parsing or conversion.
-func ParseArgs(args string) (string, any, error) {
+func parseArgs(args string) (string, any, error) {
 	parts := strings.SplitN(args, "=", 2)
 	if len(parts) != 2 {
 		return "", nil, errors.New("invalid format, expected key=value")

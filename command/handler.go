@@ -168,7 +168,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}
 
-		key, value, err := ParseArgs(args)
+		key, value, err := parseArgs(args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
