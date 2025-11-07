@@ -12,23 +12,23 @@ import (
 	"picochat/version"
 )
 
-func sendPrompt(prompt string, cfg *config.Config, history *messages.ChatHistory) {
+func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
 	stop := make(chan struct{})
 	go console.StartSpinner(stop)
 
 	history.Add(messages.RoleUser, prompt)
 
-	msg, err := chat.HandleChat(cfg, history, stop)
+	msg, err := chat.HandleChat(history, stop)
 	if err != nil {
 		console.Error(err)
 	} else {
-		if !cfg.Quiet {
+		if !quiet {
 			console.Info(msg)
 		}
 	}
 }
 
-func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
+func repeatPrompt(quiet bool, history *messages.ChatHistory) {
 	if history.Len() < 2 {
 		console.Warn("chat history is empty")
 		return
@@ -43,11 +43,13 @@ func repeatPrompt(cfg *config.Config, history *messages.ChatHistory) {
 		return
 	}
 
-	msg, err := chat.HandleChat(cfg, history, stop)
+	msg, err := chat.HandleChat(history, stop)
 	if err != nil {
 		console.Error(err)
 	} else {
-		console.Info(msg)
+		if !quiet {
+			console.Info(msg)
+		}
 	}
 }
 
@@ -119,14 +121,14 @@ func main() {
 				break
 			}
 			if result.Repeat {
-				repeatPrompt(cfg, history)
+				repeatPrompt(cfg.Quiet, history)
 			} else if result.Prompt != "" {
-				sendPrompt(result.Prompt, cfg, history)
+				sendPrompt(result.Prompt, cfg.Quiet, history)
 			}
 			continue
 		}
 
-		sendPrompt(input.Text, cfg, history)
+		sendPrompt(input.Text, cfg.Quiet, history)
 
 		if input.EOF {
 			break

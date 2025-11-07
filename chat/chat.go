@@ -21,7 +21,6 @@ import (
 //
 // Parameters:
 //
-//	cfg      - configuration containing model, URL, and other settings
 //	history  - chat history to send and update
 //	stop     - channel used to stop the spinner when the first token arrives
 //
@@ -29,7 +28,12 @@ import (
 //
 //	string  - summary message with elapsed time and token speed
 //	error   - error encountered during the request or processing
-func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (string, error) {
+func HandleChat(history *messages.ChatHistory, stop chan struct{}) (string, error) {
+	cfg, err := config.Get()
+	if err != nil {
+		return "", fmt.Errorf("config load failed: %w", err)
+	}
+
 	reqBody := messages.ChatRequest{
 		Model:    cfg.Model,
 		Messages: history.Messages,
@@ -42,7 +46,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("marshal error: %w", err)
+		return "", fmt.Errorf("json marshal failed: %w", err)
 	}
 
 	chatURL, err := requests.CleanUrl(cfg.URL, "chat")
