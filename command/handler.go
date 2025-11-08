@@ -68,7 +68,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			history.Replace(loaded.Get())
 			return CommandResult{Output: "History loaded successfully."}
 		} else {
-			return CommandResult{Output: "Load cancelled."}
+			return CommandResult{Output: "Load canceled."}
 		}
 	case "info":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
