@@ -2,6 +2,7 @@ package messages
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -190,16 +191,22 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	}
 	fullPath := filepath.Join(historyPath, filename)
 
-	data, err := json.MarshalIndent(h.Messages, "", "  ")
-	if err != nil {
-		return "", fmt.Errorf("could not marshal messages: %w", err)
+	// check if file exists
+	if _, err := os.Stat(fullPath); errors.Is(err, os.ErrNotExist) {
+		data, err := json.MarshalIndent(h.Messages, "", "  ")
+		if err != nil {
+			return "", fmt.Errorf("marshal messages failed: %w", err)
+		}
+
+		if err := os.WriteFile(fullPath, data, 0644); err != nil {
+			return "", fmt.Errorf("could not write file %s: %w", filename, err)
+		}
+
+		return filename, nil
+	} else {
+		return "", fmt.Errorf("filename already exists")
 	}
 
-	if err := os.WriteFile(fullPath, data, 0644); err != nil {
-		return "", fmt.Errorf("could not write file %s: %w", filename, err)
-	}
-
-	return filename, nil
 }
 
 // LoadHistoryFromFile reads a chat history from a file and returns a ChatHistory instance.
