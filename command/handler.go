@@ -29,7 +29,7 @@ type CommandResult struct {
 //
 //	commandLine - the raw command line string entered by the user.
 //	history     - the chat history to operate on.
-//	input       - an io.Reader used for interactive prompts.
+//	input       - io.Reader (default: os.Stdin) used for unit tests
 //
 // Returns:
 //
@@ -52,12 +52,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Output: fmt.Sprintf("History saved as '%s'", name)}
 	case "load":
-		filename := args
-		if filename == "" {
-			fmt.Print("Enter filename to load: ")
-			reader := bufio.NewReader(input)
-			inputLine, _ := reader.ReadString('\n')
-			filename = strings.TrimSpace(inputLine)
+		filename, err := getHistoryFilename(args, input)
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("history load failed: %w", err)}
 		}
 
 		if len(filename) > 0 {
@@ -233,4 +230,41 @@ func parseCommandArgs(input string) (string, string) {
 		arg = strings.TrimSpace(strings.Join(parts[1:], " "))
 	}
 	return cmd, arg
+}
+
+// getHistoryFilename does the check of the filename for loading history sessions.
+// It detects if an index (prefixed by #), a filename or none is given as arg.
+// If the arg is empty, it requests for an input.
+//
+// Parameters:
+//
+//	f (string) - the argument of the /load command
+//	input (io.Reader) - optional input stream for unit tests
+//
+// Returns:
+//
+//	string - selected filename of the history session
+//	error  - Error msg if anything went wrong
+func getHistoryFilename(f string, input io.Reader) (string, error) {
+	filename, found := strings.CutPrefix(f, "#")
+	if found {
+		index, err := strconv.Atoi(strings.TrimPrefix(filename, "#"))
+		if err != nil {
+			return "", fmt.Errorf("value not an integer")
+		}
+		fname, ok := utils.GetHistoryByIndex(index)
+		if !ok {
+			return "", fmt.Errorf("no value for given index found")
+		}
+		return fname, nil
+	}
+
+	if filename == "" {
+		fmt.Print("Enter filename to load: ")
+		reader := bufio.NewReader(input)
+		inputLine, _ := reader.ReadString('\n')
+		filename = strings.TrimSpace(inputLine)
+	}
+
+	return filename, nil
 }

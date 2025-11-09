@@ -133,6 +133,8 @@ Without a filename, an input line appears, where the name can be entered. If the
 
 The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted, as it defaults to `.chat`.
 
+If the command `/list` has been executed before, it is also possible to load a session by index, e.g.: `/load #3`. The hash mark indicates that an index is given rather than a filename.
+
 #### /save `<filename>`
 
 Without a filename, the file is stored with a timestamp as filename, e.g. `2025-05-11_20-26-32.chat`.

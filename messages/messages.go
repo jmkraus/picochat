@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"picochat/console"
 	"picochat/paths"
+	"strings"
 	"time"
 )
 
@@ -170,6 +171,10 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 //	string
 //	error
 func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
+	if strings.HasPrefix(filename, "#") {
+		return "", fmt.Errorf("filename must not start with '#'")
+	}
+
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
 		return "", fmt.Errorf("history path not found: %w", err)
