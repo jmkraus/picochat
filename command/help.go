@@ -31,8 +31,10 @@ var helpTopics = map[string][]string{
 	},
 	"load": {
 		"  /load <filename>   Load the history file with name <filename>",
+		"  /load #<number>    Load the history file with index <number>",
 		"  If <filename> is omitted, the filename is requested by input line.",
-		"  If no filename is entered, the load is cancelled.",
+		"  If no filename is entered, the load is canceled.",
+		"  To use the index load, call '/list' command first & check index.",
 	},
 	"message": {
 		"  /message           Shows the last entry in the chat history",
@@ -42,7 +44,7 @@ var helpTopics = map[string][]string{
 	"models": {
 		"  /models            Lists the available models of the LLM server",
 		"  /models <index>    Loads the model by index number",
-		"  To use the load option, list the available models first & check index",
+		"  To use the load option, list the available models first & check index.",
 	},
 	"save": {
 		"  /save <filename>   Save the history file with name <filename>",
