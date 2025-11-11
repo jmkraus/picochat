@@ -40,6 +40,7 @@ func ReadMultilineInput() InputResult {
 
 	var lines []string
 	var currentLine []rune
+	var cursorPos int
 
 	for {
 		b := make([]byte, 1)
@@ -98,7 +99,17 @@ func ReadMultilineInput() InputResult {
 					fmt.Printf(">>> %s", recalled)
 					currentLine = []rune(recalled)
 					continue
-				case 'C', 'D':
+				case 'C': // Right
+					if cursorPos < len(currentLine) {
+						cursorPos++
+						fmt.Print("\033[C") // move cursor right
+					}
+					continue
+				case 'D': // Left
+					if cursorPos > 0 {
+						cursorPos--
+						fmt.Print("\033[D") // move cursor left
+					}
 					continue
 				}
 			}
@@ -109,6 +120,7 @@ func ReadMultilineInput() InputResult {
 		case 127: // Backspace
 			if len(currentLine) > 0 {
 				currentLine = currentLine[:len(currentLine)-1]
+				cursorPos--
 				fmt.Print("\b \b")
 			}
 
@@ -127,6 +139,7 @@ func ReadMultilineInput() InputResult {
 
 		default:
 			currentLine = append(currentLine, rune(b[0]))
+			cursorPos++
 			fmt.Print(string(b))
 		}
 	}
