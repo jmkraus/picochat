@@ -12,3 +12,5 @@ type CommandHistory struct {
 	entries []string
 	index   int
 }
+
+const Prompt = ">>> "

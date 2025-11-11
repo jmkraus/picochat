@@ -90,7 +90,7 @@ func main() {
 
 	for {
 		if !cfg.Quiet {
-			fmt.Print("\n>>> ")
+			fmt.Printf("\n%s", console.Prompt)
 		}
 
 		input := console.ReadMultilineInput()
