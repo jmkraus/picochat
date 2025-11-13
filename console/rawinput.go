@@ -90,16 +90,16 @@ func ReadMultilineInput() InputResult {
 				case 'A': // Up
 					recalled := PrevCommand()
 					if recalled != "" {
-						fmt.Print("\r\033[K")
-						fmt.Printf("%s%s", Prompt, recalled)
 						currentLine = []rune(recalled)
+						cursorPos = len(currentLine)
+						updateCurrentLine(currentLine, firstLine, cursorPos)
 					}
 					continue
 				case 'B': // Down
 					recalled := NextCommand()
-					fmt.Print("\r\033[K")
-					fmt.Printf("%s%s", Prompt, recalled)
 					currentLine = []rune(recalled)
+					cursorPos = len(currentLine)
+					updateCurrentLine(currentLine, firstLine, cursorPos)
 					continue
 				case 'C': // Right
 					if cursorPos < len(currentLine) {
