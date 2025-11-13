@@ -49,6 +49,8 @@ func ReadMultilineInput() InputResult {
 			break
 		}
 
+		firstLine := len(lines) == 0
+
 		switch b[0] {
 		case 3: // Ctrl+C
 			fmt.Print("\r\n")
@@ -57,7 +59,6 @@ func ReadMultilineInput() InputResult {
 		case 4: // Ctrl+D (EOF) → input finished
 			fmt.Print("\r\n")
 			if len(currentLine) > 0 {
-				fmt.Println(string(currentLine))
 				lines = append(lines, string(currentLine))
 			}
 			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
@@ -121,12 +122,11 @@ func ReadMultilineInput() InputResult {
 		case 127: // Backspace
 			if cursorPos > 0 {
 				currentLine, cursorPos = deleteCharAt(currentLine, cursorPos)
-				updateCurrentLine(currentLine, true, cursorPos)
+				updateCurrentLine(currentLine, firstLine, cursorPos)
 			}
 		case 13, 10: // Enter
 			line := string(currentLine)
 			trimLine := strings.TrimSpace(line)
-			firstLine := (len(lines) == 0)
 
 			// Input is a command
 			if firstLine && strings.HasPrefix(trimLine, "/") {
@@ -135,11 +135,11 @@ func ReadMultilineInput() InputResult {
 
 			lines = append(lines, line)
 			currentLine = []rune{}
+			cursorPos = 0
 			fmt.Print("\r\n")
 
 		default:
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(b[0]))
-			firstLine := (len(lines) == 0)
 			updateCurrentLine(currentLine, firstLine, cursorPos)
 		}
 	}
@@ -148,7 +148,7 @@ func ReadMultilineInput() InputResult {
 
 // deleteCharAt deletes the character at the cursor position in the current line.
 // If the cursor is at the beginning (pos 0), no deletion occurs.
-// Parmeters:
+// Parameters:
 //
 //	line ([]rune)   - the current line to be edited
 //	cursorPos (int) - the actual cursor position in the line
@@ -179,7 +179,7 @@ func deleteCharAt(line []rune, cursorPos int) ([]rune, int) {
 }
 
 // insertCharAt inserts a character at the cursor position in the current line.
-// Parmeters:
+// Parameters:
 //
 //	line ([]rune)   - the current line to be edited
 //	cursorPos (int) - the actual cursor position in the line
