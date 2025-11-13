@@ -57,6 +57,7 @@ func ReadMultilineInput() InputResult {
 		case 4: // Ctrl+D (EOF) → input finished
 			fmt.Print("\r\n")
 			if len(currentLine) > 0 {
+				fmt.Println(string(currentLine))
 				lines = append(lines, string(currentLine))
 			}
 			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
@@ -118,18 +119,17 @@ func ReadMultilineInput() InputResult {
 			return InputResult{Aborted: true}
 
 		case 127: // Backspace
-			if len(currentLine) > 0 {
-				currentLine = currentLine[:len(currentLine)-1]
-				cursorPos--
-				fmt.Print("\b \b")
+			if cursorPos > 0 {
+				currentLine, cursorPos = deleteCharAt(currentLine, cursorPos)
+				updateCurrentLine(currentLine, true, cursorPos)
 			}
-
 		case 13, 10: // Enter
 			line := string(currentLine)
 			trimLine := strings.TrimSpace(line)
+			firstLine := (len(lines) == 0)
 
 			// Input is a command
-			if len(lines) == 0 && strings.HasPrefix(trimLine, "/") {
+			if firstLine && strings.HasPrefix(trimLine, "/") {
 				return InputResult{Text: trimLine, IsCommand: true}
 			}
 
@@ -138,16 +138,98 @@ func ReadMultilineInput() InputResult {
 			fmt.Print("\r\n")
 
 		default:
-			if cursorPos != len(currentLine) {
-				//temporary fix if Cursor not at the end
-				// +5 compensation for 0-based and ">>> " prompt
-				cursorPos = len(currentLine)
-				fmt.Printf("\033[%dG", cursorPos+5)
-			}
-			currentLine = append(currentLine, rune(b[0]))
-			cursorPos++
-			fmt.Print(string(b))
+			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(b[0]))
+			firstLine := (len(lines) == 0)
+			updateCurrentLine(currentLine, firstLine, cursorPos)
 		}
 	}
 	return InputResult{Text: strings.Join(lines, "\n")}
+}
+
+// deleteCharAt deletes the character at the cursor position in the current line.
+// If the cursor is at the beginning (pos 0), no deletion occurs.
+// Parmeters:
+//
+//	line ([]rune)   - the current line to be edited
+//	cursorPos (int) - the actual cursor position in the line
+//
+// Returns:
+//
+//	[]rune - the modified line
+//	int    - new cursor position
+func deleteCharAt(line []rune, cursorPos int) ([]rune, int) {
+	if cursorPos == 0 || len(line) == 0 {
+		return line, cursorPos
+	}
+
+	// Split at cursor position
+	before := line[:cursorPos]
+	after := line[cursorPos:]
+
+	// Remove last character from before part
+	if len(before) > 0 {
+		before = before[:len(before)-1]
+	}
+
+	// Merge back together
+	newLine := append(before, after...)
+	newCursorPos := cursorPos - 1
+
+	return newLine, newCursorPos
+}
+
+// insertCharAt inserts a character at the cursor position in the current line.
+// Parmeters:
+//
+//	line ([]rune)   - the current line to be edited
+//	cursorPos (int) - the actual cursor position in the line
+//	char (rune)     - the single character to be inserted
+//
+// Returns:
+//
+//	[]rune - the modified line
+//	int    - new cursor position
+func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
+	if cursorPos > len(line) {
+		cursorPos = len(line)
+	}
+
+	// Split at cursor position
+	before := line[:cursorPos]
+	after := line[cursorPos:]
+
+	// Create new slice with capacity for one more character
+	newLine := make([]rune, 0, len(line)+1)
+	newLine = append(newLine, before...)
+	newLine = append(newLine, char)
+	newLine = append(newLine, after...)
+
+	newCursorPos := cursorPos + 1
+
+	return newLine, newCursorPos
+}
+
+// updateCurrentLine redraws the current line after an edit
+// Parameters:
+//
+//	line ([]rune)    - the current line to be drawn
+//	firstLine (bool) - is the line the first line (true / false)
+//	cursorPos        - the cursor position for the redraw
+//
+// Returns:
+//
+//	none
+func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
+	// draw line
+	fmt.Print("\r\033[K") // cursor to beginning
+
+	if firstLine {
+		// first line: with prompt
+		fmt.Printf("%s%s", Prompt, string(line))
+		fmt.Printf("\033[%dG", cursorPos+len(Prompt)+1)
+	} else {
+		// subsequent lines: without prompt
+		fmt.Printf("%s", string(line))
+		fmt.Printf("\033[%dG", cursorPos+1)
+	}
 }
