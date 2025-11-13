@@ -65,19 +65,13 @@ func ReadMultilineInput() InputResult {
 
 		case 27: // ESC or escape sequences
 			// Temporarily set Stdin to non-blocking
-			err = setNonblock(fd, true)
-			if err != nil {
-				return InputResult{Error: fmt.Errorf("could not set stdin to non-blocking mode: %w", err)}
-			}
+			_ = setNonblock(fd, true)
 
 			buf := make([]byte, 3)
 			n, _ := in.Read(buf)
 
 			// Revert back to Stdin blocking mode
-			err = setNonblock(fd, false)
-			if err != nil {
-				return InputResult{Error: fmt.Errorf("could not unset stdin to blocking mode: %w", err)}
-			}
+			_ = setNonblock(fd, false)
 
 			if n == 0 {
 				// Plain ESC → abort immediately
@@ -116,9 +110,10 @@ func ReadMultilineInput() InputResult {
 				}
 			}
 
-			// Any other escape sequence → ignore or abort
-			return InputResult{Aborted: true}
-
+			if n == 0 {
+				return InputResult{Aborted: true} // plain Esc
+			}
+			continue // ignore everything else
 		case 127: // Backspace
 			if cursorPos > 0 {
 				currentLine, cursorPos = deleteCharAt(currentLine, cursorPos)
@@ -137,12 +132,12 @@ func ReadMultilineInput() InputResult {
 			currentLine = []rune{}
 			cursorPos = 0
 			fmt.Print("\r\n")
-
 		default:
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(b[0]))
 			updateCurrentLine(currentLine, firstLine, cursorPos)
 		}
 	}
+
 	return InputResult{Text: strings.Join(lines, "\n")}
 }
 
