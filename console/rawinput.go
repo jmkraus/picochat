@@ -215,16 +215,13 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 //
 //	none
 func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
-	// draw line
 	fmt.Print("\r\033[K") // cursor to beginning
 
+	prefix := ""
 	if firstLine {
-		// first line: with prompt
-		fmt.Printf("%s%s", Prompt, string(line))
-		fmt.Printf("\033[%dG", cursorPos+len(Prompt)+1)
-	} else {
-		// subsequent lines: without prompt
-		fmt.Printf("%s", string(line))
-		fmt.Printf("\033[%dG", cursorPos+1)
+		prefix = Prompt
 	}
+
+	fmt.Printf("%s%s", prefix, string(line))
+	fmt.Printf("\033[%dG", cursorPos+len(prefix)+1)
 }
