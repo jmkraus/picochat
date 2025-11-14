@@ -20,6 +20,7 @@ func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
 
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
+		console.StopSpinner(quiet, stop)
 		console.Error(err)
 	} else {
 		if !quiet {
@@ -45,6 +46,7 @@ func repeatPrompt(quiet bool, history *messages.ChatHistory) {
 
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
+		console.StopSpinner(quiet, stop)
 		console.Error(err)
 	} else {
 		if !quiet {
