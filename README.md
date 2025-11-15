@@ -19,6 +19,7 @@ The released binary is neither notarized nor signed. To use it on a Mac, there a
  ```text
   go get github.com/atotto/clipboard
   go get github.com/BurntSushi/toml
+  go get github.com/mattn/go-runewidth
   go mod tidy
   go test ./...
   go build
@@ -189,7 +190,7 @@ Special thanks to the developers of the libraries used in this project:
 
  * [BurntSushi's TOML library](https://github.com/BurntSushi/toml).
  * [Atotto's Go clipboard library](https://github.com/atotto/clipboard).
-
+ * [mattn's go-runewidth](https://github.com/mattn/go-runewidth). 
 
 ## License
 
