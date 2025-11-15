@@ -1,11 +1,13 @@
 package console
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 
+	"github.com/mattn/go-runewidth"
 	"golang.org/x/term"
 )
 
@@ -35,23 +37,28 @@ func ReadMultilineInput() InputResult {
 		if err != nil {
 			return InputResult{Error: fmt.Errorf("error enabling raw input mode: %v", err)}
 		}
-		defer term.Restore(fd, oldState)
+		fmt.Print("\033[?7l") // Disable line wrap (DECAWM)
+		defer func() {
+			fmt.Print("\033[?7h") // Enable line wrap
+			term.Restore(fd, oldState)
+		}()
 	}
 
 	var lines []string
 	var currentLine []rune
 	var cursorPos int
 
+	reader := bufio.NewReader(in)
+
 	for {
-		b := make([]byte, 1)
-		_, err := in.Read(b)
+		r, _, err := reader.ReadRune()
 		if err != nil {
 			break
 		}
 
 		firstLine := len(lines) == 0
 
-		switch b[0] {
+		switch r {
 		case 3: // Ctrl+C
 			fmt.Print("\r\n")
 			return InputResult{Aborted: true}
@@ -133,7 +140,7 @@ func ReadMultilineInput() InputResult {
 			cursorPos = 0
 			fmt.Print("\r\n")
 		default:
-			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(b[0]))
+			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(r))
 			updateCurrentLine(currentLine, firstLine, cursorPos)
 		}
 	}
@@ -218,10 +225,36 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 	fmt.Print("\r\033[K") // cursor to beginning
 
 	prefix := ""
+	prefixWidth := 0
 	if firstLine {
 		prefix = Prompt
+		prefixWidth = runewidth.StringWidth(Prompt)
 	}
 
+	visualPos := visualWidth(line, cursorPos)
+
 	fmt.Printf("%s%s", prefix, string(line))
-	fmt.Printf("\033[%dG", cursorPos+len(prefix)+1)
+	fmt.Printf("\033[%dG", visualPos+prefixWidth+1)
+}
+
+// visualWidth calculates the visual display width of a rune slice up to a given position.
+// This accounts for characters that occupy multiple terminal columns (e.g., CJK characters,
+// emojis) or zero columns (e.g., combining characters).
+// Parameters:
+//
+//	line ([]rune) - the line of runes to measure
+//	pos (int)     - the position up to which to calculate the width
+//
+// Returns:
+//
+//	int - the total visual width in terminal columns
+func visualWidth(line []rune, pos int) int {
+	if pos > len(line) {
+		pos = len(line)
+	}
+	width := 0
+	for i := 0; i < pos; i++ {
+		width += runewidth.RuneWidth(line[i])
+	}
+	return width
 }
