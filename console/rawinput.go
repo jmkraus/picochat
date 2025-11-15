@@ -71,59 +71,61 @@ func ReadMultilineInput() InputResult {
 			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
 
 		case 27: // ESC or escape sequences
-			// Temporarily set Stdin to non-blocking
+			// Peek to see if there are more bytes (escape sequence)
 			_ = setNonblock(fd, true)
-
-			buf := make([]byte, 3)
-			n, _ := reader.Read(buf)
-
-			// Revert back to Stdin blocking mode
+			peekBuf, err := reader.Peek(2)
 			_ = setNonblock(fd, false)
-
-			if n == 0 {
+			if err != nil || len(peekBuf) < 2 {
 				// Plain ESC → abort immediately
 				return InputResult{Aborted: true}
 			}
 
-			if buf[0] == '[' && n > 1 {
-				// Arrow keys (e.g. ESC[A, ESC[B, ESC[C, ESC[D])
-				switch buf[1] {
-				case 'A': // Up
-					recalled := PrevCommand()
-					if recalled != "" {
-						currentLine = []rune(recalled)
-						cursorPos = len(currentLine)
-						updateCurrentLine(currentLine, firstLine, cursorPos)
-					}
-					continue
-				case 'B': // Down
-					recalled := NextCommand()
+			// Read the escape sequence
+			buf := make([]byte, 2)
+			n, _ := reader.Read(buf)
+
+			if n < 2 || buf[0] != '[' {
+				// Unknown escape sequence
+				continue
+			}
+
+			// Arrow keys (e.g. ESC[A, ESC[B, ESC[C, ESC[D])
+			switch buf[1] {
+			case 'A': // Up
+				recalled := PrevCommand()
+				if recalled != "" {
 					currentLine = []rune(recalled)
 					cursorPos = len(currentLine)
 					updateCurrentLine(currentLine, firstLine, cursorPos)
-					continue
-				case 'C': // Right
-					if cursorPos < len(currentLine) {
-						width := runewidth.RuneWidth(currentLine[cursorPos])
-						cursorPos++
-						// Move cursor forward by visual width of char
-						for range width {
-							fmt.Print("\033[C")
-						}
-					}
-					continue
-
-				case 'D': // Left
-					if cursorPos > 0 {
-						cursorPos--
-						width := runewidth.RuneWidth(currentLine[cursorPos])
-						// Move cursor back by visual width of char
-						for range width {
-							fmt.Print("\033[D")
-						}
-					}
-					continue
 				}
+				continue
+			case 'B': // Down
+				recalled := NextCommand()
+				currentLine = []rune(recalled)
+				cursorPos = len(currentLine)
+				updateCurrentLine(currentLine, firstLine, cursorPos)
+				continue
+			case 'C': // Right
+				if cursorPos < len(currentLine) {
+					width := runewidth.RuneWidth(currentLine[cursorPos])
+					cursorPos++
+					// Move cursor forward by visual width of char
+					for range width {
+						fmt.Print("\033[C")
+					}
+				}
+				continue
+
+			case 'D': // Left
+				if cursorPos > 0 {
+					cursorPos--
+					width := runewidth.RuneWidth(currentLine[cursorPos])
+					// Move cursor back by visual width of char
+					for range width {
+						fmt.Print("\033[D")
+					}
+				}
+				continue
 			}
 			continue // ignore everything else
 		case 127: // Backspace
