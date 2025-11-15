@@ -75,7 +75,7 @@ func ReadMultilineInput() InputResult {
 			_ = setNonblock(fd, true)
 
 			buf := make([]byte, 3)
-			n, _ := in.Read(buf)
+			n, _ := reader.Read(buf)
 
 			// Revert back to Stdin blocking mode
 			_ = setNonblock(fd, false)
@@ -104,21 +104,26 @@ func ReadMultilineInput() InputResult {
 					continue
 				case 'C': // Right
 					if cursorPos < len(currentLine) {
+						width := runewidth.RuneWidth(currentLine[cursorPos])
 						cursorPos++
-						fmt.Print("\033[C") // move cursor right
+						// Move cursor forward by visual width of char
+						for range width {
+							fmt.Print("\033[C")
+						}
 					}
 					continue
+
 				case 'D': // Left
 					if cursorPos > 0 {
 						cursorPos--
-						fmt.Print("\033[D") // move cursor left
+						width := runewidth.RuneWidth(currentLine[cursorPos])
+						// Move cursor back by visual width of char
+						for range width {
+							fmt.Print("\033[D")
+						}
 					}
 					continue
 				}
-			}
-
-			if n == 0 {
-				return InputResult{Aborted: true} // plain Esc
 			}
 			continue // ignore everything else
 		case 127: // Backspace
