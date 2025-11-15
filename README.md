@@ -182,7 +182,7 @@ While everything should work as expected on macOS, PicoChat is completely untest
 * The command history flickers on Windows when you switch between entries using Up + Down keys.
 * Since Pico AI is not available on Windows, other tools (e.g., ollama) have to be used instead. These may differ in their behavior in some details.
 * Specific ollama features (e.g., new "thinking" output) are not supported.
-* Text input is currently not aware of non-ASCII characters (e.g., emojis, Chinese characters)
+* Text input cannot deal with soft wrap of lines in the Terminal.
 
 ## Acknowledgements
 
