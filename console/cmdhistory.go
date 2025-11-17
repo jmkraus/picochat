@@ -1,6 +1,6 @@
 package console
 
-var cmdHistory = &CommandHistory{}
+var cmdHistory = &commandHistory{}
 
 // AddCommand adds a command to the history.
 //
@@ -50,7 +50,7 @@ func NextCommand() string {
 // Returns:
 //
 //	none
-func (h *CommandHistory) add(cmd string) {
+func (h *commandHistory) add(cmd string) {
 	if cmd == "" {
 		return
 	}
@@ -70,7 +70,7 @@ func (h *CommandHistory) add(cmd string) {
 // Returns:
 //
 //	string - the previous command
-func (h *CommandHistory) prev() string {
+func (h *commandHistory) prev() string {
 	if len(h.entries) == 0 {
 		return ""
 	}
@@ -89,7 +89,7 @@ func (h *CommandHistory) prev() string {
 // Returns:
 //
 //	string - the next command
-func (h *CommandHistory) next() string {
+func (h *commandHistory) next() string {
 	if len(h.entries) == 0 {
 		return ""
 	}

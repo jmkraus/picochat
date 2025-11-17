@@ -9,7 +9,7 @@ type InputResult struct {
 	Error     error
 }
 
-type CommandHistory struct {
+type commandHistory struct {
 	entries []string
 	index   int
 }
