@@ -37,9 +37,9 @@ func ReadMultilineInput() InputResult {
 		if err != nil {
 			return InputResult{Error: fmt.Errorf("error enabling raw input mode: %v", err)}
 		}
-		fmt.Print("\033[?7l") // Disable line wrap (DECAWM)
+		fmt.Print(escDisableLineWrap)
 		defer func() {
-			fmt.Print("\033[?7h") // Enable line wrap
+			fmt.Print(escEnableLineWrap)
 			term.Restore(fd, oldState)
 		}()
 	}
@@ -60,11 +60,11 @@ func ReadMultilineInput() InputResult {
 
 		switch r {
 		case 3: // Ctrl+C
-			fmt.Print("\r\n")
+			fmt.Print(crlf)
 			return InputResult{Aborted: true}
 
 		case 4: // Ctrl+D (EOF) → input finished
-			fmt.Print("\r\n")
+			fmt.Print(crlf)
 			if len(currentLine) > 0 {
 				lines = append(lines, string(currentLine))
 			}
@@ -111,7 +111,7 @@ func ReadMultilineInput() InputResult {
 					cursorPos++
 					// Move cursor forward by visual width of char
 					for range width {
-						fmt.Print("\033[C")
+						fmt.Print(escCursorForward)
 					}
 				}
 				continue
@@ -122,7 +122,7 @@ func ReadMultilineInput() InputResult {
 					width := runewidth.RuneWidth(currentLine[cursorPos])
 					// Move cursor back by visual width of char
 					for range width {
-						fmt.Print("\033[D")
+						fmt.Print(escCursorBack)
 					}
 				}
 				continue
@@ -145,7 +145,7 @@ func ReadMultilineInput() InputResult {
 			lines = append(lines, line)
 			currentLine = []rune{}
 			cursorPos = 0
-			fmt.Print("\r\n")
+			fmt.Print(crlf)
 		default:
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(r))
 			updateCurrentLine(currentLine, firstLine, cursorPos)
@@ -229,7 +229,7 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 //
 //	none
 func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
-	fmt.Print("\r\033[K") // cursor to beginning
+	fmt.Printf("\r%s", escClearLine)
 
 	prefix := ""
 	prefixWidth := 0
@@ -241,7 +241,7 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 	visualPos := visualWidth(line, cursorPos)
 
 	fmt.Printf("%s%s", prefix, string(line))
-	fmt.Printf("\033[%dG", visualPos+prefixWidth+1)
+	fmt.Printf(escCursorToColumn, visualPos+prefixWidth+1)
 }
 
 // visualWidth calculates the visual display width of a rune slice up to a given position.

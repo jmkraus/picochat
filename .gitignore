@@ -3,3 +3,4 @@
 *.orig
 models.json
 release.sh
+test.sh
