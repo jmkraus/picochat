@@ -260,8 +260,8 @@ func visualWidth(line []rune, pos int) int {
 		pos = len(line)
 	}
 	width := 0
-	for i := 0; i < pos; i++ {
-		width += runewidth.RuneWidth(line[i])
+	for _, r := range line[:pos] {
+		width += runewidth.RuneWidth(r)
 	}
 	return width
 }
