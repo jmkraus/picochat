@@ -16,11 +16,12 @@ var (
 )
 
 var allowedKeys = map[string]string{
-	"temperature": "Temperature",
-	"top_p":       "TopP",
 	"context":     "Context",
 	"model":       "Model",
 	"quiet":       "Quiet",
+	"reasoning":   "Reasoning",
+	"temperature": "Temperature",
+	"top_p":       "TopP",
 }
 
 // Load reads and caches the configuration.
@@ -43,6 +44,7 @@ func load() {
 		Temperature: 0.7,
 		TopP:        0.9,
 		Context:     20,
+		Reasoning:   true,
 		Quiet:       false,
 	}
 
@@ -56,8 +58,8 @@ func load() {
 		return
 	}
 
-	if cfg.Context != 0 && (cfg.Context < 5 || cfg.Context > 100) {
-		loadErr = fmt.Errorf("context size must be between 5 and 100")
+	if cfg.Context != 0 && (cfg.Context < 3 || cfg.Context > 100) {
+		loadErr = fmt.Errorf("context size must be between 3 and 100")
 		return
 	}
 

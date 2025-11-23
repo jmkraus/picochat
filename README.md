@@ -96,12 +96,16 @@ History files (see below) are always stored in a subdirectory of the PicoChat co
 
 PicoChat currently supports the following configurable values in the config file:
 
- * link to the core **API** endpoint (default usually `http://localhost:11434/api`).
- * model name (must be already downloaded!)
- * temperature
- * top_p
- * context size (must be a value between 5 and 100) - this is the number of messages!
- * system prompt ("Persona") where a specific skill or background can be specified.
+| Key         | Type  | Value                                                                              |
+| ----------- | ----- | ---------------------------------------------------------------------------------- |
+| URL         | str   | link to the core **API** endpoint (default usually `http://localhost:11434/api`).  |
+| Model       | str   | Model name (must be already downloaded)                                            |
+| Context     | int   | Context size (must be a value between 3 and 100) - this is the number of messages! |
+| Temperature | float | Model temperature                                                                  |
+| TopP        | float | Model top_p                                                                        |
+| Prompt      | str   | System prompt ("Persona") where a specific skill or background can be specified.   |
+| Quiet       | bool  | Suppresses all messages (except for errors)                                        |
+| Reasoning   | bool  | Enables or disables reasoning                                                      |
 
 Since Pico AI currently does not report token counts, it is difficult to calculate a proper context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
 

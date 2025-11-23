@@ -35,10 +35,20 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		return "", fmt.Errorf("config load failed: %w", err)
 	}
 
+	// evaluate reasoning
+	var reasoning *messages.Reasoning
+	if cfg.Reasoning {
+		reasoning = &messages.Reasoning{Effort: "medium"}
+	} else {
+		reasoning = &messages.Reasoning{Effort: "low"}
+	}
+
 	reqBody := messages.ChatRequest{
-		Model:    cfg.Model,
-		Messages: history.Messages,
-		Stream:   true,
+		Model:     cfg.Model,
+		Messages:  history.Messages,
+		Stream:    true,
+		Reasoning: reasoning,
+		Think:     cfg.Reasoning,
 		Options: &messages.ChatOptions{
 			Temperature: cfg.Temperature,
 			TopP:        cfg.TopP,

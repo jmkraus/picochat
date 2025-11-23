@@ -1,10 +1,16 @@
 package messages
 
 type ChatRequest struct {
-	Model    string       `json:"model"`
-	Messages []Message    `json:"messages"`
-	Options  *ChatOptions `json:"options,omitempty"`
-	Stream   bool         `json:"stream"`
+	Model     string       `json:"model"`
+	Messages  []Message    `json:"messages"`
+	Reasoning *Reasoning   `json:"reasoning,omitempty"`
+	Options   *ChatOptions `json:"options,omitempty"`
+	Stream    bool         `json:"stream"`
+	Think     bool         `json:"think,omitempty"`
+}
+
+type Reasoning struct {
+	Effort string `json:"effort,omitempty"`
 }
 
 type ChatOptions struct {

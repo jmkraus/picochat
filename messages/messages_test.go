@@ -119,8 +119,8 @@ func TestSetContextSize(t *testing.T) {
 	}
 
 	// Invalid values
-	if err := h.SetContextSize(3); err == nil {
-		t.Errorf("Expected error for context size < 5, got nil")
+	if err := h.SetContextSize(2); err == nil {
+		t.Errorf("Expected error for context size < 3, got nil")
 	}
 	if err := h.SetContextSize(200); err == nil {
 		t.Errorf("Expected error for context size > 100, got nil")
@@ -134,18 +134,18 @@ func TestSetContextSize(t *testing.T) {
 		t.Errorf("Expected 10 messages, got %d", len(h.Messages))
 	}
 
-	// Reduction to 5
-	if err := h.SetContextSize(5); err != nil {
+	// Reduction to 3
+	if err := h.SetContextSize(3); err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if len(h.Messages) != 5 {
-		t.Errorf("Expected 5 messages after trimming, got %d", len(h.Messages))
+	if len(h.Messages) != 3 {
+		t.Errorf("Expected 3 messages after trimming, got %d", len(h.Messages))
 	}
 	if h.Messages[0].Role != "system" {
 		t.Errorf("First message should be system prompt")
 	}
-	if h.Messages[1].Content != "msg 6" {
-		t.Errorf("Expected oldest kept message to be 'msg 6', got '%s'", h.Messages[1].Content)
+	if h.Messages[1].Content != "msg 8" {
+		t.Errorf("Expected oldest kept message to be 'msg 8', got '%s'", h.Messages[1].Content)
 	}
 
 	// Increasing size (no changes for existing messages)

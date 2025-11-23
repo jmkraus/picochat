@@ -270,8 +270,8 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 //
 //	error
 func (h *ChatHistory) SetContextSize(max int) error {
-	if max < 5 || max > 100 {
-		return fmt.Errorf("context size must be between 5 and 100")
+	if max < 3 || max > 100 {
+		return fmt.Errorf("context size must be between 3 and 100")
 	}
 	if h.MaxContext == max {
 		return nil

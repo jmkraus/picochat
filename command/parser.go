@@ -67,7 +67,33 @@ func validateAndConvert(key, value string) (any, error) {
 		return v, nil
 	case "model":
 		return value, nil
+	case "reasoning":
+		v, err := stringToBool(value)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
 	default:
 		return nil, fmt.Errorf("unsupported config key '%s'", key)
+	}
+}
+
+// stringToBool converts a string representation of a bool to a boolean value
+// Parameters:
+//
+//	s (string) - the string representation
+//
+// Returns:
+//
+//	bool  - the boolean value of the string
+//	error - any error encountered during conversion
+func stringToBool(s string) (bool, error) {
+	switch strings.ToLower(s) {
+	case "true", "1", "t", "y", "yes":
+		return true, nil
+	case "false", "0", "f", "n", "no":
+		return false, nil
+	default:
+		return false, fmt.Errorf("invalid boolean string '%s'", s)
 	}
 }
