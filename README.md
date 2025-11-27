@@ -187,6 +187,8 @@ While everything should work as expected on macOS, PicoChat is completely untest
 * Since Pico AI is not available on Windows, other tools (e.g., ollama) have to be used instead. These may differ in their behavior in some details.
 * Specific ollama features (e.g., new "thinking" output) are not supported.
 * Text input cannot deal with soft wrap of lines in the Terminal.
+* Stdin Pipe doesn't work with non-Western characters in Windows Powershell. Workaround: Use Command Prompt (cmd.exe) instead.
+
 
 ## Acknowledgements
 
