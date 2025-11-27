@@ -249,23 +249,59 @@ func parseCommandArgs(input string) (string, string) {
 func getHistoryFilename(f string, input io.Reader) (string, error) {
 	filename, found := strings.CutPrefix(f, "#")
 	if found {
-		index, err := strconv.Atoi(strings.TrimPrefix(filename, "#"))
-		if err != nil {
-			return "", fmt.Errorf("value not an integer")
-		}
-		fname, ok := utils.GetHistoryByIndex(index)
-		if !ok {
-			return "", fmt.Errorf("no value for given index found")
-		}
-		return fname, nil
+		return getFilenameByIndex(filename)
 	}
 
 	if filename == "" {
-		fmt.Print("Enter filename to load: ")
-		reader := bufio.NewReader(input)
-		inputLine, _ := reader.ReadString('\n')
-		filename = strings.TrimSpace(inputLine)
+		var err error
+		filename, err = promptForFilename(input)
+		if err != nil {
+			return "", err
+		}
 	}
 
+	return filename, nil
+}
+
+// getFilenameByIndex retrieves the filename corresponding to a given index string.
+//
+// Parameters:
+//
+//	indexStr - string representation of the index.
+//
+// Returns:
+//
+//	string - the filename associated with the index
+//	error  - error if index is invalid or not found
+func getFilenameByIndex(indexStr string) (string, error) {
+	index, err := strconv.Atoi(indexStr)
+	if err != nil {
+		return "", fmt.Errorf("value not an integer")
+	}
+	fname, ok := utils.GetHistoryByIndex(index)
+	if !ok {
+		return "", fmt.Errorf("no value for given index found")
+	}
+	return fname, nil
+}
+
+// promptForFilename prompts the user to enter a filename to load.
+//
+// Parameters:
+//
+//	input - io.Reader used for reading user input.
+//
+// Returns:
+//
+//	string - the filename entered by the user
+//	error  - error if reading input fails
+func promptForFilename(input io.Reader) (string, error) {
+	fmt.Print("Enter filename to load: ")
+	reader := bufio.NewReader(input)
+	inputLine, err := reader.ReadString('\n')
+	if err != nil {
+		return "", fmt.Errorf("input read failed: %w", err)
+	}
+	filename := strings.TrimSpace(inputLine)
 	return filename, nil
 }
