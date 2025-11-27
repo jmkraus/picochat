@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build Go Binary
+    name: Build Binaries
     runs-on: macos-latest
 
     steps:
@@ -19,20 +19,58 @@ jobs:
         with:
           go-version: '1.24'
 
-      - name: Build binary
-        run: |
-          mkdir dist
-          go build -o dist/picochat .
+      - name: Create dist folder
+        run: mkdir -p dist
 
-      - name: Archive binary
+      #
+      # macOS Universal Build (arm64 + amd64 + lipo)
+      #
+      - name: Build macOS (arm64)
+        run: |
+          GOOS=darwin GOARCH=arm64 go build -o dist/picochat-arm64 .
+
+      - name: Build macOS (amd64)
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -o dist/picochat-amd64 .
+
+      - name: Create macOS universal binary
+        run: |
+          lipo -create -output dist/picochat-macOS dist/picochat-arm64 dist/picochat-amd64
+          rm dist/picochat-arm64 dist/picochat-amd64
+
+      #
+      # Windows Build (amd64)
+      #
+      - name: Build Windows (amd64)
+        run: |
+          GOOS=windows GOARCH=amd64 go build -o dist/picochat-windows.exe .
+
+      #
+      # Package macOS
+      #
+      - name: Archive macOS
         run: |
           cd dist
           cp ../config.toml .
-          zip picochat-macOS.zip picochat config.toml
+          zip picochat-macOS.zip picochat-macOS config.toml
 
+      #
+      # Package Windows
+      #
+      - name: Archive Windows
+        run: |
+          cd dist
+          cp ../config.toml .
+          zip picochat-windows.zip picochat-windows.exe config.toml
+
+      #
+      # Release
+      #
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/picochat-macOS.zip
+          files: |
+            dist/picochat-macOS.zip
+            dist/picochat-windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
