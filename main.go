@@ -74,6 +74,10 @@ func main() {
 		config.ApplyToConfig("quiet", true)
 	}
 
+	if *args.Model != "" {
+		config.ApplyToConfig("model", *args.Model)
+	}
+
 	var history *messages.ChatHistory
 	if *args.HistoryFile != "" {
 		history, err = messages.LoadHistoryFromFile(*args.HistoryFile)
@@ -87,6 +91,9 @@ func main() {
 
 	if !cfg.Quiet {
 		console.Info(fmt.Sprintf("Configuration file used: %s", cfg.FilePath))
+		if *args.Model != "" {
+			console.Info(fmt.Sprintf("Configuration overridden by model '%s'", *args.Model))
+		}
 		console.Info("PicoChat started. Help with '/?'")
 	}
 
