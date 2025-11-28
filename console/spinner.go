@@ -54,6 +54,11 @@ func StopSpinner(quiet bool, stop chan struct{}) {
 		return
 	}
 
-	close(stop)
-	fmt.Print("\r\033[K") // delete to EOL
+	select {
+	case <-stop:
+		return //channel already closed, do nothing
+	default:
+		close(stop)
+		fmt.Print("\r\033[K") // delete to EOL
+	}
 }
