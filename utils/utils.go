@@ -5,6 +5,7 @@ import (
 	"os"
 	"picochat/paths"
 	"picochat/requests"
+	"runtime"
 	"strings"
 	"unicode"
 )
@@ -203,9 +204,24 @@ func capitalize(s string) string {
 //
 //	none
 func CreateTestFile(baseUrl string) error {
+	var (
+		ext   string
+		first string
+	)
 
-	const teststr = "中国是一个拥有悠久历史的文明古国。 Can you translate this for me? 😊"
-	const cmdline = "echo \"%s\" | picochat -model %s"
+	const (
+		teststr = "中国是一个拥有悠久历史的文明古国。 Can you translate this for me? 😊"
+		cmdline = "echo \"%s\" | picochat -model %s"
+	)
+
+	switch runtime.GOOS {
+	case "windows":
+		ext = "cmd"
+		first = "@echo off"
+	default:
+		ext = "sh"
+		first = "#!/bin/sh"
+	}
 
 	models, err := requests.GetAvailableModels(baseUrl)
 	if err != nil {
@@ -213,15 +229,17 @@ func CreateTestFile(baseUrl string) error {
 	}
 
 	if len(models) == 0 {
-		return fmt.Errorf("no models available.")
+		return fmt.Errorf("no models available")
 	}
 
 	var rows []string
+	rows = append(rows, first)
 	for _, m := range models {
 		rows = append(rows, fmt.Sprintf(cmdline, teststr, m))
 	}
 
-	if err := os.WriteFile("test.sh", []byte(strings.Join(rows, "\n")), 0755); err != nil {
+	filename := fmt.Sprintf("test.%s", ext)
+	if err := os.WriteFile(filename, []byte(strings.Join(rows, "\n")), 0755); err != nil {
 		return fmt.Errorf("could not write test file: %w", err)
 	}
 
