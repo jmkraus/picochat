@@ -44,7 +44,10 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
 	case "test":
-		utils.CreateTestFile(cfg.URL)
+		err := utils.CreateTestFile(cfg.URL)
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("test file save failed: %w", err)}
+		}
 		return CommandResult{Output: "Test file was created."}
 	case "bye":
 		return CommandResult{Output: "Chat has ended.", Quit: true}
