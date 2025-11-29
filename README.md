@@ -107,6 +107,8 @@ PicoChat currently supports the following configurable values in the config file
 | Quiet       | bool  | Suppresses all messages (except for errors)                                        |
 | Reasoning   | bool  | Enables or disables reasoning                                                      |
 
+Reasoning is currently labeled as “experimental” because it depends to a large extent on the model used: Not all reasoning models react equally to the settings and the results range from “ignoring” to unexpected side effects or even crashes (freeze).
+
 Since Pico AI currently does not report token counts, it is difficult to calculate a proper context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
 
 ### Commands
@@ -183,7 +185,7 @@ This configuration can be loaded using a shortcut, e.g., `picochat -config @deve
 While everything should work as expected on macOS, PicoChat is completely untested on Linux and only minimally tested on Windows.
 
 * On Windows, the Esc key must be pressed twice to cancel a prompt input. Alternatively, Ctrl + C can be used.
-* The command history flickers on Windows when you switch between entries using Up + Down keys.
+* The command history flickers on Windows when switching between entries using Up + Down keys.
 * Since Pico AI is not available on Windows, other tools (e.g., ollama) have to be used instead. These may differ in their behavior in some details.
 * Specific ollama features (e.g., new "thinking" output) are not supported.
 * Text input cannot deal with soft wrap of lines in the Terminal.
