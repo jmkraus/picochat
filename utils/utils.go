@@ -190,3 +190,40 @@ func capitalize(s string) string {
 	runes[0] = unicode.ToUpper(runes[0])
 	return string(runes)
 }
+
+// CreateTestFile writes a batch script where each downloaded model is called with a sample text.
+// The text contains Western and non-Western characters as well as an Emoji.
+// This is for internal test purposes only and runs with the '/test' command.
+//
+// Parameters:
+//
+//	baseUrl (string) - Base URL for the API
+//
+// Returns:
+//
+//	none
+func CreateTestFile(baseUrl string) error {
+
+	const teststr = "中国是一个拥有悠久历史的文明古国。 Can you translate this for me? 😊"
+	const cmdline = "echo \"%s\" | picochat -model %s"
+
+	models, err := requests.GetAvailableModels(baseUrl)
+	if err != nil {
+		return err
+	}
+
+	if len(models) == 0 {
+		return fmt.Errorf("no models available.")
+	}
+
+	var rows []string
+	for _, m := range models {
+		rows = append(rows, fmt.Sprintf(cmdline, teststr, m))
+	}
+
+	if err := os.WriteFile("test.sh", []byte(strings.Join(rows, "\n")), 0755); err != nil {
+		return fmt.Errorf("could not write test file: %w", err)
+	}
+
+	return nil
+}
