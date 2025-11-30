@@ -44,7 +44,7 @@ func load() {
 		Temperature: 0.7,
 		TopP:        0.9,
 		Context:     20,
-		Reasoning:   true,
+		Reasoning:   false,
 		Quiet:       false,
 	}
 

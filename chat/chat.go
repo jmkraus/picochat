@@ -40,7 +40,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	if cfg.Reasoning {
 		reasoning = &messages.Reasoning{Effort: "medium"}
 	} else {
-		reasoning = &messages.Reasoning{Effort: "low"}
+		reasoning = nil
 	}
 
 	reqBody := messages.ChatRequest{
