@@ -205,20 +205,25 @@ func capitalize(s string) string {
 //	none
 func CreateTestFile(baseUrl string) error {
 	var (
+		def   string
+		cmd   string
 		ext   string
 		first string
 	)
 
 	const (
-		teststr = "中国是一个拥有悠久历史的文明古国。 Can you translate this for me? 😊"
-		cmdline = "echo \"%s\" | picochat -model %s"
+		text = "中国是一个拥有悠久历史的文明古国。 Can you translate this for me? 😊"
 	)
 
 	switch runtime.GOOS {
 	case "windows":
+		def = fmt.Sprintf("set \"TEXT=%s\"", text)
+		cmd = "echo %%TEXT%% | picochat -model %s"
 		ext = "cmd"
 		first = "@echo off\nchcp 65001"
 	default:
+		def = fmt.Sprintf("TEXT='%s'", text)
+		cmd = "echo \"$TEXT\" | picochat -model %s"
 		ext = "sh"
 		first = "#!/bin/sh"
 	}
@@ -234,8 +239,9 @@ func CreateTestFile(baseUrl string) error {
 
 	var rows []string
 	rows = append(rows, first)
+	rows = append(rows, def)
 	for _, m := range models {
-		rows = append(rows, fmt.Sprintf(cmdline, teststr, m))
+		rows = append(rows, fmt.Sprintf(cmd, m))
 	}
 
 	filename := fmt.Sprintf("test.%s", ext)
