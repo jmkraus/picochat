@@ -217,7 +217,7 @@ func CreateTestFile(baseUrl string) error {
 	switch runtime.GOOS {
 	case "windows":
 		ext = "cmd"
-		first = "@echo off"
+		first = "@echo off\nchcp 65001"
 	default:
 		ext = "sh"
 		first = "#!/bin/sh"

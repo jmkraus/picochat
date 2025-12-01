@@ -61,7 +61,7 @@ How are you today? ↵
 [Ctrl]+D        ← Send prompt
 ```
 
-#### Via Pipe
+#### Via stdin pipe
 It's also possible to use PicoChat in scripts via Pipe, e.g.:
 ```
 echo "Write a Haiku about Cheese" | picochat -quiet
@@ -69,7 +69,12 @@ echo "Write a Haiku about Cheese" | picochat -quiet
 
 The `-quiet` argument is optional and suppresses all app messages, so that only the LLM response is displayed.
 
-NOTE: This has been currently tested on macOS only. It might have issues on other platforms.
+For Windows turn the command shell into UTF-8 mode first for proper handling of non-Western characters:
+```
+chcp 65001
+```
+
+NOTE: Stdin pipes have been currently tested mainly on macOS. It might have issues on other platforms.
 
 ### Command line args
 
