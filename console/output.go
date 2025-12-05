@@ -8,29 +8,15 @@ import (
 const err_prefix string = "×"  // or "error:"
 const warn_prefix string = "!" // or "warning:"
 
-// Error is a simplified wrapper for Errorf
+// Error prints a custom error message to stderr
 // Parameters:
 //
-//	err (error) - error to be printed
+//	msg (string) - error message to be printed
 //
 // Returns:
 //
 //	none
-func Error(err error) {
-	Errorf("%v", err)
-}
-
-// Errorf prints a custom error message to stderr
-// Parameters:
-//
-//	format (string) - format string
-//	args (any)      - arguments for the format string
-//
-// Returns:
-//
-//	none
-func Errorf(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
+func Error(msg string) {
 	fmt.Fprintf(os.Stderr, "%s %s\n", err_prefix, msg)
 }
 

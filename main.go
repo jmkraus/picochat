@@ -21,7 +21,7 @@ func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
 		console.StopSpinner(quiet, stop)
-		console.Error(err)
+		console.Error(fmt.Sprintf("%v", err))
 	} else {
 		if !quiet {
 			console.Info(msg)
@@ -47,7 +47,7 @@ func repeatPrompt(quiet bool, history *messages.ChatHistory) {
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
 		console.StopSpinner(quiet, stop)
-		console.Error(err)
+		console.Error(fmt.Sprintf("%v", err))
 	} else {
 		if !quiet {
 			console.Info(msg)
@@ -65,7 +65,7 @@ func main() {
 
 	cfg, err := config.Get()
 	if err != nil {
-		console.Errorf("load configuration failed: %v", err)
+		console.Error(fmt.Sprintf("load configuration failed: %v", err))
 		os.Exit(1)
 	}
 
@@ -82,7 +82,7 @@ func main() {
 	if *args.HistoryFile != "" {
 		history, err = messages.LoadHistoryFromFile(*args.HistoryFile)
 		if err != nil {
-			console.Errorf("load history failed: %v", err)
+			console.Error(fmt.Sprintf("load history failed: %v", err))
 			os.Exit(1)
 		}
 	} else {
@@ -104,7 +104,7 @@ func main() {
 
 		input := console.ReadMultilineInput()
 		if input.Error != nil {
-			console.Error(input.Error)
+			console.Error(fmt.Sprintf("%v", input.Error))
 		}
 
 		if input.Aborted {
@@ -120,7 +120,7 @@ func main() {
 			fmt.Println()
 			result := command.HandleCommand(input.Text, history, os.Stdin)
 			if result.Error != nil {
-				console.Errorf("command handler failed: %v", result.Error)
+				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
 			}
 			console.AddCommand(input.Text)
 			if result.Output != "" {
