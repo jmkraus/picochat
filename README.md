@@ -62,7 +62,7 @@ How are you today? ↵
 ```
 
 #### Via stdin pipe
-It's also possible to use PicoChat in scripts via Pipe, e.g.:
+Use PicoChat in scripts via Pipe, e.g.:
 ```
 echo "Write a Haiku about Cheese" | picochat -quiet
 ```
@@ -74,7 +74,11 @@ For Windows turn the command shell into UTF-8 mode first for proper handling of 
 chcp 65001
 ```
 
-NOTE: Stdin pipes have been currently tested mainly on macOS. It might have issues on other platforms.
+It's also possible to run a PicoChat command via stdin pipe. This is experimental and has not yet been thoroughly tested and might have unexpected side effects. 
+```
+echo "/models" | picochat -quiet
+```
+
 
 ### Command line args
 
@@ -101,16 +105,16 @@ History files (see below) are always stored in a subdirectory of the PicoChat co
 
 PicoChat currently supports the following configurable values in the config file:
 
-| Key         | Type  | Value                                                                              |
-| ----------- | ----- | ---------------------------------------------------------------------------------- |
-| URL         | str   | link to the core **API** endpoint (default usually `http://localhost:11434/api`).  |
-| Model       | str   | Model name (must be already downloaded)                                            |
-| Context     | int   | Context size (must be a value between 3 and 100) - this is the number of messages! |
-| Temperature | float | Model temperature                                                                  |
-| TopP        | float | Model top_p                                                                        |
-| Prompt      | str   | System prompt ("Persona") where a specific skill or background can be specified.   |
-| Quiet       | bool  | Suppresses all messages (except for errors)                                        |
-| Reasoning   | bool  | Enables or disables reasoning                                                      |
+| Key           | Type    | Value                                                                              |
+| ------------- | ------- | ---------------------------------------------------------------------------------- |
+| `URL`         | string  | link to the core **API** endpoint (default usually `http://localhost:11434/api`).  |
+| `Model`       | string  | Model name (must be already downloaded)                                            |
+| `Context`     | integer | Context size (must be a value between 3 and 100) - this is the number of messages! |
+| `Temperature` | float   | Model temperature                                                                  |
+| `TopP`        | float   | Model top_p                                                                        |
+| `Prompt`      | string  | System prompt ("Persona") where a specific skill or background can be specified.   |
+| `Quiet`       | bool    | Suppresses all messages (except for errors)                                        |
+| `Reasoning`   | bool    | Enables or disables reasoning                                                      |
 
 Reasoning is currently labeled as “experimental” because it depends to a large extent on the model used: Not all reasoning models react equally to the settings and the results range from “ignoring” to unexpected side effects or even crashes (freeze).
 
