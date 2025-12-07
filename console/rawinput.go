@@ -31,7 +31,7 @@ func ReadMultilineInput() InputResult {
 			return InputResult{Error: fmt.Errorf("error reading stdin: %v", err)}
 		}
 		text := strings.TrimRight(string(data), "\n")
-		return InputResult{Text: text, EOF: true}
+		return InputResult{Text: text, EOF: true, IsCommand: strings.HasPrefix(text, "/")}
 	} else {
 		oldState, err := term.MakeRaw(fd)
 		if err != nil {

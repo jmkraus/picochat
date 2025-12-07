@@ -134,7 +134,12 @@ func main() {
 			} else if result.Prompt != "" {
 				sendPrompt(result.Prompt, cfg.Quiet, history)
 			}
-			continue
+			if input.EOF {
+				// we come from stdin pipe
+				break
+			} else {
+				continue
+			}
 		}
 
 		sendPrompt(input.Text, cfg.Quiet, history)
