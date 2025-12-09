@@ -11,4 +11,6 @@ type Config struct {
 	Quiet       bool
 
 	FilePath string `toml:"-"`
+	////IMAGES
+	ImagePath string `toml:"-"`
 }

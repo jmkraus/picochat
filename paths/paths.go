@@ -167,3 +167,23 @@ func fallbackToExecutableDir() (string, error) {
 
 	return filepath.Dir(ex), nil
 }
+
+// ExpandHomeDir checks the given path and expands its user home
+// Parameters:
+//
+//	path (string) - the path with wildcard
+//
+// Returns:
+//
+//	string - the expanded path
+//	error  - error if any
+func ExpandHomeDir(path string) (string, error) {
+	if strings.HasPrefix(path, "~/") {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		path = homeDir + path[1:]
+	}
+	return path, nil
+}

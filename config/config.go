@@ -19,6 +19,7 @@ var allowedKeys = map[string]string{
 	"context":     "Context",
 	"model":       "Model",
 	"quiet":       "Quiet",
+	"image":       "ImagePath",
 	"reasoning":   "Reasoning",
 	"temperature": "Temperature",
 	"top_p":       "TopP",

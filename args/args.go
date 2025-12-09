@@ -8,6 +8,7 @@ var (
 	Quiet       = flag.Bool("quiet", false, "Suppress info messages")
 	Model       = flag.String("model", "", "Set model for the request")
 	ShowVersion = flag.Bool("version", false, "Print picochat version")
+	Image       = flag.String("image", "", "Path to an image file")
 )
 
 func Parse() {

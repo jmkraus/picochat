@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,9 +22,10 @@ const (
 )
 
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-	Raw     string `json:"-"`
+	Role    string   `json:"role"`
+	Content string   `json:"content"`
+	Images  []string `json:"images,omitempty"` ////IMAGES
+	Raw     string   `json:"-"`
 }
 
 type ChatHistory struct {
@@ -59,7 +61,7 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 // Returns:
 //
 //	error
-func (h *ChatHistory) Add(role, content string) error {
+func (h *ChatHistory) Add(role, content string, image string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
 		clear := content
@@ -71,7 +73,17 @@ func (h *ChatHistory) Add(role, content string) error {
 			raw = ""
 		}
 
-		h.Messages = append(h.Messages, Message{Role: role, Content: clear, Raw: raw})
+		////IMAGES
+		var img []string
+		if image != "" {
+			b64, err := imageToBase64(image)
+			if err != nil {
+				return fmt.Errorf("base64 convert failed: %w", err)
+			}
+			img = append(img, b64)
+		}
+
+		h.Messages = append(h.Messages, Message{Role: role, Content: clear, Raw: raw, Images: img})
 
 		if h.MaxContext > 0 {
 			h.Compress(h.MaxContext)
@@ -373,4 +385,27 @@ func (h *ChatHistory) EstimateTokens() float64 {
 		total += CalculateTokens(text)
 	}
 	return total
+}
+
+// imageToBase64 reads an image file and converts it to a base64 string
+//
+// Parameter:
+//
+//	filename (string) - the path to the image
+//
+// Returns:
+//
+//	string - the base64 encoded image
+//	error
+func imageToBase64(filename string) (string, error) {
+	fn, err := paths.ExpandHomeDir(filename)
+	if err != nil {
+		return "", err
+	}
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		return "", err
+	}
+	encoded := base64.StdEncoding.EncodeToString(data)
+	return encoded, nil
 }

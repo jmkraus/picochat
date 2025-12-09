@@ -12,11 +12,11 @@ import (
 	"picochat/version"
 )
 
-func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
+func sendPrompt(prompt string, image string, quiet bool, history *messages.ChatHistory) {
 	stop := make(chan struct{})
 	go console.StartSpinner(quiet, stop)
 
-	history.Add(messages.RoleUser, prompt)
+	history.Add(messages.RoleUser, prompt, image)
 
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
@@ -71,11 +71,15 @@ func main() {
 
 	if *args.Quiet {
 		// only override config if arg actively set
-		config.ApplyToConfig("quiet", true)
+		cfg.Quiet = true
 	}
 
 	if *args.Model != "" {
-		config.ApplyToConfig("model", *args.Model)
+		cfg.Model = *args.Model
+	}
+
+	if *args.Image != "" {
+		cfg.ImagePath = *args.Image
 	}
 
 	var history *messages.ChatHistory
@@ -132,7 +136,7 @@ func main() {
 			if result.Repeat {
 				repeatPrompt(cfg.Quiet, history)
 			} else if result.Prompt != "" {
-				sendPrompt(result.Prompt, cfg.Quiet, history)
+				sendPrompt(result.Prompt, cfg.ImagePath, cfg.Quiet, history)
 			}
 			if input.EOF {
 				// we come from stdin pipe
@@ -142,7 +146,7 @@ func main() {
 			}
 		}
 
-		sendPrompt(input.Text, cfg.Quiet, history)
+		sendPrompt(input.Text, cfg.ImagePath, cfg.Quiet, history)
 
 		if input.EOF {
 			break
