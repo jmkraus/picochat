@@ -199,7 +199,7 @@ or by using the `/set` command:
 >>> /set image=./testimage.jpg
 ```
 
-With the next user prompt this image will be processed and then discarded. In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
+It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
 
 ```
 echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./testimage.jpg -quiet
