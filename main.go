@@ -135,8 +135,9 @@ func main() {
 			}
 			if result.Repeat {
 				repeatPrompt(cfg.Quiet, history)
-			} else if result.Prompt != "" {
-				sendPrompt(result.Prompt, cfg.ImagePath, cfg.Quiet, history)
+			} else if result.Pasted != "" {
+				// start the request with pasted content from clipboard
+				sendPrompt(result.Pasted, cfg.ImagePath, cfg.Quiet, history)
 			}
 			if input.EOF {
 				// we come from stdin pipe

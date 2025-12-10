@@ -65,7 +65,7 @@ func validateAndConvert(key, value string) (any, error) {
 			return nil, fmt.Errorf("invalid integer value for key '%s'", key)
 		}
 		return v, nil
-	case "model":
+	case "image", "model":
 		return value, nil
 	case "reasoning":
 		v, err := stringToBool(value)
