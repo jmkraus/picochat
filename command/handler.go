@@ -18,7 +18,7 @@ type CommandResult struct {
 	Output string
 	Error  error
 	Quit   bool
-	Prompt string
+	Pasted string
 	Repeat bool
 }
 
@@ -132,7 +132,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{
 			Output: fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
-			Prompt: text,
+			Pasted: text,
 		}
 	case "retry":
 		history.Discard()
@@ -154,10 +154,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if !ok {
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
-		err = config.ApplyToConfig("model", model)
-		if err != nil {
-			return CommandResult{Error: fmt.Errorf("apply value to config failed: %w", err)}
-		}
+		cfg.Model = model
 		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
 	case "set":
 		if args == "" {

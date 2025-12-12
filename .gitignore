@@ -4,3 +4,5 @@
 models.json
 release.sh
 test.sh
+*.jpg
+*.png

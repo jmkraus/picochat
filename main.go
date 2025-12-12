@@ -9,14 +9,20 @@ import (
 	"picochat/config"
 	"picochat/console"
 	"picochat/messages"
+	"picochat/paths"
 	"picochat/version"
 )
 
-func sendPrompt(prompt string, quiet bool, history *messages.ChatHistory) {
+func sendPrompt(prompt string, image string, quiet bool, history *messages.ChatHistory) {
 	stop := make(chan struct{})
 	go console.StartSpinner(quiet, stop)
 
-	history.Add(messages.RoleUser, prompt)
+	err := history.Add(messages.RoleUser, prompt, image)
+	if err != nil {
+		console.StopSpinner(quiet, stop)
+		console.Error(fmt.Sprintf("%v", err))
+		return
+	}
 
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
@@ -71,11 +77,18 @@ func main() {
 
 	if *args.Quiet {
 		// only override config if arg actively set
-		config.ApplyToConfig("quiet", true)
+		cfg.Quiet = true
 	}
 
 	if *args.Model != "" {
-		config.ApplyToConfig("model", *args.Model)
+		cfg.Model = *args.Model
+	}
+
+	if *args.Image != "" {
+		cfg.ImagePath = *args.Image
+		if !paths.FileExists(cfg.ImagePath) {
+			console.Warn("image file not found")
+		}
 	}
 
 	var history *messages.ChatHistory
@@ -131,8 +144,9 @@ func main() {
 			}
 			if result.Repeat {
 				repeatPrompt(cfg.Quiet, history)
-			} else if result.Prompt != "" {
-				sendPrompt(result.Prompt, cfg.Quiet, history)
+			} else if result.Pasted != "" {
+				// start the request with pasted content from clipboard
+				sendPrompt(result.Pasted, cfg.ImagePath, cfg.Quiet, history)
 			}
 			if input.EOF {
 				// we come from stdin pipe
@@ -142,7 +156,7 @@ func main() {
 			}
 		}
 
-		sendPrompt(input.Text, cfg.Quiet, history)
+		sendPrompt(input.Text, cfg.ImagePath, cfg.Quiet, history)
 
 		if input.EOF {
 			break

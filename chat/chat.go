@@ -109,7 +109,8 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	}
 
 	cleanMsg := messages.TrimEmptyLines(fullReply.String())
-	err = history.Add(messages.RoleAssistant, cleanMsg)
+	cfg.ImagePath = "" ////IMAGES discard path after first use
+	err = history.Add(messages.RoleAssistant, cleanMsg, cfg.ImagePath)
 	if err != nil {
 		return "", fmt.Errorf("could not add message to history: %w", err)
 	}

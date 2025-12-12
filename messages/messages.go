@@ -2,7 +2,6 @@ package messages
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,9 +20,10 @@ const (
 )
 
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-	Raw     string `json:"-"`
+	Role    string   `json:"role"`
+	Content string   `json:"content"`
+	Images  []string `json:"images,omitempty"` ////IMAGES
+	Raw     string   `json:"-"`
 }
 
 type ChatHistory struct {
@@ -59,7 +59,7 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 // Returns:
 //
 //	error
-func (h *ChatHistory) Add(role, content string) error {
+func (h *ChatHistory) Add(role, content string, image string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
 		clear := content
@@ -71,7 +71,17 @@ func (h *ChatHistory) Add(role, content string) error {
 			raw = ""
 		}
 
-		h.Messages = append(h.Messages, Message{Role: role, Content: clear, Raw: raw})
+		////IMAGES
+		var img []string
+		if image != "" {
+			b64, err := ImageToBase64(image)
+			if err != nil {
+				return fmt.Errorf("base64 convert failed: %w", err)
+			}
+			img = append(img, b64)
+		}
+
+		h.Messages = append(h.Messages, Message{Role: role, Content: clear, Raw: raw, Images: img})
 
 		if h.MaxContext > 0 {
 			h.Compress(h.MaxContext)
@@ -191,8 +201,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	}
 	fullPath := filepath.Join(historyPath, filename)
 
-	// check if file exists
-	if _, err := os.Stat(fullPath); errors.Is(err, os.ErrNotExist) {
+	if !paths.FileExists(fullPath) {
 		data, err := json.MarshalIndent(h.Messages, "", "  ")
 		if err != nil {
 			return "", fmt.Errorf("marshal messages failed: %w", err)

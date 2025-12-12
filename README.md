@@ -82,12 +82,14 @@ echo "/models" | picochat -quiet
 
 ### Command line args
 
-| ARG      | DESCRIPTION                    |
-| -------- | ------------------------------ |
-| -config  | Loads a configuration file     |
-| -history | Loads the specific session     |
-| -quiet   | Suppresses all app messages    |
-| -version | Shows version number and quits |
+| ARG      | DESCRIPTION                       |
+| -------- | --------------------------------- |
+| -config  | Loads a configuration file        |
+| -history | Loads the specific session        |
+| -model   | Overrides a config with new model |
+| -image   | Sets a path for an image file     |
+| -quiet   | Suppresses all app messages       |
+| -version | Shows version number and quits    |
 
 ### Configuration files
 
@@ -181,6 +183,30 @@ Without the argument, the last entry of the chat history (usually an assistant a
 With one of the possible roles (system, user, assistant), the specific last entry of the chat history can be chosen.
 
 For example, `/message user` displays the last user question again.
+
+
+### Image processing
+
+PicoChat allows for simple use of images. An image can either be passed as an argument:
+
+```
+picochat -image ./testimage.jpg
+```
+
+or by using the `/set` command:
+
+```
+>>> /set image=./testimage.jpg
+```
+
+It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
+
+```
+echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./testimage.jpg -quiet
+```
+
+When saving the chat history, the user prompt contains the image as base64 encoded data.
+
 
 ### Personas
 

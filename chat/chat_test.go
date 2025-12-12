@@ -46,7 +46,7 @@ func TestHandleChat(t *testing.T) {
 	}
 
 	history := messages.NewHistory(cfg.Prompt, 10)
-	history.Add("user", "Say Hello")
+	history.Add("user", "Say Hello", "")
 
 	// Simulate HandleChat
 	_, err := dummyHandleChat(cfg, history)
@@ -73,7 +73,7 @@ func TestHandleChat_InvalidURL(t *testing.T) {
 	}
 
 	history := messages.NewHistory(cfg.Prompt, 10)
-	history.Add("user", "test")
+	history.Add("user", "test", "")
 
 	_, err := dummyHandleChat(cfg, history)
 	if err == nil || !strings.Contains(err.Error(), "http") {
@@ -95,7 +95,7 @@ func TestHandleChat_BrokenStream(t *testing.T) {
 		Model: "test-model",
 	}
 	history := messages.NewHistory(cfg.Prompt, 10)
-	history.Add("user", "test")
+	history.Add("user", "test", "")
 
 	_, err := dummyHandleChat(cfg, history)
 	if err == nil || !strings.Contains(err.Error(), "stream") {
@@ -118,7 +118,7 @@ func TestHandleChat_EOFWithoutDone(t *testing.T) {
 		Model: "test-model",
 	}
 	history := messages.NewHistory(cfg.Prompt, 10)
-	history.Add("user", "test")
+	history.Add("user", "test", "")
 
 	_, err := dummyHandleChat(cfg, history)
 	if err != nil {
