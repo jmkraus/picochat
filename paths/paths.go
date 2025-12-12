@@ -1,6 +1,7 @@
 package paths
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -171,7 +172,7 @@ func fallbackToExecutableDir() (string, error) {
 // ExpandHomeDir checks the given path and expands its user home
 // Parameters:
 //
-//	path (string) - the path with wildcard
+//	path (string) - the path with tilde
 //
 // Returns:
 //
@@ -186,4 +187,20 @@ func ExpandHomeDir(path string) (string, error) {
 		path = homeDir + path[1:]
 	}
 	return path, nil
+}
+
+// FileExists checks if the file of a given path actually exists
+// Parameters:
+//
+//	path (string) - the full file path
+//
+// Returns:
+//
+//	bool - file exists: true or false
+func FileExists(path string) bool {
+	info, err := os.Stat(path)
+	if err == nil {
+		return !info.IsDir()
+	}
+	return !errors.Is(err, os.ErrNotExist)
 }

@@ -1,6 +1,10 @@
 package messages
 
 import (
+	"encoding/base64"
+	"fmt"
+	"os"
+	"picochat/paths"
 	"regexp"
 	"strings"
 )
@@ -84,4 +88,33 @@ func ExtractCodeBlock(s string) (string, bool) {
 func CalculateTokens(s string) float64 {
 	words := strings.Fields(s)
 	return float64(len(words)) * 1.3
+}
+
+// imageToBase64 reads an image file and converts it to a base64 string
+//
+// Parameter:
+//
+//	filename (string) - the path to the image
+//
+// Returns:
+//
+//	string - the base64 encoded image
+//	error
+func ImageToBase64(filename string) (string, error) {
+	fn, err := paths.ExpandHomeDir(filename)
+	if err != nil {
+		return "", err
+	}
+
+	if !paths.FileExists(fn) {
+		return "", fmt.Errorf("image file not found")
+	}
+
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		return "", err
+	}
+
+	encoded := base64.StdEncoding.EncodeToString(data)
+	return encoded, nil
 }

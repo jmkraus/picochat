@@ -9,6 +9,7 @@ import (
 	"picochat/config"
 	"picochat/console"
 	"picochat/messages"
+	"picochat/paths"
 	"picochat/version"
 )
 
@@ -16,7 +17,12 @@ func sendPrompt(prompt string, image string, quiet bool, history *messages.ChatH
 	stop := make(chan struct{})
 	go console.StartSpinner(quiet, stop)
 
-	history.Add(messages.RoleUser, prompt, image)
+	err := history.Add(messages.RoleUser, prompt, image)
+	if err != nil {
+		console.StopSpinner(quiet, stop)
+		console.Error(fmt.Sprintf("%v", err))
+		return
+	}
 
 	msg, err := chat.HandleChat(nil, history, stop)
 	if err != nil {
@@ -80,6 +86,9 @@ func main() {
 
 	if *args.Image != "" {
 		cfg.ImagePath = *args.Image
+		if !paths.FileExists(cfg.ImagePath) {
+			console.Warn("image file not found")
+		}
 	}
 
 	var history *messages.ChatHistory

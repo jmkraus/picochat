@@ -1,9 +1,7 @@
 package messages
 
 import (
-	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -76,7 +74,7 @@ func (h *ChatHistory) Add(role, content string, image string) error {
 		////IMAGES
 		var img []string
 		if image != "" {
-			b64, err := imageToBase64(image)
+			b64, err := ImageToBase64(image)
 			if err != nil {
 				return fmt.Errorf("base64 convert failed: %w", err)
 			}
@@ -203,8 +201,7 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	}
 	fullPath := filepath.Join(historyPath, filename)
 
-	// check if file exists
-	if _, err := os.Stat(fullPath); errors.Is(err, os.ErrNotExist) {
+	if !paths.FileExists(fullPath) {
 		data, err := json.MarshalIndent(h.Messages, "", "  ")
 		if err != nil {
 			return "", fmt.Errorf("marshal messages failed: %w", err)
@@ -385,27 +382,4 @@ func (h *ChatHistory) EstimateTokens() float64 {
 		total += CalculateTokens(text)
 	}
 	return total
-}
-
-// imageToBase64 reads an image file and converts it to a base64 string
-//
-// Parameter:
-//
-//	filename (string) - the path to the image
-//
-// Returns:
-//
-//	string - the base64 encoded image
-//	error
-func imageToBase64(filename string) (string, error) {
-	fn, err := paths.ExpandHomeDir(filename)
-	if err != nil {
-		return "", err
-	}
-	data, err := os.ReadFile(fn)
-	if err != nil {
-		return "", err
-	}
-	encoded := base64.StdEncoding.EncodeToString(data)
-	return encoded, nil
 }
