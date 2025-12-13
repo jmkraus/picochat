@@ -8,6 +8,7 @@ import (
 	"picochat/clipb"
 	"picochat/config"
 	"picochat/messages"
+	"picochat/paths"
 	"picochat/requests"
 	"picochat/utils"
 	"strconv"
@@ -73,6 +74,15 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		} else {
 			return CommandResult{Output: "Load canceled."}
 		}
+	case "image":
+		if args != "" {
+			if !paths.FileExists(args) {
+				return CommandResult{Error: fmt.Errorf("image file not found")}
+			}
+			cfg.ImagePath = args
+			return CommandResult{Output: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
+		}
+		return CommandResult{Error: fmt.Errorf("no image file path provided")}
 	case "info":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {

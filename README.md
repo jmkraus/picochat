@@ -190,19 +190,25 @@ For example, `/message user` displays the last user question again.
 PicoChat allows for simple use of images. An image can either be passed as an argument:
 
 ```
-picochat -image ./testimage.jpg
+picochat -image ./imgfile.jpg
+```
+
+or by using the `/image` command:
+
+```
+>>> /image ./imgfile.jpg
 ```
 
 or by using the `/set` command:
 
 ```
->>> /set image=./testimage.jpg
+>>> /set image=./imgfile.jpg
 ```
 
 It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
 
 ```
-echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./testimage.jpg -quiet
+echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./imgfile.jpg -quiet
 ```
 
 When saving the chat history, the user prompt contains the image as base64 encoded data.
