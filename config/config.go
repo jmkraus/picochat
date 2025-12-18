@@ -64,7 +64,7 @@ func load() {
 		return
 	}
 
-	cfg.FilePath = path
+	cfg.ConfigPath = path
 	instance = &cfg
 }
 

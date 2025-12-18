@@ -10,7 +10,6 @@ type Config struct {
 	Reasoning   bool
 	Quiet       bool
 
-	FilePath string `toml:"-"`
-	////IMAGES
-	ImagePath string `toml:"-"`
+	ConfigPath string `toml:"-"`
+	ImagePath  string `toml:"-"` ////IMAGES
 }
