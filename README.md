@@ -82,14 +82,14 @@ echo "/models" | picochat -quiet
 
 ### Command line args
 
-| ARG      | DESCRIPTION                       |
-| -------- | --------------------------------- |
-| -config  | Loads a configuration file        |
-| -history | Loads the specific session        |
-| -model   | Overrides a config with new model |
-| -image   | Sets a path for an image file     |
-| -quiet   | Suppresses all app messages       |
-| -version | Shows version number and quits    |
+| ARG      | DESCRIPTION                             |
+| -------- | --------------------------------------- |
+| -config  | Loads a configuration file              |
+| -history | Loads the specific session              |
+| -model   | Overrides config setting with new model |
+| -image   | Sets a path for an image file           |
+| -quiet   | Suppresses all app messages             |
+| -version | Shows version number and quits          |
 
 ### Configuration files
 
@@ -126,22 +126,22 @@ Since Pico AI currently does not report token counts, it is difficult to calcula
 
 | CMD         | DESCRIPTION |
 | ----------- | ------------------------------------------------- |
-| [Ctrl] + D  | Submit multiline input (EOF) |
-| [Esc]       | Cancel multiline input and return to prompt |
-| [Up]/[Down] | Browse prompt command history |
-| /copy, /c   | Copy the last answer to clipboard |
-| /paste, /v  | Get clipboard content as user input and send |
-| /info       | Show system information |
-| /message    | Show last message again (e.g., after load) |
-| /load       | Load chat history from a file |
-| /save       | Save current chat history to a file |
-| /list       | List available saved history files |
-| /models     | List (and switch) downloaded models |
+| [Ctrl] + D  | Submit multiline input (EOF)                      |
+| [Esc]       | Cancel multiline input and return to prompt       |
+| [Up]/[Down] | Browse prompt command history                     |
+| /copy, /c   | Copy the last answer to clipboard                 |
+| /paste, /v  | Get clipboard content as user input and send      |
+| /info       | Show system information                           |
+| /message    | Show last message again (e.g., after load)        |
+| /load       | Load chat history from a file                     |
+| /save       | Save current chat history to a file               |
+| /list       | List available saved history files                |
+| /models     | List (and switch) downloaded models               |
 | /clear      | Clear history and reinitialize with system prompt |
-| /set        | Set session variables (key=value) |
+| /set        | Set session variables (key=value)                 |
 | /retry      | Sends chat history again, but without last answer |
-| /bye        | Exit the chat |
-| /help, /?   | Show available commands |
+| /bye        | Quit PicoChat                                     |
+| /help, /?   | Show available commands                           |
 
 Some commands can have an argument:
 
@@ -206,6 +206,8 @@ or by using the `/set` command:
 ```
 
 It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
+
+When passing an image path to PicoChat, the existence of that file will be checked (and a warning message is shown if it doesn't exist), but not if it is a valid image.
 
 ```
 echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./imgfile.jpg -quiet
