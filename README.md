@@ -205,9 +205,9 @@ or by using the `/set` command:
 >>> /set image=./imgfile.jpg
 ```
 
-It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
+It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. When passing an image path to PicoChat, the existence of that file will be checked (and a warning message is shown if it doesn't exist), but not if it is a valid image.
 
-When passing an image path to PicoChat, the existence of that file will be checked (and a warning message is shown if it doesn't exist), but not if it is a valid image.
+In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
 
 ```
 echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./imgfile.jpg -quiet
