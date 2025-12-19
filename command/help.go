@@ -22,7 +22,7 @@ var helpTopics = map[string][]string{
 		"  /set            Set session variables (key=value)",
 		"  /image          Set image file path",
 		"  /retry          Sends chat history again, but without last answer",
-		"  /bye            Exit",
+		"  /bye            Quit PicoChat",
 		"  /help, /?       Show available commands",
 	},
 	"copy": {

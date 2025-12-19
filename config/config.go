@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"picochat/paths"
-	"reflect"
 	"sync"
 
 	"github.com/BurntSushi/toml"
@@ -14,16 +13,6 @@ var (
 	once     sync.Once
 	loadErr  error
 )
-
-var allowedKeys = map[string]string{
-	"context":     "Context",
-	"model":       "Model",
-	"quiet":       "Quiet",
-	"image":       "ImagePath",
-	"reasoning":   "Reasoning",
-	"temperature": "Temperature",
-	"top_p":       "TopP",
-}
 
 // Load reads and caches the configuration.
 //
@@ -83,7 +72,7 @@ func Get() (*Config, error) {
 	return instance, loadErr
 }
 
-// ApplyToConfig allows changing a specific parameter after loading.
+// Set allows changing a specific parameter after loading.
 //
 // Parameters:
 //
@@ -92,33 +81,63 @@ func Get() (*Config, error) {
 //
 // Returns:
 //
-//	error - an error if the key is unsupported or the value cannot be set
-func ApplyToConfig(key string, value any) error {
+//	error - an error if the key is unsupported or the value has the wrong type
+func Set(key string, value any) error {
 	cfg, err := Get()
 	if err != nil {
 		return fmt.Errorf("cannot apply config change: %w", err)
 	}
 
-	fieldName, ok := allowedKeys[key]
-	if !ok {
+	switch key {
+	case "context":
+		intVal, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("value for key '%s' must be an integer", key)
+		}
+		cfg.Context = intVal
+		return nil
+
+	case "model":
+		strVal, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("value for key '%s' must be a string", key)
+		}
+		cfg.Model = strVal
+		return nil
+
+	case "image":
+		strVal, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("value for key '%s' must be a string", key)
+		}
+		cfg.ImagePath = strVal
+		return nil
+
+	case "reasoning":
+		boolVal, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("value for key '%s' must be a boolean", key)
+		}
+		cfg.Reasoning = boolVal
+		return nil
+
+	case "temperature":
+		floatVal, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("value for key '%s' must be a float", key)
+		}
+		cfg.Temperature = floatVal
+		return nil
+
+	case "top_p":
+		floatVal, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("value for key '%s' must be a float", key)
+		}
+		cfg.TopP = floatVal
+		return nil
+
+	default:
 		return fmt.Errorf("unsupported config key '%s'", key)
 	}
-
-	v := reflect.ValueOf(cfg).Elem()  // dereference pointer to Config struct
-	field := v.FieldByName(fieldName) // find struct field
-
-	if !field.IsValid() {
-		return fmt.Errorf("unsupported config key '%s'", fieldName)
-	}
-	if !field.CanSet() {
-		return fmt.Errorf("cannot set config key '%s'", fieldName)
-	}
-
-	valValue := reflect.ValueOf(value)
-	if valValue.Type().ConvertibleTo(field.Type()) {
-		field.Set(valValue.Convert(field.Type()))
-		return nil
-	}
-
-	return fmt.Errorf("cannot assign value of type %T to config key '%s'", value, fieldName)
 }

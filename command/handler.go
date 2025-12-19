@@ -184,7 +184,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
-		err = config.ApplyToConfig(key, value)
+		err = config.Set(key, value)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("apply to config failed: %w", err)}
 		}
