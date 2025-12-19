@@ -105,14 +105,6 @@ func Set(key string, value any) error {
 		cfg.Model = strVal
 		return nil
 
-	case "image":
-		strVal, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("value for key '%s' must be a string", key)
-		}
-		cfg.ImagePath = strVal
-		return nil
-
 	case "reasoning":
 		boolVal, ok := value.(bool)
 		if !ok {
