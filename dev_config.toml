@@ -1,6 +1,6 @@
 # Configuration for PicoChat
 URL = "http://localhost:11434/api"
-Model = "Qwen3-8B-8bit"
+Model = "Devstral-Small-2507-4bit-DWQ"
 Context = 50
 Temperature = 0.10
 TopP = 0.90

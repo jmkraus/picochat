@@ -2,7 +2,7 @@
 URL = "http://localhost:11434/api"
 Model = "DeepSeek-R1-Distill-Qwen-14B-6bit"
 Quiet = false
-Context = 50
+Context = 20
 Temperature = 0.70
 TopP = 0.90
-Prompt = "You are Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging."
+Prompt = "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging."
