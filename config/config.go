@@ -138,6 +138,7 @@ func Set(key string, value any) error {
 		return nil
 
 	default:
+		// Don't forget to update command/parser.go --> validateAndConvert()
 		return fmt.Errorf("unsupported config key '%s'", key)
 	}
 }
