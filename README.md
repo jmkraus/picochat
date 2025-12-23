@@ -124,24 +124,25 @@ Since Pico AI currently does not report token counts, it is difficult to calcula
 
 ### Commands
 
-| CMD         | DESCRIPTION |
-| ----------- | ------------------------------------------------- |
-| [Ctrl] + D  | Submit multiline input (EOF)                      |
-| [Esc]       | Cancel multiline input and return to prompt       |
-| [Up]/[Down] | Browse prompt command history                     |
-| /copy, /c   | Copy the last answer to clipboard                 |
-| /paste, /v  | Get clipboard content as user input and send      |
-| /info       | Show system information                           |
-| /message    | Show last message again (e.g., after load)        |
-| /load       | Load chat history from a file                     |
-| /save       | Save current chat history to a file               |
-| /list       | List available saved history files                |
-| /models     | List (and switch) downloaded models               |
-| /clear      | Clear history and reinitialize with system prompt |
-| /set        | Set session variables (key=value)                 |
-| /retry      | Sends chat history again, but without last answer |
-| /bye        | Quit PicoChat                                     |
-| /help, /?   | Show available commands                           |
+| CMD             | DESCRIPTION |
+| --------------- | ------------------------------------------------- |
+| [Ctrl]+D        | Submit multiline input (EOF)                      |
+| [Esc], [Ctrl]+C | Cancel multiline input and return to prompt       |
+| [Up]/[Down]     | Browse prompt command history                     |
+| /copy, /c       | Copy the last answer to clipboard                 |
+| /paste, /v      | Get clipboard content as user input and send      |
+| /info           | Show system information                           |
+| /message        | Show last message again (e.g., after load)        |
+| /load           | Load chat history from a file                     |
+| /save           | Save current chat history to a file               |
+| /list           | List available saved history files                |
+| /models         | List (and switch) downloaded models               |
+| /clear          | Clear session context                             |
+| /set            | Set session variables (key=value)                 |
+| /image          | Set image file path                               |
+| /retry          | Sends chat history again, but without last answer |
+| /bye            | Quit PicoChat                                     |
+| /help, /?       | Show available commands                           |
 
 Some commands can have an argument:
 
