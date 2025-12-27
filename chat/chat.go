@@ -29,10 +29,10 @@ import (
 //
 //	string  - summary message with elapsed time and token speed
 //	error   - error encountered during the request or processing
-func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (string, error) {
+func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (*ChatResult, error) {
 	cfg, err := getConfig(cfg)
 	if err != nil {
-		return "", fmt.Errorf("config load failed: %w", err)
+		return nil, fmt.Errorf("config load failed: %w", err)
 	}
 
 	// evaluate reasoning
@@ -57,18 +57,18 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("json marshal failed: %w", err)
+		return nil, fmt.Errorf("json marshal failed: %w", err)
 	}
 
 	chatURL, err := requests.CleanUrl(cfg.URL, "chat")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	start := time.Now()
 	response, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return "", fmt.Errorf("http request error for model %s: %w", cfg.Model, err)
+		return nil, fmt.Errorf("http request error for model %s: %w", cfg.Model, err)
 	}
 	defer response.Body.Close()
 
@@ -78,45 +78,59 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	seconds := 0
 	elapsed := "--:--"
 	firstToken := true
+	streamPlain := cfg.OutputFmt == "plain"
+
 	for {
 		var res messages.StreamResponse
 		if err := decoder.Decode(&res); err != nil {
 			if err == io.EOF {
 				break
 			}
-			return "", fmt.Errorf("stream decoding error for model %s: %w", cfg.Model, err)
+			return nil, fmt.Errorf("stream decoding error for model %s: %w", cfg.Model, err)
 		}
 
 		if res.Message.Content != "" {
-			if firstToken {
+			if firstToken && streamPlain {
 				console.StopSpinner(cfg.Quiet, stop)
 				firstToken = false
 			}
-			fmt.Print(res.Message.Content)
+
+			if streamPlain {
+				fmt.Print(res.Message.Content)
+			}
+
 			fullReply.WriteString(res.Message.Content)
 		}
 
 		if res.Done {
+			if firstToken {
+				console.StopSpinner(cfg.Quiet, stop)
+			}
+
 			seconds, elapsed = elapsedTime(start)
-			fmt.Println()
+
+			if streamPlain {
+				fmt.Println()
+			}
+
 			break
 		}
 	}
 
 	if fullReply.Len() == 0 {
 		console.StopSpinner(cfg.Quiet, stop)
-		return "", fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
+		return nil, fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
 	}
 
 	cleanMsg := messages.TrimEmptyLines(fullReply.String())
 	cfg.ImagePath = "" ////IMAGES discard path after first use
 	err = history.Add(messages.RoleAssistant, cleanMsg, cfg.ImagePath)
 	if err != nil {
-		return "", fmt.Errorf("could not add message to history: %w", err)
+		return nil, fmt.Errorf("could not add message to history: %w", err)
 	}
 	speed := tokenSpeed(seconds, fullReply.String())
-	msg := fmt.Sprintf("\nElapsed (mm:ss): %s | Tokens/sec: %.1f", elapsed, speed)
-	return msg, nil
+
+	return &ChatResult{Output: cleanMsg, Elapsed: elapsed, TokensPS: speed}, nil
 }
 
 // elapsedTime returns the elapsed time in seconds and a formatted

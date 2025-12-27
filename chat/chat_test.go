@@ -29,7 +29,7 @@ func streamingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // dummyHandleChat calls HandleChat and instantly closes the Stop-Channel.
-func dummyHandleChat(cfg *config.Config, history *messages.ChatHistory) (string, error) {
+func dummyHandleChat(cfg *config.Config, history *messages.ChatHistory) (*ChatResult, error) {
 	stop := make(chan struct{})
 	return HandleChat(cfg, history, stop)
 }

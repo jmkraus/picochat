@@ -14,51 +14,79 @@ import (
 	"picochat/version"
 )
 
-func sendPrompt(prompt string, image string, quiet bool, history *messages.ChatHistory) {
-	stop := make(chan struct{})
-	go console.StartSpinner(quiet, stop)
+type Session struct {
+	Config  *config.Config
+	History *messages.ChatHistory
+	Quiet   bool
+}
 
-	err := history.Add(messages.RoleUser, prompt, image)
+func sendPrompt(session *Session, prompt string, image string) {
+	stop := make(chan struct{})
+	go console.StartSpinner(session.Quiet, stop)
+
+	err := session.History.Add(messages.RoleUser, prompt, image)
 	if err != nil {
-		console.StopSpinner(quiet, stop)
+		console.StopSpinner(session.Quiet, stop)
 		console.Error(fmt.Sprintf("%v", err))
 		return
 	}
 
-	msg, err := chat.HandleChat(nil, history, stop)
+	result, err := chat.HandleChat(session.Config, session.History, stop)
 	if err != nil {
-		console.StopSpinner(quiet, stop)
+		console.StopSpinner(session.Quiet, stop)
 		console.Error(fmt.Sprintf("%v", err))
-	} else {
-		if !quiet {
-			console.Info(msg)
-		}
+		return
 	}
+
+	outputResult(result, session)
 }
 
-func repeatPrompt(quiet bool, history *messages.ChatHistory) {
-	if history.Len() < 2 {
+func repeatPrompt(session *Session) {
+	if session.History.Len() < 2 {
 		console.Warn("chat history is empty")
 		return
 	}
 
 	stop := make(chan struct{})
-	go console.StartSpinner(quiet, stop)
+	go console.StartSpinner(session.Quiet, stop)
 
-	lastEntry := history.GetLast()
+	lastEntry := session.History.GetLast()
 	if lastEntry.Role != messages.RoleUser {
 		console.Warn("last entry in history is not a user prompt")
 		return
 	}
 
-	msg, err := chat.HandleChat(nil, history, stop)
+	result, err := chat.HandleChat(session.Config, session.History, stop)
 	if err != nil {
-		console.StopSpinner(quiet, stop)
+		console.StopSpinner(session.Quiet, stop)
 		console.Error(fmt.Sprintf("%v", err))
-	} else {
-		if !quiet {
-			console.Info(msg)
-		}
+		return
+	}
+
+	outputResult(result, session)
+}
+
+func outputResult(result *chat.ChatResult, session *Session) {
+	if session.Quiet {
+		return
+	}
+
+	switch session.Config.OutputFmt {
+	case "json":
+		// if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
+		// 	console.Error(fmt.Sprintf("json encode failed: %v", err))
+		// }
+	case "yaml":
+		// if err := yaml.NewEncoder(os.Stdout).Encode(result); err != nil {
+		// 	console.Error(fmt.Sprintf("yaml encode failed: %v", err))
+		// }
+	default:
+		msg := fmt.Sprintf(
+			"\nElapsed (mm:ss): %s | Tokens/sec: %.1f",
+			result.Elapsed,
+			result.TokensPS,
+		)
+		console.Info(msg)
 	}
 }
 
@@ -116,7 +144,13 @@ func main() {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	if !cfg.Quiet {
+	session := &Session{
+		Config:  cfg,
+		History: history,
+		Quiet:   cfg.Quiet,
+	}
+
+	if !session.Quiet {
 		if *args.Model != "" {
 			console.Info(fmt.Sprintf("Configuration overridden by model='%s'", *args.Model))
 		}
@@ -124,7 +158,7 @@ func main() {
 	}
 
 	for {
-		if !cfg.Quiet {
+		if !session.Quiet {
 			fmt.Printf("\n%s", console.Prompt)
 		}
 
@@ -156,10 +190,10 @@ func main() {
 				break
 			}
 			if result.Repeat {
-				repeatPrompt(cfg.Quiet, history)
+				repeatPrompt(session)
 			} else if result.Pasted != "" {
 				// start the request with pasted content from clipboard
-				sendPrompt(result.Pasted, cfg.ImagePath, cfg.Quiet, history)
+				sendPrompt(session, result.Pasted, cfg.ImagePath)
 			}
 			if input.EOF {
 				// we come from stdin pipe
@@ -169,7 +203,7 @@ func main() {
 			}
 		}
 
-		sendPrompt(input.Text, cfg.ImagePath, cfg.Quiet, history)
+		sendPrompt(session, input.Text, cfg.ImagePath)
 
 		if input.EOF {
 			break
