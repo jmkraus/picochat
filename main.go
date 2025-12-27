@@ -8,6 +8,7 @@ import (
 	"picochat/command"
 	"picochat/config"
 	"picochat/console"
+	"picochat/format"
 	"picochat/messages"
 	"picochat/paths"
 	"picochat/version"
@@ -78,6 +79,19 @@ func main() {
 	if *args.Quiet {
 		// only override config if arg actively set
 		cfg.Quiet = true
+	}
+
+	if *args.Format == "" {
+		// default
+		cfg.OutputFmt = "plain"
+	} else {
+		format, ok := format.AllowedKeys(*args.Format)
+		if ok {
+			cfg.OutputFmt = format
+		} else {
+			cfg.OutputFmt = "plain"
+			console.Warn("unknown output format - fallback to plain")
+		}
 	}
 
 	if *args.Model != "" {
