@@ -117,7 +117,6 @@ func main() {
 	}
 
 	if !cfg.Quiet {
-		// console.Info(fmt.Sprintf("Configuration file used: %s", cfg.ConfigPath))
 		if *args.Model != "" {
 			console.Info(fmt.Sprintf("Configuration overridden by model='%s'", *args.Model))
 		}
