@@ -71,3 +71,16 @@ func TestExpandHomeDir(t *testing.T) {
 		})
 	}
 }
+
+func TestFileExists_Negative(t *testing.T) {
+	// Define a path that does not exist
+	nonExistentFilePath := "non_existent_file.txt"
+
+	// Call the FileExists function
+	result := FileExists(nonExistentFilePath)
+
+	// Assert that the result is false
+	if result {
+		t.Errorf("FileExists(%s) = true; want false", nonExistentFilePath)
+	}
+}
