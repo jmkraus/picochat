@@ -82,14 +82,34 @@ echo "/models" | picochat -quiet
 
 ### Command line args
 
-| ARG      | DESCRIPTION                             |
+| Arg      | Description                             |
 | -------- | --------------------------------------- |
 | -config  | Loads a configuration file              |
 | -history | Loads the specific session              |
 | -model   | Overrides config setting with new model |
 | -image   | Sets a path for an image file           |
+| -format  | Defines output format of the response   |
 | -quiet   | Suppresses all app messages             |
 | -version | Shows version number and quits          |
+
+
+### Output formats
+
+Since v0.12 PicoChat allows output formats other than plain text. This simplifies the output processing in pipelines etc.
+
+Example usage: `picochat -format json`
+
+The following formats are available:
+
+| Format      | Description                                        |
+| ----------- | -------------------------------------------------- |
+| plain       | (default) Plain text output, can be omitted.       |
+| json        | Response formatted as json output.                 |
+| json-pretty | Response formatted as json output in pretty print. |
+| yaml        | Response formatted as yaml output.                 |
+
+If a wrong format is given, a warning shows up and PicoChat uses plain text as fallback.
+
 
 ### Configuration files
 

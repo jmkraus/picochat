@@ -7,6 +7,7 @@ require (
 	github.com/atotto/clipboard v0.1.4
 	github.com/mattn/go-runewidth v0.0.19
 	golang.org/x/term v0.35.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

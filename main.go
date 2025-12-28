@@ -71,22 +71,8 @@ func outputResult(result *chat.ChatResult, session *Session) {
 		return
 	}
 
-	switch session.Config.OutputFmt {
-	case "json":
-		// if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
-		// 	console.Error(fmt.Sprintf("json encode failed: %v", err))
-		// }
-	case "yaml":
-		// if err := yaml.NewEncoder(os.Stdout).Encode(result); err != nil {
-		// 	console.Error(fmt.Sprintf("yaml encode failed: %v", err))
-		// }
-	default:
-		msg := fmt.Sprintf(
-			"\nElapsed (mm:ss): %s | Tokens/sec: %.1f",
-			result.Elapsed,
-			result.TokensPS,
-		)
-		console.Info(msg)
+	if err := format.RenderResult(os.Stdout, result, session.Config.OutputFmt); err != nil {
+		console.Error(fmt.Sprintf("output failed: %v", err))
 	}
 }
 
