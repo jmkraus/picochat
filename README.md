@@ -95,7 +95,7 @@ echo "/models" | picochat -quiet
 
 ### Output formats
 
-Since v0.12 PicoChat allows output formats other than plain text. This simplifies the output processing in pipelines etc.
+Since v0.12 PicoChat provides output formats other than plain text. This simplifies the output processing in pipelines etc.
 
 Example usage: `picochat -format json`
 
@@ -109,6 +109,12 @@ The following formats are available:
 | yaml        | Response formatted as yaml output.                 |
 
 If a wrong format is given, a warning shows up and PicoChat uses plain text as fallback.
+
+Using formatted output enables pipelines like this:
+
+```
+echo "Write a Haiku about Cheese" | go run main.go -quiet -format json | jq -r '.elapsed'
+```
 
 
 ### Configuration files
