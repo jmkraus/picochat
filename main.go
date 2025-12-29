@@ -142,7 +142,7 @@ func main() {
 
 	if !session.Quiet {
 		if *args.Model != "" {
-			console.Info(fmt.Sprintf("Configuration overridden by model='%s'", *args.Model))
+			console.Info(fmt.Sprintf("Configuration overridden by model='%s'", cfg.Model))
 		}
 		console.Info("PicoChat started. Help with '/?'")
 	}
@@ -167,7 +167,9 @@ func main() {
 		}
 
 		if input.IsCommand {
-			fmt.Println()
+			if !session.Quiet {
+				fmt.Println()
+			}
 			result := command.HandleCommand(input.Text, history, os.Stdin)
 			if result.Error != nil {
 				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
