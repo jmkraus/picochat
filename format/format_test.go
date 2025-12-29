@@ -49,7 +49,7 @@ func testResult() *chat.ChatResult {
 func TestRenderResult_JSON(t *testing.T) {
 	var buf bytes.Buffer
 
-	err := RenderResult(&buf, testResult(), "json")
+	err := RenderResult(&buf, testResult(), "json", false)
 	if err != nil {
 		t.Fatalf("RenderResult returned error: %v", err)
 	}
@@ -68,7 +68,7 @@ func TestRenderResult_JSON(t *testing.T) {
 func TestRenderResult_JSONPretty(t *testing.T) {
 	var buf bytes.Buffer
 
-	err := RenderResult(&buf, testResult(), "json-pretty")
+	err := RenderResult(&buf, testResult(), "json-pretty", false)
 	if err != nil {
 		t.Fatalf("RenderResult returned error: %v", err)
 	}
@@ -83,7 +83,7 @@ func TestRenderResult_JSONPretty(t *testing.T) {
 func TestRenderResult_YAML(t *testing.T) {
 	var buf bytes.Buffer
 
-	err := RenderResult(&buf, testResult(), "yaml")
+	err := RenderResult(&buf, testResult(), "yaml", false)
 	if err != nil {
 		t.Fatalf("RenderResult returned error: %v", err)
 	}
@@ -102,7 +102,7 @@ func TestRenderResult_YAML(t *testing.T) {
 func TestRenderResult_UnknownFormat(t *testing.T) {
 	var buf bytes.Buffer
 
-	err := RenderResult(&buf, testResult(), "unknown")
+	err := RenderResult(&buf, testResult(), "unknown", false)
 	if err == nil {
 		t.Fatal("expected error for unknown format, got nil")
 	}

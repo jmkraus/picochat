@@ -38,7 +38,14 @@ func sendPrompt(session *Session, prompt string, image string) {
 		return
 	}
 
-	outputResult(result, session)
+	if err := format.RenderResult(
+		os.Stdout,
+		result,
+		session.Config.OutputFmt,
+		session.Quiet,
+	); err != nil {
+		console.Error(fmt.Sprintf("output failed: %v", err))
+	}
 }
 
 func repeatPrompt(session *Session) {
@@ -63,15 +70,12 @@ func repeatPrompt(session *Session) {
 		return
 	}
 
-	outputResult(result, session)
-}
-
-func outputResult(result *chat.ChatResult, session *Session) {
-	if session.Quiet {
-		return
-	}
-
-	if err := format.RenderResult(os.Stdout, result, session.Config.OutputFmt); err != nil {
+	if err := format.RenderResult(
+		os.Stdout,
+		result,
+		session.Config.OutputFmt,
+		session.Quiet,
+	); err != nil {
 		console.Error(fmt.Sprintf("output failed: %v", err))
 	}
 }

@@ -42,7 +42,7 @@ func AllowedKeys(input string) (string, bool) {
 // Returns:
 //
 //	error - any error that might have occurred
-func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string) error {
+func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet bool) error {
 
 	switch outputFmt {
 
@@ -65,12 +65,12 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string) error 
 		return enc.Encode(result)
 
 	case "plain":
-		_, err := fmt.Printf(
-			"\nElapsed (mm:ss): %s | Tokens/sec: %.1f",
-			result.Elapsed,
-			result.TokensPS,
-		)
-		return err
+		fmt.Println()
+		if !quiet {
+			_, err := fmt.Printf("\nElapsed (mm:ss): %s | Tokens/sec: %.1f\n", result.Elapsed, result.TokensPS)
+			return err
+		}
+		return nil
 
 	default:
 		return fmt.Errorf("unknown output format: %s", outputFmt)

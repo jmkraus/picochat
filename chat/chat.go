@@ -106,13 +106,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			if firstToken {
 				console.StopSpinner(cfg.Quiet, stop)
 			}
-
 			seconds, elapsed = elapsedTime(start)
-
-			if streamPlain {
-				fmt.Println()
-			}
-
 			break
 		}
 	}
