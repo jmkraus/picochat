@@ -17,9 +17,7 @@ The released binary is neither notarized nor signed. To use it on a Mac, there a
  Add the required libraries to your local Go setup.
 
  ```text
-  go get github.com/atotto/clipboard
-  go get github.com/BurntSushi/toml
-  go get github.com/mattn/go-runewidth
+  go mod download
   go mod tidy
   go test ./...
   go build
