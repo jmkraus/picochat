@@ -9,7 +9,7 @@ var (
 	Model       = flag.String("model", "", "Set model for the request")
 	ShowVersion = flag.Bool("version", false, "Print picochat version")
 	Image       = flag.String("image", "", "Path to an image file")
-	Format      = flag.String("format", "", "Output format of the LLM (plain, json, yaml)")
+	Format      = flag.String("format", "", "Output format of the LLM (plain, json, json-pretty, yaml)")
 )
 
 func Parse() {

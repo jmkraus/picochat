@@ -38,6 +38,7 @@ func AllowedKeys(input string) (string, bool) {
 //	w (io.Writer)       - the io output
 //	result (ChatResult) - a struct with all chat information
 //	outputFmt (string)  - the output format of the current session
+//	quiet (bool)        - Suppress output in quiet mode
 //
 // Returns:
 //
@@ -65,7 +66,7 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 		return enc.Encode(result)
 
 	case "plain":
-		fmt.Println()
+		fmt.Println() // final newline after streamed token output
 		if !quiet {
 			_, err := fmt.Printf("\nElapsed (mm:ss): %s | Tokens/sec: %.1f\n", result.Elapsed, result.TokensPS)
 			return err

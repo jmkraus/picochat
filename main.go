@@ -100,13 +100,11 @@ func main() {
 	}
 
 	if *args.Format == "" {
-		// default
-		cfg.OutputFmt = "plain"
+		cfg.OutputFmt = "plain" // default
 	} else {
-		format, ok := format.AllowedKeys(*args.Format)
-		if ok {
-			cfg.OutputFmt = format
-		} else {
+		f, ok := format.AllowedKeys(*args.Format)
+		cfg.OutputFmt = f
+		if !ok {
 			cfg.OutputFmt = "plain"
 			console.Warn("unknown output format - fallback to plain")
 		}
