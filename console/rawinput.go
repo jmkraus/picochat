@@ -32,7 +32,7 @@ func ReadMultilineInput() InputResult {
 		}
 		text := strings.TrimRight(string(data), "\n")
 		trimText := strings.TrimSpace(text)
-		return InputResult{Text: text, EOF: true, IsCommand: strings.HasPrefix(trimText, "/")}
+		return InputResult{Text: trimText, EOF: true, IsCommand: strings.HasPrefix(trimText, "/")}
 	} else {
 		oldState, err := term.MakeRaw(fd)
 		if err != nil {

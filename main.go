@@ -161,13 +161,18 @@ func main() {
 		}
 
 		if input.Text == "" && !input.IsCommand {
-			continue
+			if input.EOF {
+				// we come from stdin pipe
+				console.NewLine(session.Quiet)
+				break
+			} else {
+				continue
+			}
+			// continue
 		}
 
 		if input.IsCommand {
-			if !session.Quiet {
-				fmt.Println()
-			}
+			console.NewLine(session.Quiet)
 			result := command.HandleCommand(input.Text, history, os.Stdin)
 			if result.Error != nil {
 				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
