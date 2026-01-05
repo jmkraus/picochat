@@ -110,7 +110,7 @@ If a wrong format is given, a warning shows up and PicoChat uses plain text as f
 
 **Example output: plain**
 
-`echo "Write a Haiku about Cheese" | go run main.go -quiet`
+`echo "Write a Haiku about Cheese" | picochat -quiet`
 
 ```
 Golden, sharp, and bold,
@@ -120,7 +120,7 @@ Dairy bliss unfolds.
 
 **Example output: json**
 
-`echo "Write a Haiku about Cheese" | go run main.go -quiet -format json`
+`echo "Write a Haiku about Cheese" | picochat -quiet -format json`
 
 ```
 {"output":"Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds.","elapsed":"00:02","tokens_per_sec":7.8}
@@ -128,7 +128,7 @@ Dairy bliss unfolds.
 
 **Example output: json-pretty**
 
-`echo "Write a Haiku about Cheese" | go run main.go -quiet -format json-pretty`
+`echo "Write a Haiku about Cheese" | picochat -quiet -format json-pretty`
 
 ```
 {
@@ -140,7 +140,7 @@ Dairy bliss unfolds.
 
 **Example output: yaml**
 
-`echo "Write a Haiku about Cheese" | go run main.go -quiet -format yaml`
+`echo "Write a Haiku about Cheese" | picochat -quiet -format yaml`
 
 ```
 output: "Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds."
@@ -151,7 +151,7 @@ tokens_per_sec: 7.8
 Using formatted output enables pipelines like this:
 
 ```
-echo "Write a Haiku about Cheese" | go run main.go -quiet -format json | jq -r '.elapsed'
+echo "Write a Haiku about Cheese" | picochat -quiet -format json | jq -r '.elapsed'
 ```
 
 
