@@ -230,7 +230,7 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 //
 //	none
 func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
-	fmt.Printf("\r%s", escClearLine)
+	fmt.Print(escClearLine)
 
 	prefix := ""
 	prefixWidth := 0

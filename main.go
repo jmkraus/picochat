@@ -20,32 +20,13 @@ type Session struct {
 	Quiet   bool
 }
 
-func sendPrompt(session *Session, prompt string, image string) {
-	stop := make(chan struct{})
-	go console.StartSpinner(session.Quiet, stop)
-
-	err := session.History.Add(messages.RoleUser, prompt, image)
-	if err != nil {
-		console.StopSpinner(session.Quiet, stop)
+func sendPrompt(session *Session, prompt, image string) {
+	if err := session.History.Add(messages.RoleUser, prompt, image); err != nil {
 		console.Error(fmt.Sprintf("%v", err))
 		return
 	}
 
-	result, err := chat.HandleChat(session.Config, session.History, stop)
-	if err != nil {
-		console.StopSpinner(session.Quiet, stop)
-		console.Error(fmt.Sprintf("%v", err))
-		return
-	}
-
-	if err := format.RenderResult(
-		os.Stdout,
-		result,
-		session.Config.OutputFmt,
-		session.Quiet,
-	); err != nil {
-		console.Error(fmt.Sprintf("output failed: %v", err))
-	}
+	runChat(session)
 }
 
 func repeatPrompt(session *Session) {
@@ -54,18 +35,22 @@ func repeatPrompt(session *Session) {
 		return
 	}
 
-	stop := make(chan struct{})
-	go console.StartSpinner(session.Quiet, stop)
-
 	lastEntry := session.History.GetLast()
 	if lastEntry.Role != messages.RoleUser {
 		console.Warn("last entry in history is not a user prompt")
 		return
 	}
 
+	runChat(session)
+}
+
+func runChat(session *Session) {
+	stop := make(chan struct{})
+	go console.StartSpinner(session.Quiet, stop)
+	defer console.StopSpinner(session.Quiet, stop)
+
 	result, err := chat.HandleChat(session.Config, session.History, stop)
 	if err != nil {
-		console.StopSpinner(session.Quiet, stop)
 		console.Error(fmt.Sprintf("%v", err))
 		return
 	}
@@ -168,7 +153,6 @@ func main() {
 			} else {
 				continue
 			}
-			// continue
 		}
 
 		if input.IsCommand {

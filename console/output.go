@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-const err_prefix string = "×"  // or "error:"
-const warn_prefix string = "!" // or "warning:"
+const err_prefix string = "×"
+const warn_prefix string = "!"
 
 // Error prints a custom error message to stderr
 // Parameters:
@@ -17,6 +17,7 @@ const warn_prefix string = "!" // or "warning:"
 //
 //	none
 func Error(msg string) {
+	fmt.Print(escClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", err_prefix, msg)
 }
 
@@ -29,6 +30,7 @@ func Error(msg string) {
 //
 //	none
 func Warn(msg string) {
+	fmt.Print(escClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", warn_prefix, msg)
 }
 
@@ -41,6 +43,7 @@ func Warn(msg string) {
 //
 //	none
 func Info(msg string) {
+	fmt.Print(escClearLine)
 	fmt.Fprintln(os.Stdout, msg)
 }
 
@@ -56,5 +59,5 @@ func NewLine(quiet bool) {
 	if quiet {
 		return
 	}
-	fmt.Println()
+	fmt.Print(crlf)
 }
