@@ -108,6 +108,46 @@ The following formats are available:
 
 If a wrong format is given, a warning shows up and PicoChat uses plain text as fallback.
 
+**Example output: plain**
+
+`echo "Write a Haiku about Cheese" | go run main.go -quiet`
+
+```
+Golden, sharp, and bold,
+Melts upon your waiting tongue,
+Dairy bliss unfolds.
+```
+
+**Example output: json**
+
+`echo "Write a Haiku about Cheese" | go run main.go -quiet -format json`
+
+```
+{"output":"Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds.","elapsed":"00:02","tokens_per_sec":7.8}
+```
+
+**Example output: json-pretty**
+
+`echo "Write a Haiku about Cheese" | go run main.go -quiet -format json-pretty`
+
+```
+{
+  "output": "Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds."
+  "elapsed": "00:02",
+  "tokens_per_sec": 7.8
+}
+```
+
+**Example output: yaml**
+
+`echo "Write a Haiku about Cheese" | go run main.go -quiet -format yaml`
+
+```
+output: "Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds."
+elapsed: "00:02",
+tokens_per_sec: 7.8
+```
+
 Using formatted output enables pipelines like this:
 
 ```
