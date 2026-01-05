@@ -212,7 +212,7 @@ func CreateTestFile(baseUrl string) error {
 	)
 
 	const (
-		text = "中国是一个拥有悠久历史的文明古国。 Can you translate this for me? 😊"
+		text = "中国是一个拥有悠久历史的文明古国。 Can you translate this into English? 😊"
 	)
 
 	switch runtime.GOOS {
