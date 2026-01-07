@@ -162,8 +162,11 @@ func main() {
 				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
 			}
 			console.AddCommand(input.Text)
+			if result.Info != "" && !session.Quiet {
+				console.Info(result.Info)
+			}
 			if result.Output != "" {
-				console.Info(result.Output)
+				fmt.Println(result.Output)
 			}
 			if result.Quit {
 				break

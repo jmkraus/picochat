@@ -17,6 +17,7 @@ import (
 
 type CommandResult struct {
 	Output string
+	Info   string
 	Error  error
 	Quit   bool
 	Pasted string
@@ -49,15 +50,15 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("test file save failed: %w", err)}
 		}
-		return CommandResult{Output: "Test file was created.", Quit: true}
+		return CommandResult{Info: "Test file was created.", Quit: true}
 	case "bye":
-		return CommandResult{Output: "Chat has ended.", Quit: true}
+		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
 		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("history save failed: %w", err)}
 		}
-		return CommandResult{Output: fmt.Sprintf("History saved as '%s'", name)}
+		return CommandResult{Info: fmt.Sprintf("History saved as '%s'", name)}
 	case "load":
 		filename, err := getHistoryFilename(args, input)
 		if err != nil {
@@ -70,9 +71,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("history load failed: %w", err)}
 			}
 			history.Replace(loaded.Get())
-			return CommandResult{Output: "History loaded successfully."}
+			return CommandResult{Info: "History loaded successfully."}
 		} else {
-			return CommandResult{Output: "Load canceled."}
+			return CommandResult{Info: "Load canceled."}
 		}
 	case "image":
 		if args != "" {
@@ -80,7 +81,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("image file not found")}
 			}
 			cfg.ImagePath = args
-			return CommandResult{Output: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
+			return CommandResult{Info: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
 		}
 		return CommandResult{Error: fmt.Errorf("no image file path provided")}
 	case "info":
@@ -106,7 +107,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			if found {
 				return CommandResult{Output: msg.Content}
 			} else {
-				return CommandResult{Output: fmt.Sprintf("No matching history for role type '%s' found.", args)}
+				return CommandResult{Info: fmt.Sprintf("No element for role type '%s' found.", args)}
 			}
 		default:
 			msg := history.GetLast().Content
@@ -129,26 +130,26 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			if found {
 				lastAnswer = codeBlock
 			} else {
-				return CommandResult{Output: "Nothing to copy."}
+				return CommandResult{Info: "Nothing to copy."}
 			}
 		}
 		err := clipb.WriteClipboard(lastAnswer)
 		if err != nil {
 			return CommandResult{Error: err}
 		}
-		return CommandResult{Output: "Last answer written to clipboard."}
+		return CommandResult{Info: "Last answer written to clipboard."}
 	case "paste":
 		text, err := clipb.ReadClipboard()
 		if err != nil {
 			return CommandResult{Error: err}
 		}
 		return CommandResult{
-			Output: fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
+			Info:   fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
 			Pasted: text,
 		}
 	case "retry":
 		history.Discard()
-		return CommandResult{Output: "Repeating last chat history user prompt.", Repeat: true}
+		return CommandResult{Info: "Repeating last chat history user prompt.", Repeat: true}
 	case "models":
 		if args == "" {
 			models, err := utils.ShowAvailableModels(cfg.URL)
@@ -167,7 +168,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
 		cfg.Model = model
-		return CommandResult{Output: fmt.Sprintf("Switched model to '%s'.", model)}
+		return CommandResult{Info: fmt.Sprintf("Switched model to '%s'.", model)}
 	case "set":
 		if args == "" {
 			list := []string{
@@ -199,12 +200,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("set context size failed: %w", err)}
 			}
 		}
-		return CommandResult{Output: fmt.Sprintf("Config updated: %s = %v", key, value)}
+		return CommandResult{Info: fmt.Sprintf("Config updated: %s = %v", key, value)}
 	case "clear":
 		history.ClearExceptSystemPrompt()
-		return CommandResult{Output: "History cleared (system prompt retained)."}
+		return CommandResult{Info: "History cleared (system prompt retained)."}
 	case "help":
-		return CommandResult{Output: HelpText(args)}
+		return CommandResult{Info: HelpText(args)}
 	default:
 		return CommandResult{Error: fmt.Errorf("unknown command")}
 	}

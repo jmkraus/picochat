@@ -15,16 +15,16 @@ func TestHandleClear(t *testing.T) {
 	if !h.IsEmpty() {
 		t.Error("expected history to be cleared except system prompt")
 	}
-	if !strings.Contains(result.Output, "cleared") {
-		t.Errorf("unexpected output: %s", result.Output)
+	if !strings.Contains(result.Info, "cleared") {
+		t.Errorf("unexpected output: %s", result.Info)
 	}
 }
 
 func TestHandleHelp(t *testing.T) {
 	h := messages.NewHistory("prompt", 50)
 	result := command.HandleCommand("/help", h, strings.NewReader(""))
-	if !strings.Contains(result.Output, "/save") {
-		t.Errorf("expected help to contain /save, got: %s", result.Output)
+	if !strings.Contains(result.Info, "/save") {
+		t.Errorf("expected help to contain /save, got: %s", result.Info)
 	}
 }
 
@@ -34,7 +34,7 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 
 	result := command.HandleCommand("/load", h, input)
 
-	if !strings.Contains(result.Output, "failed") && !strings.Contains(result.Output, "success") {
-		t.Errorf("Unexpected load result: %s", result.Output)
+	if !strings.Contains(result.Info, "failed") && !strings.Contains(result.Info, "success") {
+		t.Errorf("Unexpected load result: %s", result.Info)
 	}
 }
