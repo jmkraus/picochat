@@ -1,13 +1,13 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 )
 
 // parseArgs parses a string of the form "key=value" and returns the key, converted value, and error.
+//
 // Parameters:
 //
 //	args - the input string to parse
@@ -20,17 +20,17 @@ import (
 func parseArgs(args string) (string, any, error) {
 	parts := strings.SplitN(args, "=", 2)
 	if len(parts) != 2 {
-		return "", nil, errors.New("invalid format, expected key=value")
+		return "", nil, fmt.Errorf("invalid format, expected key=value")
 	}
 
 	key := strings.ToLower(strings.TrimSpace(parts[0]))
 	value := strings.TrimSpace(parts[1])
 
 	if key == "" {
-		return "", nil, errors.New("invalid format, missing key")
+		return "", nil, fmt.Errorf("invalid format, missing key")
 	}
 	if value == "" {
-		return "", nil, errors.New("invalid format, missing value")
+		return "", nil, fmt.Errorf("invalid format, missing value")
 	}
 
 	convertedValue, err := validateAndConvert(key, value)
@@ -42,6 +42,7 @@ func parseArgs(args string) (string, any, error) {
 }
 
 // validateAndConvert validates the key and converts the value to the appropriate type.
+//
 // Parameters:
 //
 //	key   - the configuration key
@@ -80,6 +81,7 @@ func validateAndConvert(key, value string) (any, error) {
 }
 
 // stringToBool converts a string representation of a bool to a boolean value.
+//
 // Parameters:
 //
 //	s (string) - the string representation

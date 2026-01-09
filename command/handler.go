@@ -159,6 +159,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: models}
 		}
 
+		args, _ := strings.CutPrefix(args, "#") // accept and ignore # prefix
 		index, err := strconv.Atoi(args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("value not an integer")}
