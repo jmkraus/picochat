@@ -36,20 +36,20 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	}
 
 	// evaluate reasoning
-	var reasoning *messages.Reasoning
+	var reasoning *Reasoning
 	if cfg.Reasoning {
-		reasoning = &messages.Reasoning{Effort: "medium"}
+		reasoning = &Reasoning{Effort: "medium"}
 	} else {
 		reasoning = nil
 	}
 
-	reqBody := messages.ChatRequest{
+	reqBody := ChatRequest{
 		Model:     cfg.Model,
 		Messages:  history.Messages,
 		Stream:    true,
 		Reasoning: reasoning,
 		Think:     cfg.Reasoning,
-		Options: &messages.ChatOptions{
+		Options: &ChatOptions{
 			Temperature: cfg.Temperature,
 			TopP:        cfg.TopP,
 		},
@@ -81,7 +81,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	streamPlain := cfg.OutputFmt == "plain"
 
 	for {
-		var res messages.StreamResponse
+		var res StreamResponse
 		if err := decoder.Decode(&res); err != nil {
 			if err == io.EOF {
 				break
