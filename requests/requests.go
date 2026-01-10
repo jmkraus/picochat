@@ -10,6 +10,7 @@ import (
 )
 
 // GetAvailableModels fetches model names from the /tags endpoint.
+//
 // Parameters:
 //
 //	apiBaseURL string - Base URL of the API.
@@ -19,7 +20,7 @@ import (
 //	[]string - Slice of model names.
 //	error - Error if fetching or decoding fails.
 func GetAvailableModels(apiBaseURL string) ([]string, error) {
-	tagsURL, err := CleanUrl(apiBaseURL, "tags")
+	tagsURL, err := BuildCleanUrl(apiBaseURL, "tags")
 	if err != nil {
 		return nil, fmt.Errorf("error fetching models: %w", err)
 	}
@@ -49,6 +50,7 @@ func GetAvailableModels(apiBaseURL string) ([]string, error) {
 }
 
 // GetServerVersion retrieves the server version from the /version endpoint.
+//
 // Parameters:
 //
 //	apiBaseURL string - Base URL of the API.
@@ -58,16 +60,21 @@ func GetAvailableModels(apiBaseURL string) ([]string, error) {
 //	string - Server version.
 //	error - Error if request or decoding fails.
 func GetServerVersion(apiBaseURL string) (string, error) {
-	versionURL, err := CleanUrl(apiBaseURL, "version")
+	versionURL, err := BuildCleanUrl(apiBaseURL, "version")
 	if err != nil {
 		return "", fmt.Errorf("error fetching version: %w", err)
 	}
 
 	resp, err := http.Get(versionURL)
 	if err != nil {
-		return "", fmt.Errorf("could not fetch server version: %w", err)
+		return "", fmt.Errorf("error fetching version: %w", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("non-200 response: %d – %s", resp.StatusCode, string(body))
+	}
 
 	var v ServerVersion
 	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
@@ -81,7 +88,9 @@ func GetServerVersion(apiBaseURL string) (string, error) {
 	return v.Version, nil
 }
 
-// CleanUrl constructs a full API URL by ensuring the base URL includes the /api path and appending the specified endpoint.
+// BuildCleanUrl constructs a full API URL by ensuring the baseURL
+// includes the /api path and appending the specified endpoint.
+//
 // Parameters:
 //
 //	apiBaseURL string - Base API URL.
@@ -91,7 +100,7 @@ func GetServerVersion(apiBaseURL string) (string, error) {
 //
 //	string - Full URL string.
 //	error - Error if base URL is invalid.
-func CleanUrl(apiBaseURL, endPoint string) (string, error) {
+func BuildCleanUrl(apiBaseURL, endPoint string) (string, error) {
 	u, err := url.Parse(apiBaseURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid http url string %w", err)
@@ -107,7 +116,7 @@ func CleanUrl(apiBaseURL, endPoint string) (string, error) {
 	}
 
 	// Add endpoint
-	u.Path = path + "/" + endPoint
+	u.Path = fmt.Sprintf("%s/%s", path, endPoint)
 	apiFullURL := u.String()
 
 	return apiFullURL, nil

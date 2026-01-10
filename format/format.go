@@ -6,10 +6,12 @@ import (
 	"gopkg.in/yaml.v3"
 	"io"
 	"picochat/chat"
+	"picochat/console"
 	"strings"
 )
 
-// AllowedKeys checks if the argument string is valid.
+// AllowedKeys checks if the argument string is valid.i
+//
 // Parameters:
 //
 //	input (string) - the format argument
@@ -33,6 +35,7 @@ func AllowedKeys(input string) (string, bool) {
 }
 
 // RenderResult formats and writes the inference output to screen.
+//
 // Parameters:
 //
 //	w (io.Writer)       - the io output
@@ -68,7 +71,10 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 	case "plain":
 		fmt.Println() // final newline after streamed token output
 		if !quiet {
-			_, err := fmt.Printf("\nElapsed (mm:ss): %s | Tokens/sec: %.1f\n", result.Elapsed, result.TokensPS)
+			fmt.Println()
+			fmt.Print(console.EscWhite)
+			_, err := fmt.Printf("elapsed (mm:ss): %s | tok/s: %.1f\n", result.Elapsed, result.TokensPS)
+			fmt.Print(console.EscReset)
 			return err
 		}
 		return nil

@@ -49,7 +49,8 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 	}
 }
 
-// Add appends a message with the specified role and content to the history. It handles role validation and compression.
+// Add appends a message with the specified role and content to the history.
+// It handles role validation and compression.
 //
 // Parameters:
 //
@@ -139,7 +140,8 @@ func (h *ChatHistory) GetLast() Message {
 	return h.Messages[h.Len()-1]
 }
 
-// GetLastRole searches backward for the last message with the specified role and returns it along with a boolean indicating success.
+// GetLastRole searches backward for the last message with the specified
+// role and returns it along with a boolean indicating success.
 //
 // Parameters:
 //
@@ -171,7 +173,8 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 	h.Messages = newMessages
 }
 
-// SaveHistoryToFile writes the chat history to a file in the history directory and returns the filename.
+// SaveHistoryToFile writes the chat history to a file in the history
+// directory and returns the filename.
 //
 // Parameters:
 //
@@ -218,7 +221,8 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 
 }
 
-// LoadHistoryFromFile reads a chat history from a file and returns a ChatHistory instance.
+// LoadHistoryFromFile reads a chat history from a file and returns
+// a ChatHistory instance.
 //
 // Parameters:
 //
@@ -253,7 +257,8 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	return &ChatHistory{Messages: messages}, nil
 }
 
-// ClearExceptSystemPrompt removes all messages except the system prompt and resets context flag.
+// ClearExceptSystemPrompt removes all messages except the system prompt
+// and resets context flag.
 //
 // Parameters:
 //
@@ -300,7 +305,8 @@ func (h *ChatHistory) SetContextSize(max int) error {
 	return nil
 }
 
-// Compress reduces the history to the specified maximum number of messages, keeping the system prompt.
+// Compress reduces the history to the specified maximum number of messages,
+// keeping the system prompt.
 //
 // Parameters:
 //

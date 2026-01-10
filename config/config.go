@@ -29,7 +29,7 @@ var (
 	loadErr  error
 )
 
-// Load reads and caches the configuration.
+// load reads and caches the configuration.
 //
 // Parameters:
 //
@@ -72,7 +72,8 @@ func load() {
 	instance = &cfg
 }
 
-// Get loads the configuration once and returns the instance of the loaded configuration.
+// Get loads the configuration once and returns the instance of the
+// loaded configuration.
 //
 // Parameters:
 //

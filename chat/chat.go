@@ -60,7 +60,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		return nil, fmt.Errorf("json marshal failed: %w", err)
 	}
 
-	chatURL, err := requests.CleanUrl(cfg.URL, "chat")
+	chatURL, err := requests.BuildCleanUrl(cfg.URL, "chat")
 	if err != nil {
 		return nil, err
 	}

@@ -5,10 +5,12 @@ import (
 	"time"
 )
 
-// StartSpinner starts a spinner animation until a signal is received on the stop channel.
+// StartSpinner starts a spinner animation until a signal is
+// received on the stop channel.
+//
 // Parameters:
 //
-//	quiet (bool)           - Suppress Spinner in quiet mode (true / false)
+//	quiet (bool)           - Suppress Spinner in quiet mode (true/false)
 //	stop (<-chan struct{}) – placeholder for input channel
 //
 // Returns:
@@ -22,10 +24,10 @@ func StartSpinner(quiet bool, stop <-chan struct{}) {
 	frames := []rune{'⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'}
 	i := 0
 
-	fmt.Print(escDisableCursor)
-	defer fmt.Print(escEnableCursor)
+	fmt.Print(EscDisableCursor)
+	defer fmt.Print(EscEnableCursor)
 
-	fmt.Print(escClearLine)
+	fmt.Print(EscClearLine)
 
 	for {
 		select {
@@ -40,6 +42,7 @@ func StartSpinner(quiet bool, stop <-chan struct{}) {
 }
 
 // StopSpinner stops the spinner animation and clears the line.
+//
 // Parameters:
 //
 //	quiet (bool)         - Suppress Spinner in quiet mode (true / false)
@@ -58,6 +61,6 @@ func StopSpinner(quiet bool, stop chan struct{}) {
 		return //channel already closed, do nothing
 	default:
 		close(stop)
-		fmt.Print(escClearLine)
+		fmt.Print(EscClearLine)
 	}
 }

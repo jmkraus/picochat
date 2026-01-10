@@ -10,6 +10,7 @@ import (
 )
 
 // GetConfigPath returns the path to the configuration file.
+//
 // Parameters:
 //
 //	none
@@ -37,6 +38,7 @@ func GetConfigPath() (string, error) {
 }
 
 // EnsureSuffix ensures that the filename ends with the given suffix.
+//
 // Parameters:
 //
 //	filename string - the original filename
@@ -53,6 +55,7 @@ func EnsureSuffix(filename string, suffix string) string {
 }
 
 // getConfigDir determines the configuration directory using various fallbacks.
+//
 // Parameters:
 //
 //	none
@@ -91,6 +94,7 @@ func getConfigDir() (string, error) {
 var overrideHistoryPath string // for Unit Tests
 
 // OverrideHistoryPath sets a custom history path for testing purposes.
+//
 // Parameters:
 //
 //	path string - the custom history path
@@ -103,6 +107,7 @@ func OverrideHistoryPath(path string) {
 }
 
 // GetHistoryPath returns the path to the history directory.
+//
 // Parameters:
 //
 //	none
@@ -129,6 +134,7 @@ func GetHistoryPath() (string, error) {
 }
 
 // fallbackToXDGOrHome returns the XDG config directory or the home config directory.
+//
 // Parameters:
 //
 //	none
@@ -152,6 +158,7 @@ func fallbackToXDGOrHome() (string, error) {
 }
 
 // fallbackToExecutableDir returns the directory of the executable.
+//
 // Parameters:
 //
 //	none
@@ -170,6 +177,7 @@ func fallbackToExecutableDir() (string, error) {
 }
 
 // ExpandHomeDir checks the given path and expands its user home
+//
 // Parameters:
 //
 //	path (string) - the path with tilde
@@ -190,6 +198,7 @@ func ExpandHomeDir(path string) (string, error) {
 }
 
 // FileExists checks if the file of a given path actually exists
+//
 // Parameters:
 //
 //	path (string) - the full file path

@@ -11,16 +11,17 @@ import (
 	"golang.org/x/term"
 )
 
-// ReadMultilineInput reads multiline input from stdin. It handles raw mode, escape sequences,
-// command detection, and returns an InputResult containing the entered text, flags for EOF,
-// Aborted, IsCommand, and any error.
+// ReadMultilineInput reads multiline input from stdin. It handles raw mode,
+// Escape sequences, command detection, and returns an InputResult containing
+// the entered text, flags for EOF, Aborted, IsCommand, and any error.
+//
 // Parameters:
 //
 //	none
 //
 // Returns:
 //
-//	InputResult - A structure containing the entered text and flags indicating specific states
+//	InputResult - A structure containing entered text and specific states
 func ReadMultilineInput() InputResult {
 	in := os.Stdin
 	fd := int(in.Fd())
@@ -38,9 +39,9 @@ func ReadMultilineInput() InputResult {
 		if err != nil {
 			return InputResult{Error: fmt.Errorf("error enabling raw input mode: %v", err)}
 		}
-		fmt.Print(escDisableLineWrap)
+		fmt.Print(EscDisableLineWrap)
 		defer func() {
-			fmt.Print(escEnableLineWrap)
+			fmt.Print(EscEnableLineWrap)
 			term.Restore(fd, oldState)
 		}()
 	}
@@ -71,26 +72,26 @@ func ReadMultilineInput() InputResult {
 			}
 			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
 
-		case 27: // ESC or escape sequences
-			// Peek to see if there are more bytes (escape sequence)
+		case 27: // Esc or Escape sequences
+			// Peek to see if there are more bytes (Escape sequence)
 			_ = setNonblock(fd, true)
 			peekBuf, err := reader.Peek(2)
 			_ = setNonblock(fd, false)
 			if err != nil || len(peekBuf) < 2 {
-				// Plain ESC → abort immediately
+				// Plain Esc → abort immediately
 				return InputResult{Aborted: true}
 			}
 
-			// Read the escape sequence
+			// Read the Escape sequence
 			buf := make([]byte, 2)
 			n, _ := reader.Read(buf)
 
 			if n < 2 || buf[0] != '[' {
-				// Unknown escape sequence
+				// Unknown Escape sequence
 				continue
 			}
 
-			// Arrow keys (e.g. ESC[A, ESC[B, ESC[C, ESC[D])
+			// Arrow keys (e.g. Esc[A, Esc[B, Esc[C, Esc[D])
 			switch buf[1] {
 			case 'A': // Up
 				recalled := PrevCommand()
@@ -112,7 +113,7 @@ func ReadMultilineInput() InputResult {
 					cursorPos++
 					// Move cursor forward by visual width of char
 					for range width {
-						fmt.Print(escCursorForward)
+						fmt.Print(EscCursorForward)
 					}
 				}
 				continue
@@ -123,7 +124,7 @@ func ReadMultilineInput() InputResult {
 					width := runewidth.RuneWidth(currentLine[cursorPos])
 					// Move cursor back by visual width of char
 					for range width {
-						fmt.Print(escCursorBack)
+						fmt.Print(EscCursorBack)
 					}
 				}
 				continue
@@ -158,6 +159,7 @@ func ReadMultilineInput() InputResult {
 
 // deleteCharAt deletes the character at the cursor position in the current line.
 // If the cursor is at the beginning (pos 0), no deletion occurs.
+//
 // Parameters:
 //
 //	line ([]rune)   - the current line to be edited
@@ -189,6 +191,7 @@ func deleteCharAt(line []rune, cursorPos int) ([]rune, int) {
 }
 
 // insertCharAt inserts a character at the cursor position in the current line.
+//
 // Parameters:
 //
 //	line ([]rune)   - the current line to be edited
@@ -220,6 +223,7 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 }
 
 // updateCurrentLine redraws the current line after an edit
+//
 // Parameters:
 //
 //	line ([]rune)    - the current line to be drawn
@@ -230,7 +234,7 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 //
 //	none
 func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
-	fmt.Print(escClearLine)
+	fmt.Print(EscClearLine)
 
 	prefix := ""
 	prefixWidth := 0
@@ -242,12 +246,14 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 	visualPos := visualWidth(line, cursorPos)
 
 	fmt.Printf("%s%s", prefix, string(line))
-	fmt.Printf(escCursorToColumn, visualPos+prefixWidth+1)
+	fmt.Printf(EscCursorToColumn, visualPos+prefixWidth+1)
 }
 
-// visualWidth calculates the visual display width of a rune slice up to a given position.
-// This accounts for characters that occupy multiple terminal columns (e.g., CJK characters,
-// emojis) or zero columns (e.g., combining characters).
+// visualWidth calculates the visual display width of a rune slice up to
+// a given position. This accounts for characters that occupy multiple
+// terminal columns (e.g., CJK characters, emojis) or zero columns
+// (e.g., combining characters).
+//
 // Parameters:
 //
 //	line ([]rune) - the line of runes to measure

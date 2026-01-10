@@ -59,8 +59,8 @@ func ReadClipboard() (string, error) {
 	return text, nil
 }
 
-// WriteClipboard writes the given text to the system clipboard and, if running inside tmux,
-// also copies it to the tmux buffer.
+// WriteClipboard writes the given text to the system clipboard and,
+// if running inside tmux, also copies it to the tmux buffer.
 //
 // Parameters:
 //
