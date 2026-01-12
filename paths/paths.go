@@ -144,9 +144,8 @@ func GetHistoryPath() (string, error) {
 //	string - the config directory path
 //	error - error if any
 func fallbackToXDGOrHome() (string, error) {
-	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
-	if xdgConfigHome != "" {
-		return filepath.Join(xdgConfigHome, "picochat"), nil
+	if env := os.Getenv("XDG_CONFIG_HOME"); env != "" {
+		return filepath.Join(env, "picochat"), nil
 	}
 
 	homeDir, err := os.UserHomeDir()
