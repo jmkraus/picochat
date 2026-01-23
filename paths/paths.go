@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	cfgDefaultName   = "config.toml"
+	cfgDefaultSuffix = ".toml"
+)
+
 // GetConfigPath returns the path to the configuration file.
 //
 // Parameters:
@@ -20,7 +25,7 @@ import (
 //	string - the configuration file path
 //	error - error if any
 func GetConfigPath() (string, error) {
-	configDir, err := getConfigDir()
+	cfgDir, err := getConfigDir()
 	if err != nil {
 		return "", err
 	}
@@ -30,11 +35,11 @@ func GetConfigPath() (string, error) {
 		if !found {
 			return *args.ConfigPath, nil
 		}
-		name = EnsureSuffix(name, ".toml")
-		return filepath.Join(configDir, name), nil
+		name = EnsureSuffix(name, cfgDefaultSuffix)
+		return filepath.Join(cfgDir, name), nil
 	}
 
-	return filepath.Join(configDir, "config.toml"), nil
+	return filepath.Join(cfgDir, cfgDefaultName), nil
 }
 
 // EnsureSuffix ensures that the filename ends with the given suffix.
@@ -65,27 +70,30 @@ func EnsureSuffix(filename string, suffix string) string {
 //	string - the configuration directory path
 //	error - error if any
 func getConfigDir() (string, error) {
-	// Fallback 1: $CONFIG_PATH
+	// Fallback 1: Executable path
+	exc, err := fallbackToExecutableDir()
+	if err != nil {
+		return "", err
+	}
+	if exc != "" {
+		found := FileExists(filepath.Join(exc, cfgDefaultName))
+		if found {
+			return exc, nil
+		}
+	}
+
+	// Fallback 2: $CONFIG_PATH
 	if env := os.Getenv("CONFIG_PATH"); env != "" {
 		return env, nil
 	}
 
-	// Fallback 2: $XDG_CONFIG_HOME or ~/.config
+	// Fallback 3: $XDG_CONFIG_HOME or ~/.config
 	xdg, err := fallbackToXDGOrHome()
 	if err != nil {
 		return "", err
 	}
 	if xdg != "" {
 		return xdg, nil
-	}
-
-	// Fallback 3: Executable path
-	ex, err := fallbackToExecutableDir()
-	if err != nil {
-		return "", err
-	}
-	if ex != "" {
-		return ex, nil
 	}
 
 	return "", fmt.Errorf("no valid config path found.")
@@ -167,12 +175,12 @@ func fallbackToXDGOrHome() (string, error) {
 //	string - the executable directory path
 //	error - error if any
 func fallbackToExecutableDir() (string, error) {
-	ex, err := os.Executable()
+	exc, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
 
-	return filepath.Dir(ex), nil
+	return filepath.Dir(exc), nil
 }
 
 // ExpandHomeDir checks the given path and expands its user home
