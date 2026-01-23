@@ -35,7 +35,7 @@ jobs:
 
       - name: Create macOS universal binary
         run: |
-          lipo -create -output dist/picochat-macOS dist/picochat-arm64 dist/picochat-amd64
+          lipo -create -output dist/picochat dist/picochat-arm64 dist/picochat-amd64
           rm dist/picochat-arm64 dist/picochat-amd64
 
       #
@@ -43,7 +43,7 @@ jobs:
       #
       - name: Build Windows (amd64)
         run: |
-          GOOS=windows GOARCH=amd64 go build -o dist/picochat-windows.exe .
+          GOOS=windows GOARCH=amd64 go build -o dist/picochat.exe .
 
       #
       # Package macOS
@@ -52,7 +52,8 @@ jobs:
         run: |
           cd dist
           cp ../config.toml .
-          zip picochat-macOS.zip picochat-macOS config.toml
+          cp ../config-dev.toml .
+          zip picochat-macOS.zip picochat config.toml config-dev.toml
 
       #
       # Package Windows
@@ -61,7 +62,8 @@ jobs:
         run: |
           cd dist
           cp ../config.toml .
-          zip picochat-windows.zip picochat-windows.exe config.toml
+          cp ../config-dev.toml .
+          zip picochat-windows.zip picochat.exe config.toml config-dev.toml
 
       #
       # Release
