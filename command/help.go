@@ -28,7 +28,7 @@ var helpTopics = map[string][]string{
 	"copy": {
 		"  /copy         Copy the last answer to clipboard",
 		"  /copy think   Copy the last answer to clipboard & retain reasoning",
-		"  /copy code    Copy only code snippets between ``` to clipboard",
+		"  /copy code    Copy first code snippet enclosed in ``` to clipboard",
 	},
 	"load": {
 		"  /load <filename>   Load the history file with name <filename>",
