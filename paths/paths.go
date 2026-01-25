@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"picochat/args"
+	"picochat/envs"
 	"strings"
 )
 
@@ -66,7 +67,7 @@ func EnsureSuffix(filename string, suffix string) string {
 //	error - error if any
 func getConfigDir() (string, error) {
 	// Fallback 1: $CONFIG_PATH
-	if env := os.Getenv("CONFIG_PATH"); env != "" {
+	if env := envs.GetEnv(envs.CONFIG_PATH); env != "" {
 		return env, nil
 	}
 
@@ -144,7 +145,7 @@ func GetHistoryPath() (string, error) {
 //	string - the config directory path
 //	error - error if any
 func fallbackToXDGOrHome() (string, error) {
-	if env := os.Getenv("XDG_CONFIG_HOME"); env != "" {
+	if env := envs.GetEnv(envs.XDG_CONFIG_HOME); env != "" {
 		return filepath.Join(env, "picochat"), nil
 	}
 
