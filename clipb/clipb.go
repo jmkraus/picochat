@@ -2,8 +2,8 @@ package clipb
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
+	"picochat/envs"
 	"strings"
 
 	"github.com/atotto/clipboard"
@@ -19,7 +19,7 @@ import (
 //
 //	bool - app is running in a tmux session (true / false)
 func isTmuxSession() bool {
-	return os.Getenv("TMUX") != ""
+	return envs.GetEnv(envs.TMUX) != ""
 }
 
 // copyToTmuxBufferStdin loads the given text into the tmux buffer via stdin.
