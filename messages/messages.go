@@ -20,10 +20,11 @@ const (
 )
 
 type Message struct {
-	Role    string   `json:"role"`
-	Content string   `json:"content"`
-	Images  []string `json:"images,omitempty"` ////IMAGES
-	Raw     string   `json:"-"`
+	Role     string   `json:"role"`
+	Content  string   `json:"content"`
+	Thinking string   `json:"thinking,omitempty"`
+	Images   []string `json:"images,omitempty"` ////IMAGES
+	Raw      string   `json:"-"`
 }
 
 type ChatHistory struct {

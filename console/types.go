@@ -72,5 +72,5 @@ const (
 	EscBgBrightWhite   string = "\033[107m"
 
 	// Reset
-	EscReset string = "\033[0m"
+	EscColorReset string = "\033[0m"
 )

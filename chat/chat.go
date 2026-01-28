@@ -74,6 +74,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	decoder := json.NewDecoder(response.Body)
 	var fullReply strings.Builder
+	var fullReasoning strings.Builder
 
 	seconds := 0
 	elapsed := "--:--"
@@ -89,17 +90,30 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			return nil, fmt.Errorf("stream decoding error for model %s: %w", cfg.Model, err)
 		}
 
-		if res.Message.Content != "" {
-			if firstToken && streamPlain {
-				console.StopSpinner(cfg.Quiet, stop)
-				firstToken = false
-			}
+		if (res.Message.Content != "" ||
+			(res.Message.Thinking != "" && cfg.Reasoning)) &&
+			firstToken &&
+			streamPlain {
+			console.StopSpinner(cfg.Quiet, stop)
+			firstToken = false
+		}
 
+		// Reasoning
+		if res.Message.Thinking != "" {
+			fullReasoning.WriteString(res.Message.Thinking)
+			if streamPlain && cfg.Reasoning {
+				fmt.Print(console.EscBrightBlack)
+				fmt.Print(res.Message.Thinking)
+				fmt.Print(console.EscColorReset)
+			}
+		}
+
+		// Content
+		if res.Message.Content != "" {
+			fullReply.WriteString(res.Message.Content)
 			if streamPlain {
 				fmt.Print(res.Message.Content)
 			}
-
-			fullReply.WriteString(res.Message.Content)
 		}
 
 		if res.Done {

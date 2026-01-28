@@ -74,7 +74,7 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 			fmt.Println()
 			fmt.Print(console.EscWhite)
 			_, err := fmt.Printf("elapsed (mm:ss): %s | tok/s: %.1f\n", result.Elapsed, result.TokensPS)
-			fmt.Print(console.EscReset)
+			fmt.Print(console.EscColorReset)
 			return err
 		}
 		return nil
