@@ -16,7 +16,6 @@ type commandHistory struct {
 
 // Constants
 const Prompt = ">>> "
-const crlf = "\r\n"
 
 const (
 	// Cursor controls

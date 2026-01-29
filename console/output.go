@@ -63,7 +63,7 @@ func NewLine(quiet bool) {
 	if quiet {
 		return
 	}
-	fmt.Print(crlf)
+	fmt.Println()
 }
 
 // colorize is a Helper function for enclosing text in color esc sequences.

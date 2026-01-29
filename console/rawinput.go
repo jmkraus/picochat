@@ -62,11 +62,11 @@ func ReadMultilineInput() InputResult {
 
 		switch r {
 		case 3: // Ctrl+C
-			fmt.Print(crlf)
+			fmt.Println()
 			return InputResult{Aborted: true}
 
 		case 4: // Ctrl+D (EOF) → input finished
-			fmt.Print(crlf)
+			fmt.Println()
 			if len(currentLine) > 0 {
 				lines = append(lines, string(currentLine))
 			}
@@ -147,7 +147,7 @@ func ReadMultilineInput() InputResult {
 			lines = append(lines, line)
 			currentLine = []rune{}
 			cursorPos = 0
-			fmt.Print(crlf)
+			fmt.Println()
 		default:
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(r))
 			updateCurrentLine(currentLine, firstLine, cursorPos)
