@@ -18,7 +18,7 @@ const warn_prefix string = "!"
 //
 //	none
 func Error(msg string) {
-	fmt.Print(EscClearLine)
+	fmt.Print(ClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", err_prefix, msg)
 }
 
@@ -32,7 +32,7 @@ func Error(msg string) {
 //
 //	none
 func Warn(msg string) {
-	fmt.Print(EscClearLine)
+	fmt.Print(ClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", warn_prefix, msg)
 }
 
@@ -46,7 +46,7 @@ func Warn(msg string) {
 //
 //	none
 func Info(msg string) {
-	fmt.Print(EscClearLine)
+	fmt.Print(ClearLine)
 	fmt.Fprintln(os.Stdout, msg)
 }
 

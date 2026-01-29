@@ -12,7 +12,7 @@ import (
 )
 
 // ReadMultilineInput reads multiline input from stdin. It handles raw mode,
-// Escape sequences, command detection, and returns an InputResult containing
+// ape sequences, command detection, and returns an InputResult containing
 // the entered text, flags for EOF, Aborted, IsCommand, and any error.
 //
 // Parameters:
@@ -39,9 +39,9 @@ func ReadMultilineInput() InputResult {
 		if err != nil {
 			return InputResult{Error: fmt.Errorf("error enabling raw input mode: %v", err)}
 		}
-		fmt.Print(EscDisableLineWrap)
+		fmt.Print(DisableLineWrap)
 		defer func() {
-			fmt.Print(EscEnableLineWrap)
+			fmt.Print(EnableLineWrap)
 			term.Restore(fd, oldState)
 		}()
 	}
@@ -72,26 +72,26 @@ func ReadMultilineInput() InputResult {
 			}
 			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
 
-		case 27: // Esc or Escape sequences
-			// Peek to see if there are more bytes (Escape sequence)
+		case 27: //  or ape sequences
+			// Peek to see if there are more bytes (ape sequence)
 			_ = setNonblock(fd, true)
 			peekBuf, err := reader.Peek(2)
 			_ = setNonblock(fd, false)
 			if err != nil || len(peekBuf) < 2 {
-				// Plain Esc → abort immediately
+				// Plain  → abort immediately
 				return InputResult{Aborted: true}
 			}
 
-			// Read the Escape sequence
+			// Read the ape sequence
 			buf := make([]byte, 2)
 			n, _ := reader.Read(buf)
 
 			if n < 2 || buf[0] != '[' {
-				// Unknown Escape sequence
+				// Unknown ape sequence
 				continue
 			}
 
-			// Arrow keys (e.g. Esc[A, Esc[B, Esc[C, Esc[D])
+			// Arrow keys (e.g. [A, [B, [C, [D])
 			switch buf[1] {
 			case 'A': // Up
 				recalled := PrevCommand()
@@ -113,7 +113,7 @@ func ReadMultilineInput() InputResult {
 					cursorPos++
 					// Move cursor forward by visual width of char
 					for range width {
-						fmt.Print(EscCursorForward)
+						fmt.Print(CursorForward)
 					}
 				}
 				continue
@@ -124,7 +124,7 @@ func ReadMultilineInput() InputResult {
 					width := runewidth.RuneWidth(currentLine[cursorPos])
 					// Move cursor back by visual width of char
 					for range width {
-						fmt.Print(EscCursorBack)
+						fmt.Print(CursorBack)
 					}
 				}
 				continue
@@ -234,7 +234,7 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 //
 //	none
 func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
-	fmt.Print(EscClearLine)
+	fmt.Print(ClearLine)
 
 	prefix := ""
 	prefixWidth := 0
@@ -246,7 +246,7 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 	visualPos := visualWidth(line, cursorPos)
 
 	fmt.Printf("%s%s", prefix, string(line))
-	fmt.Printf(EscCursorToColumn, visualPos+prefixWidth+1)
+	fmt.Printf(CursorToColumn, visualPos+prefixWidth+1)
 }
 
 // visualWidth calculates the visual display width of a rune slice up to
