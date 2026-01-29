@@ -72,10 +72,8 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 		fmt.Println() // final newline after streamed token output
 		if !quiet {
 			fmt.Println()
-			fmt.Print(console.White)
-			_, err := fmt.Printf("elapsed (mm:ss): %s | tok/s: %.1f\n", result.Elapsed, result.TokensPS)
-			fmt.Print(console.ColorReset)
-			return err
+			status := fmt.Sprintf("elapsed (mm:ss): %s | tok/s: %.1f", result.Elapsed, result.TokensPS)
+			console.ColorPrintln(console.White, status)
 		}
 		return nil
 

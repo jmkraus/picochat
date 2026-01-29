@@ -65,3 +65,24 @@ func NewLine(quiet bool) {
 	}
 	fmt.Print(crlf)
 }
+
+func colorize(color, text string) string {
+	return color + text + ColorReset
+}
+
+func colorPrint(color string, newline bool, a ...any) {
+	text := colorize(color, fmt.Sprint(a...))
+	if newline {
+		fmt.Println(text)
+	} else {
+		fmt.Print(text)
+	}
+}
+
+func ColorPrint(color string, a ...any) {
+	colorPrint(color, false, a...)
+}
+
+func ColorPrintln(color string, a ...any) {
+	colorPrint(color, true, a...)
+}
