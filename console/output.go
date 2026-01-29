@@ -66,10 +66,31 @@ func NewLine(quiet bool) {
 	fmt.Print(crlf)
 }
 
+// colorize is a Helper function for enclosing text in color esc sequences.
+//
+// Parameters:
+//
+//	color (string) - esc sequence for the color (use constants)
+//	text (string)  - the text
+//
+// Returns:
+//
+//	string - text enclosed in esc sequences
 func colorize(color, text string) string {
 	return color + text + ColorReset
 }
 
+// colorPrint is a Helper function for printing colorized text
+//
+// Parameters:
+//
+//	color (string) - esc sequence for the color (use constants)
+//	newline (bool) - flag if text output should be finished with newline
+//	a (any)        - interface for arbitrary output data
+//
+// Returns:
+//
+//	none
 func colorPrint(color string, newline bool, a ...any) {
 	text := colorize(color, fmt.Sprint(a...))
 	if newline {
@@ -79,10 +100,30 @@ func colorPrint(color string, newline bool, a ...any) {
 	}
 }
 
+// ColorPrint is the interface for color text output without newline
+//
+// Parameters:
+//
+//	color (string) - esc sequence for the color (use constants)
+//	a (any)        - interface for arbitrary output data
+//
+// Returns:
+//
+//	none
 func ColorPrint(color string, a ...any) {
 	colorPrint(color, false, a...)
 }
 
+// ColorPrintln is the interface for color text output with newline
+//
+// Parameters:
+//
+//	color (string) - esc sequence for the color (use constants)
+//	a (any)        - interface for arbitrary output data
+//
+// Returns:
+//
+//	none
 func ColorPrintln(color string, a ...any) {
 	colorPrint(color, true, a...)
 }
