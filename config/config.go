@@ -11,8 +11,8 @@ import (
 type Config struct {
 	URL         string
 	Model       string
-	Context     int
 	Prompt      string
+	Context     int
 	Temperature float64
 	TopP        float64
 	Reasoning   bool
@@ -46,9 +46,12 @@ func load() {
 	}
 
 	var cfg = Config{
+		URL:         "http://localhost:11434/api",
+		Model:       "gpt-oss:latest",
+		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
+		Context:     20,
 		Temperature: 0.7,
 		TopP:        0.9,
-		Context:     20,
 		Reasoning:   false,
 		Quiet:       false,
 	}
