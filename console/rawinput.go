@@ -147,7 +147,7 @@ func ReadMultilineInput() InputResult {
 			lines = append(lines, line)
 			currentLine = []rune{}
 			cursorPos = 0
-			fmt.Println()
+			fmt.Print("\r\n") // Println not sufficient here
 		default:
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(r))
 			updateCurrentLine(currentLine, firstLine, cursorPos)
