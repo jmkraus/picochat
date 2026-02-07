@@ -79,6 +79,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	seconds := 0
 	elapsed := "--:--"
 	firstToken := true
+	firstContent := true
 	streamPlain := cfg.OutputFmt == "plain"
 
 	for {
@@ -110,6 +111,10 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		if res.Message.Content != "" {
 			fullContent.WriteString(res.Message.Content)
 			if streamPlain {
+				if firstContent {
+					fmt.Println()
+					firstContent = false
+				}
 				fmt.Print(res.Message.Content)
 			}
 		}
