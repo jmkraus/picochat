@@ -135,6 +135,14 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Info: "Nothing to copy."}
 			}
 		}
+		if args == "user" {
+			msg, found := history.GetLastRole(messages.RoleUser)
+			if found {
+				lastAnswer = msg.Content
+			} else {
+				return CommandResult{Info: "Nothing to copy."}
+			}
+		}
 		err := clipb.WriteClipboard(lastAnswer)
 		if err != nil {
 			return CommandResult{Error: err}

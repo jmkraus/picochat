@@ -229,6 +229,8 @@ This command copies the entire last answer to the clipboard but removes the `<th
 
 If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text. If no codeblock is found, then the copy command is canceled.
 
+With the argument `/copy user` the last user prompt is put into the clipboard.
+
 #### /models `<index>`
 
 Without an argument, this command lists the available models of the **LLM** server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
