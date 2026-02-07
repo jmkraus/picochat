@@ -20,12 +20,13 @@ type Session struct {
 	Quiet   bool
 }
 
-func sendPrompt(session *Session, prompt, image string) {
-	if err := session.History.AddUser(prompt, image); err != nil {
+func sendPrompt(session *Session, prompt string) {
+	if err := session.History.AddUser(prompt, session.Config.ImagePath); err != nil {
 		console.Error(fmt.Sprintf("%v", err))
 		return
 	}
 
+	session.Config.ImagePath = "" // store once in history and forget
 	runChat(session)
 }
 
@@ -175,7 +176,7 @@ func main() {
 				repeatPrompt(session)
 			} else if result.Pasted != "" {
 				// start the request with pasted content from clipboard
-				sendPrompt(session, result.Pasted, cfg.ImagePath)
+				sendPrompt(session, result.Pasted)
 			}
 			if input.EOF {
 				// we come from stdin pipe
@@ -185,7 +186,7 @@ func main() {
 			}
 		}
 
-		sendPrompt(session, input.Text, cfg.ImagePath)
+		sendPrompt(session, input.Text)
 
 		if input.EOF {
 			break
