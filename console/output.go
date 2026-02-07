@@ -127,3 +127,19 @@ func ColorPrint(color string, a ...any) {
 func ColorPrintln(color string, a ...any) {
 	colorPrint(color, true, a...)
 }
+
+// Debug is used for additional output during development.
+// INTERNAL USE ONLY!
+// There shouldn't be any Debug statements in release code.
+//
+// Parameter:
+//
+//	msg (string) - message to be printed
+//
+// Returns:
+//
+//	none
+func Debug(a ...any) {
+	fmt.Println()
+	ColorPrintln(BrightYellow, "⚠️ "+fmt.Sprint(a...))
+}
