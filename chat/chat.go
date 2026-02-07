@@ -73,8 +73,8 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	defer response.Body.Close()
 
 	decoder := json.NewDecoder(response.Body)
-	var fullReply strings.Builder
-	var fullReasoning strings.Builder
+	var fullThinking strings.Builder
+	var fullContent strings.Builder
 
 	seconds := 0
 	elapsed := "--:--"
@@ -100,7 +100,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 		// Reasoning
 		if res.Message.Thinking != "" {
-			fullReasoning.WriteString(res.Message.Thinking)
+			fullThinking.WriteString(res.Message.Thinking)
 			if streamPlain && cfg.Reasoning {
 				console.ColorPrint(console.BrightBlack, res.Message.Thinking)
 			}
@@ -108,7 +108,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 		// Content
 		if res.Message.Content != "" {
-			fullReply.WriteString(res.Message.Content)
+			fullContent.WriteString(res.Message.Content)
 			if streamPlain {
 				fmt.Print(res.Message.Content)
 			}
@@ -123,20 +123,50 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		}
 	}
 
-	if fullReply.Len() == 0 {
+	if fullContent.Len() == 0 {
 		console.StopSpinner(cfg.Quiet, stop)
 		return nil, fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
 	}
 
-	cleanMsg := messages.TrimEmptyLines(fullReply.String())
+	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), fullContent.String())
 	cfg.ImagePath = "" ////IMAGES discard path after first use
-	err = history.Add(messages.RoleAssistant, cleanMsg, cfg.ImagePath)
+	err = history.Add(messages.RoleAssistant,
+		cleanReasoning,
+		cleanContent,
+		cfg.ImagePath)
 	if err != nil {
 		return nil, fmt.Errorf("could not add message to history: %w", err)
 	}
-	speed := tokenSpeed(seconds, fullReply.String())
+	speed := tokenSpeed(seconds, fullContent.String())
 
-	return &ChatResult{Output: cleanMsg, Elapsed: elapsed, TokensPS: speed}, nil
+	return &ChatResult{Output: cleanContent, Elapsed: elapsed, TokensPS: speed}, nil
+}
+
+// postProcessingChat separates reasoning part from content and cleans the text
+// by stripping empty lines or extracting embedded thinking from content.
+//
+// Parameters:
+//
+//	thinking (string) - the thinking part of the response
+//	content (string)  - the content part of the response
+//
+// Returns:
+//
+//	string - the cleaned reasoning part
+//	string - the cleaned content part
+func postProcessingChat(thinking, content string) (string, string) {
+	// Case 1: thinking contains data
+	// This should be the default for ollama reasoning models
+	if thinking != "" {
+		cleanReasoning := trimEmptyLines(thinking)
+		cleanContent := trimEmptyLines(content)
+		return cleanReasoning, cleanContent
+	}
+
+	// Case 2: Check if content contains <think> tags
+	// This is the case for AI servers which embed thinking in the content part
+	// If no think tag is found, the function returns an empty Reasoning part
+	return splitReasoning(content)
 }
 
 // elapsedTime returns the elapsed time in seconds and a formatted

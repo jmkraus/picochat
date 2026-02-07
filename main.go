@@ -21,7 +21,7 @@ type Session struct {
 }
 
 func sendPrompt(session *Session, prompt, image string) {
-	if err := session.History.Add(messages.RoleUser, prompt, image); err != nil {
+	if err := session.History.Add(messages.RoleUser, "", prompt, image); err != nil {
 		console.Error(fmt.Sprintf("%v", err))
 		return
 	}

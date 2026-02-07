@@ -1,4 +1,4 @@
-package messages
+package chat
 
 import (
 	"testing"
@@ -16,7 +16,7 @@ func TestStripReasoning(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := StripReasoning(tt.input)
+		result := stripReasoning(tt.input)
 		if result != tt.expected {
 			t.Errorf("Expected %q, got %q for input %q", tt.expected, result, tt.input)
 		}
@@ -55,31 +55,9 @@ func TestTrimEmptyLines(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := TrimEmptyLines(tt.input)
+		result := trimEmptyLines(tt.input)
 		if result != tt.expected {
 			t.Errorf("Expected %q, got %q", tt.expected, result)
 		}
-	}
-}
-
-func TestExtractCodeBlock(t *testing.T) {
-	text := "Some explanation.\n```go\nfmt.Println(\"hi\")\n```"
-	code, found := ExtractCodeBlock(text)
-	if code != "fmt.Println(\"hi\")\n" {
-		t.Errorf("Unexpected extracted code block: %q", code)
-	}
-	if code == "fmt.Println(\"hi\")\n" && found == false {
-		t.Errorf("'Found' flag for ExtractCode reported False, but should be True")
-	}
-}
-
-func TestExtractCodeBlock_Empty(t *testing.T) {
-	text := "No code block here"
-	code, found := ExtractCodeBlock(text)
-	if code != "" {
-		t.Errorf("Expected empty string, got %q", code)
-	}
-	if code == "" && found == true {
-		t.Errorf("'Found' flag for ExtractCode reported True, but should be False")
 	}
 }

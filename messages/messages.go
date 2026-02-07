@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"picochat/console"
 	"picochat/paths"
+	"picochat/utils"
 	"strings"
 	"time"
 )
@@ -20,11 +21,11 @@ const (
 )
 
 type Message struct {
-	Role     string   `json:"role"`
-	Content  string   `json:"content"`
-	Thinking string   `json:"thinking,omitempty"`
-	Images   []string `json:"images,omitempty"` ////IMAGES
-	Raw      string   `json:"-"`
+	Role      string   `json:"role"`
+	Thinking  string   `json:"thinking,omitempty"`
+	Content   string   `json:"content"`
+	Images    []string `json:"images,omitempty"` ////IMAGES
+	Reasoning string   `json:"-"`
 }
 
 type ChatHistory struct {
@@ -61,29 +62,20 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 // Returns:
 //
 //	error
-func (h *ChatHistory) Add(role, content string, image string) error {
+func (h *ChatHistory) Add(role, reasoning, content, image string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
-		clear := content
-		raw := content
-
-		if role == RoleAssistant {
-			clear = StripReasoning(content)
-		} else {
-			raw = ""
-		}
-
 		////IMAGES
 		var img []string
 		if image != "" {
-			b64, err := ImageToBase64(image)
+			b64, err := utils.ImageToBase64(image)
 			if err != nil {
-				return fmt.Errorf("base64 convert failed: %w", err)
+				return fmt.Errorf("convert image to base64 failed: %w", err)
 			}
 			img = append(img, b64)
 		}
 
-		h.Messages = append(h.Messages, Message{Role: role, Content: clear, Raw: raw, Images: img})
+		h.Messages = append(h.Messages, Message{Role: role, Reasoning: reasoning, Content: content, Images: img})
 
 		if h.MaxContext > 0 {
 			h.Compress(h.MaxContext)
@@ -381,12 +373,26 @@ func (h *ChatHistory) IsEmpty() bool {
 func (h *ChatHistory) EstimateTokens() float64 {
 	total := 0.0
 	for _, msg := range h.Messages {
-		// use raw data (incl. reasoning) if available
-		text := msg.Raw
+		// use full data (incl. reasoning) if available
+		text := msg.Thinking + msg.Content
 		if text == "" {
 			text = msg.Content
 		}
 		total += CalculateTokens(text)
 	}
 	return total
+}
+
+// CalculateTokens estimates the number of tokens in a string based on word count.
+//
+// Parameters:
+//
+//	s (string) - the input string.
+//
+// Returns:
+//
+//	float64 - the estimated token count.
+func CalculateTokens(s string) float64 {
+	words := strings.Fields(s)
+	return float64(len(words)) * 1.3
 }
