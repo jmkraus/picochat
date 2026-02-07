@@ -137,7 +137,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	if err != nil {
 		return nil, fmt.Errorf("could not add message to history: %w", err)
 	}
-	speed := tokenSpeed(seconds, fullContent.String())
+	speed := tokenSpeed(seconds, cleanReasoning+cleanContent)
 
 	return &ChatResult{Output: cleanContent, Elapsed: elapsed, TokensPS: speed}, nil
 }

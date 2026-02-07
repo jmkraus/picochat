@@ -374,10 +374,7 @@ func (h *ChatHistory) EstimateTokens() float64 {
 	total := 0.0
 	for _, msg := range h.Messages {
 		// use full data (incl. reasoning) if available
-		text := msg.Thinking + msg.Content
-		if text == "" {
-			text = msg.Content
-		}
+		text := msg.Reasoning + msg.Content
 		total += CalculateTokens(text)
 	}
 	return total
