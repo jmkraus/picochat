@@ -1,14 +1,13 @@
-package messages_test
+package messages
 
 import (
 	"fmt"
-	"picochat/messages"
 	"picochat/paths"
 	"testing"
 )
 
 func TestNewHistory(t *testing.T) {
-	h := messages.NewHistory("hello world", 5)
+	h := NewHistory("hello world", 5)
 
 	if len(h.Get()) != 1 {
 		t.Fatalf("expected 1 message, got %d", len(h.Get()))
@@ -24,10 +23,10 @@ func TestNewHistory(t *testing.T) {
 }
 
 func TestAddAndClear(t *testing.T) {
-	h := messages.NewHistory("init", 5)
+	h := NewHistory("init", 5)
 
-	h.Add("user", "", "Hello!", "")
-	h.Add("assistant", "", "Hi there!", "")
+	h.add("user", "", "Hello!", "")
+	h.add("assistant", "", "Hi there!", "")
 
 	if h.Len() != 3 {
 		t.Errorf("expected 3 messages, got %d", h.Len())
@@ -40,12 +39,12 @@ func TestAddAndClear(t *testing.T) {
 	}
 }
 
-func TestChatHistory_Add_InvalidRole(t *testing.T) {
-	h := &messages.ChatHistory{}
+func TestChatHistory_add_InvalidRole(t *testing.T) {
+	h := &ChatHistory{}
 
 	initialLen := h.Len()
 
-	err := h.Add("alien", "", "we come in peace", "")
+	err := h.add("alien", "", "we come in peace", "")
 
 	if err == nil {
 		t.Fatalf("expected error for invalid role, got nil")
@@ -62,8 +61,8 @@ func TestChatHistory_Add_InvalidRole(t *testing.T) {
 }
 
 func TestSaveAndLoad(t *testing.T) {
-	h := messages.NewHistory("persist me", 5)
-	h.Add("user", "", "data", "")
+	h := NewHistory("persist me", 5)
+	h.add("user", "", "data", "")
 
 	// Force temporary directory
 	tmpDir := t.TempDir()
@@ -74,7 +73,7 @@ func TestSaveAndLoad(t *testing.T) {
 		t.Fatalf("save failed: %v", err)
 	}
 
-	loaded, err := messages.LoadHistoryFromFile(filename)
+	loaded, err := LoadHistoryFromFile(filename)
 	if err != nil {
 		t.Fatalf("load failed: %v", err)
 	}
@@ -85,10 +84,10 @@ func TestSaveAndLoad(t *testing.T) {
 }
 
 func TestCompressKeepsLimitAndPrompt(t *testing.T) {
-	h := messages.NewHistory("system prompt", 5)
+	h := NewHistory("system prompt", 5)
 
 	for i := 1; i <= 10; i++ {
-		h.Add("user", "", fmt.Sprintf("msg %d", i), "")
+		h.add("user", "", fmt.Sprintf("msg %d", i), "")
 	}
 
 	if h.Len() != 5 {
@@ -111,11 +110,11 @@ func TestCompressKeepsLimitAndPrompt(t *testing.T) {
 }
 
 func TestSetContextSize(t *testing.T) {
-	h := messages.NewHistory("system prompt", 10)
+	h := NewHistory("system prompt", 10)
 
-	// Add 9 messages to fill context
+	// add 9 messages to fill context
 	for i := 1; i < 10; i++ {
-		h.Add("user", "", fmt.Sprintf("msg %d", i), "")
+		h.add("user", "", fmt.Sprintf("msg %d", i), "")
 	}
 
 	// Invalid values
@@ -159,12 +158,12 @@ func TestSetContextSize(t *testing.T) {
 }
 
 func TestAddAndCompress(t *testing.T) {
-	h := messages.NewHistory("system prompt", 5)
+	h := NewHistory("system prompt", 5)
 
-	// Add 4 User/Assistant messages → +1 System = 5
+	// add 4 User/Assistant messages → +1 System = 5
 	for i := 1; i <= 4; i++ {
-		h.Add("user", "", "Hello", "")
-		h.Add("assistant", "", "Hi there", "")
+		h.add("user", "", "Hello", "")
+		h.add("assistant", "", "Hi there", "")
 	}
 
 	if h.Len() != 5 {
@@ -176,7 +175,7 @@ func TestAddAndCompress(t *testing.T) {
 	}
 
 	// Now add another message - this should trigger Compress()
-	h.Add("user", "", "Overflow message", "")
+	h.add("user", "", "Overflow message", "")
 
 	if h.Len() != 5 {
 		t.Errorf("After compress, expected length 5, got %d", h.Len())
@@ -190,10 +189,10 @@ func TestAddAndCompress(t *testing.T) {
 }
 
 func TestReplaceMessages(t *testing.T) {
-	h := messages.NewHistory("init", 5)
-	h.Add("user", "", "first", "")
+	h := NewHistory("init", 5)
+	h.add("user", "", "first", "")
 
-	newMessages := []messages.Message{
+	newMessages := []Message{
 		{Role: "system", Content: "replaced system"},
 		{Role: "user", Content: "replaced message"},
 	}
@@ -209,9 +208,9 @@ func TestReplaceMessages(t *testing.T) {
 }
 
 func TestEstimateTokens(t *testing.T) {
-	h := messages.NewHistory("short prompt", 5)
-	h.Add("user", "", "This is a short message", "")
-	h.Add("assistant", "", "This is a slightly longer reply that includes a few more words.", "")
+	h := NewHistory("short prompt", 5)
+	h.add("user", "", "This is a short message", "")
+	h.add("assistant", "", "This is a slightly longer reply that includes a few more words.", "")
 
 	tokens := h.EstimateTokens()
 	if tokens <= 0 {
@@ -220,13 +219,13 @@ func TestEstimateTokens(t *testing.T) {
 }
 
 func TestGetLastMessage(t *testing.T) {
-	h := messages.NewHistory("sys", 5)
+	h := NewHistory("sys", 5)
 	last := h.GetLast()
 	if last.Role != "system" {
 		t.Errorf("expected last message to be system at init, got %s", last.Role)
 	}
 
-	h.Add("user", "", "msg", "")
+	h.add("user", "", "msg", "")
 	last = h.GetLast()
 	if last.Role != "user" || last.Content != "msg" {
 		t.Errorf("unexpected last message: %+v", last)
@@ -234,10 +233,10 @@ func TestGetLastMessage(t *testing.T) {
 }
 
 func TestGetLastRole(t *testing.T) {
-	h := messages.NewHistory("init", 5)
-	h.Add("user", "", "hello", "")
-	h.Add("assistant", "", "hi", "")
-	h.Add("user", "", "bye", "")
+	h := NewHistory("init", 5)
+	h.add("user", "", "hello", "")
+	h.add("assistant", "", "hi", "")
+	h.add("user", "", "bye", "")
 
 	t.Run("find last user", func(t *testing.T) {
 		msg, ok := h.GetLastRole("user")
@@ -267,7 +266,7 @@ func TestGetLastRole(t *testing.T) {
 	})
 
 	t.Run("empty history", func(t *testing.T) {
-		empty := messages.NewHistory("empty", 5)
+		empty := NewHistory("empty", 5)
 		_, ok := empty.GetLastRole("user")
 		if ok {
 			t.Errorf("expected no match in empty history, but got one")
@@ -276,12 +275,67 @@ func TestGetLastRole(t *testing.T) {
 }
 
 func TestIsEmpty(t *testing.T) {
-	h := messages.NewHistory("only system", 5)
+	h := NewHistory("only system", 5)
 	if !h.IsEmpty() {
 		t.Errorf("expected history to be empty (only system prompt)")
 	}
-	h.Add("user", "", "hi", "")
+	h.add("user", "", "hi", "")
 	if h.IsEmpty() {
 		t.Errorf("expected history to be non-empty after user message")
+	}
+}
+
+func TestEstimateTokens_IncludesReasoning(t *testing.T) {
+	h := NewHistory("sys", 5)
+
+	// Baseline: only system prompt
+	base := h.EstimateTokens()
+
+	// Reasoning-only message (empty content) should raise number of tokens
+	// because EstimateTokens counts Reasoning + Content.
+	if err := h.add("assistant", "This is hidden reasoning text", "", ""); err != nil {
+		t.Fatalf("add failed: %v", err)
+	}
+
+	withReasoning := h.EstimateTokens()
+	if withReasoning <= base {
+		t.Errorf("expected tokens to increase when reasoning is present; base=%.1f withReasoning=%.1f", base, withReasoning)
+	}
+}
+
+func TestSaveAndLoad_DropsReasoning(t *testing.T) {
+	h := NewHistory("persist me", 5)
+
+	if err := h.add("assistant", "internal reasoning that must not be persisted", "visible content", ""); err != nil {
+		t.Fatalf("add failed: %v", err)
+	}
+
+	// Force temporary directory
+	tmpDir := t.TempDir()
+	paths.OverrideHistoryPath(tmpDir)
+
+	filename, err := h.SaveHistoryToFile("")
+	if err != nil {
+		t.Fatalf("save failed: %v", err)
+	}
+
+	loaded, err := LoadHistoryFromFile(filename)
+	if err != nil {
+		t.Fatalf("load failed: %v", err)
+	}
+
+	// System + 1 assistant
+	if loaded.Len() != 2 {
+		t.Fatalf("expected loaded history length 2, got %d", loaded.Len())
+	}
+
+	// Content muss da sein
+	if loaded.Messages[1].Content != "visible content" {
+		t.Errorf("expected loaded content to match; got %q", loaded.Messages[1].Content)
+	}
+
+	// Reasoning darf nicht da sein (json:"-"), muss nach Load leer sein
+	if loaded.Messages[1].Reasoning != "" {
+		t.Errorf("expected reasoning to be empty after load, got %q", loaded.Messages[1].Reasoning)
 	}
 }

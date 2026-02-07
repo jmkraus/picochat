@@ -9,7 +9,7 @@ import (
 
 func TestHandleClear(t *testing.T) {
 	h := messages.NewHistory("initial system prompt", 50)
-	h.Add("user", "", "hello", "")
+	h.AddUser("hello", "")
 
 	result := command.HandleCommand("/clear", h, strings.NewReader(""))
 	if !h.IsEmpty() {

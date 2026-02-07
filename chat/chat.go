@@ -136,11 +136,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	}
 
 	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), fullContent.String())
-	cfg.ImagePath = "" ////IMAGES discard path after first use
-	err = history.Add(messages.RoleAssistant,
-		cleanReasoning,
-		cleanContent,
-		cfg.ImagePath)
+	err = history.AddAssistant(cleanReasoning, cleanContent)
 	if err != nil {
 		return nil, fmt.Errorf("could not add message to history: %w", err)
 	}

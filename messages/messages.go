@@ -62,7 +62,7 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 // Returns:
 //
 //	error
-func (h *ChatHistory) Add(role, reasoning, content, image string) error {
+func (h *ChatHistory) add(role, reasoning, content, image string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
 		////IMAGES
@@ -85,6 +85,14 @@ func (h *ChatHistory) Add(role, reasoning, content, image string) error {
 	default:
 		return fmt.Errorf("invalid role '%s'", role)
 	}
+}
+
+func (h *ChatHistory) AddUser(content, image string) error {
+	return h.add(RoleUser, "", content, image)
+}
+
+func (h *ChatHistory) AddAssistant(reasoning, content string) error {
+	return h.add(RoleAssistant, reasoning, content, "")
 }
 
 // Discard removes the last assistant message from the history if present.
