@@ -112,7 +112,9 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			fullContent.WriteString(res.Message.Content)
 			if streamPlain {
 				if firstContent {
-					fmt.Println()
+					if fullThinking.String() != "" && cfg.Reasoning {
+						fmt.Println()
+					}
 					firstContent = false
 				}
 				fmt.Print(res.Message.Content)
