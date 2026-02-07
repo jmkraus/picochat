@@ -4,21 +4,46 @@ import (
 	"testing"
 )
 
-func TestStripReasoning(t *testing.T) {
+func TestSplitReasoning(t *testing.T) {
 	tests := []struct {
-		input    string
-		expected string
+		input             string
+		expectedReasoning string
+		expectedContent   string
 	}{
-		{"Answer here <think>reasoning inside</think> end.", "Answer here  end."},
-		{"Answer here </think> reasoning inside end.", " reasoning inside end."},
-		{"Answer here <think>reasoning inside", "Answer here <think>reasoning inside"},
-		{"Answer here", "Answer here"},
+		{
+			input:             "Answer here <think>reasoning inside</think> end.",
+			expectedReasoning: "reasoning inside",
+			expectedContent:   "Answer here  end.",
+		},
+		{
+			input:             "Answer here </think> reasoning inside end.",
+			expectedReasoning: "Answer here ",
+			expectedContent:   " reasoning inside end.",
+		},
+		{
+			input:             "Answer here <think>reasoning inside",
+			expectedReasoning: "",
+			expectedContent:   "Answer here <think>reasoning inside",
+		},
+		{
+			input:             "Answer here",
+			expectedReasoning: "",
+			expectedContent:   "Answer here",
+		},
 	}
 
 	for _, tt := range tests {
-		result := stripReasoning(tt.input)
-		if result != tt.expected {
-			t.Errorf("Expected %q, got %q for input %q", tt.expected, result, tt.input)
+		reasoning, content := splitReasoning(tt.input)
+
+		if reasoning != tt.expectedReasoning || content != tt.expectedContent {
+			t.Errorf(
+				"For input %q expected reasoning=%q, content=%q; got reasoning=%q, content=%q",
+				tt.input,
+				tt.expectedReasoning,
+				tt.expectedContent,
+				reasoning,
+				content,
+			)
 		}
 	}
 }

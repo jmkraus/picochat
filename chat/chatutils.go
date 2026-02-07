@@ -5,33 +5,6 @@ import (
 	"strings"
 )
 
-// stripReasoning removes <think>...</think> tags from the input string
-// and trims empty lines.
-//
-// Parameters:
-//
-//	s (string) - the input string.
-//
-// Returns:
-//
-//	string - the cleaned string.
-func stripReasoning(s string) string {
-	// 1st case: correct pair <think>...</think>
-	re := regexp.MustCompile(`(?s)<think>.*?</think>`)
-	if re.MatchString(s) {
-		cleaned := re.ReplaceAllString(s, "")
-		return trimEmptyLines(cleaned)
-	}
-
-	// 2nd case: only </think> exists
-	if _, after, found := strings.Cut(s, "</think>"); found {
-		return trimEmptyLines(after)
-	}
-
-	// 3rd case: no changes
-	return s
-}
-
 // splitReasoning separates reasoning and content if merged in the content part.
 //
 // Parameters:
