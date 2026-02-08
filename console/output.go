@@ -19,7 +19,7 @@ const warn_prefix string = "!"
 //	none
 func Error(msg string) {
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", err_prefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", colorize(BrightRed, err_prefix), msg)
 }
 
 // Warn prints a warning message to stderr, prefixed with "warning:"
@@ -33,7 +33,7 @@ func Error(msg string) {
 //	none
 func Warn(msg string) {
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", warn_prefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", colorize(BrightYellow, warn_prefix), msg)
 }
 
 // Info prints a message to stdout (normal output)
