@@ -93,7 +93,7 @@ echo "/models" | picochat -quiet
 
 ### Output formats
 
-Since v0.12 PicoChat provides output formats other than plain text. This simplifies the output processing in pipelines etc.
+PicoChat provides output formats other than plain text. This simplifies the output processing in pipelines etc.
 
 Example usage: `picochat -format json`
 
