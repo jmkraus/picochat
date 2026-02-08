@@ -70,6 +70,11 @@ const (
 	BgBrightCyan    string = "\033[106m"
 	BgBrightWhite   string = "\033[107m"
 
+	// Style
+	Bold        string = "\033[1m"
+	Italics     string = "\033[3m"
+	BoldItalics string = "\033[1;3m"
+
 	// Reset
 	ColorReset string = "\033[0m"
 )
