@@ -329,12 +329,12 @@ func TestSaveAndLoad_DropsReasoning(t *testing.T) {
 		t.Fatalf("expected loaded history length 2, got %d", loaded.Len())
 	}
 
-	// Content muss da sein
+	// Content must be there
 	if loaded.Messages[1].Content != "visible content" {
 		t.Errorf("expected loaded content to match; got %q", loaded.Messages[1].Content)
 	}
 
-	// Reasoning darf nicht da sein (json:"-"), muss nach Load leer sein
+	// Reasoning must not be there (json:"-")
 	if loaded.Messages[1].Reasoning != "" {
 		t.Errorf("expected reasoning to be empty after load, got %q", loaded.Messages[1].Reasoning)
 	}

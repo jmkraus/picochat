@@ -65,6 +65,11 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 func (h *ChatHistory) add(role, reasoning, content, image string) error {
 	switch role {
 	case RoleSystem, RoleUser, RoleAssistant:
+		if role != RoleAssistant {
+			// safety net - just in case
+			reasoning = ""
+		}
+
 		////IMAGES
 		var img []string
 		if image != "" {
