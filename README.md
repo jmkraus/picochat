@@ -155,6 +155,19 @@ echo "Write a Haiku about Cheese" | picochat -quiet -format json | jq -r '.elaps
 ```
 
 
+### Reasoning
+
+Pico AI Server and Ollama handle reasoning differently. While Ollama separates reasoning and content output, Pico AI's content also includes reasoning, which is embedded in `<think>` tags.
+
+PicoChat can handle both forms directly. However, there are differences in how they are displayed during output. The output in Ollama is in gray color to distinguish it from the content. Since some models in Pico AI are faulty and do not output an opening `<think>` tag, the reasoning part cannot be correctly recognized. Therefore, in this case, the reasoning remains part of the content and is not colorized.
+
+Internally, reasoning is separated from content for both, Pico AI and Ollama. This means that even if the answer is queried later using `/message`, no reasoning is displayed in Pico AI. However, the behavior of `/copy` is now consistent: only the content is copied in Pico AI as well. If reasoning is also to be included, `/copy think` can be used.
+
+Care should also be taken to ensure that the reasoning flag is set when using reasoning models. Furthermore, reasoning behavior is highly dependent on the model used and can occasionally lead to unexpected behavior and freezes, or simply be ignored by the model.
+
+It should be noted that reasoning is not saved when using `/save`, as it is not considered an official part of the conversation. 
+
+
 ### Configuration files
 
 PicoChat expects a configuration file. If no specific name is given, it looks for a file named `config.toml`
@@ -181,8 +194,6 @@ PicoChat currently supports the following configurable values in the config file
 | `Prompt`      | string  | System prompt ("Persona") where a specific skill or background can be specified.   |
 | `Quiet`       | bool    | Suppresses all messages (except for errors)                                        |
 | `Reasoning`   | bool    | Enables or disables reasoning                                                      |
-
-Reasoning is currently labeled as “experimental” because it depends to a large extent on the model used: Not all reasoning models react equally to the settings and the results range from “ignoring” to unexpected side effects or even crashes (freeze).
 
 Since Pico AI currently does not report token counts, it is difficult to calculate a proper context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
 
@@ -308,4 +319,4 @@ Special thanks to the developers of the libraries used in this project:
 
 This project is licensed under the MIT license.
 
-JMK 2025
+JMK 2026
