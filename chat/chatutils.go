@@ -25,9 +25,8 @@ func splitReasoning(s string) (reasoning string, content string) {
 	}
 
 	// 2nd case: only </think> exists
-	if before, after, found := strings.Cut(s, "</think>"); found {
-		reasoning = before
-		content = after
+	found := false
+	if reasoning, content, found = strings.Cut(s, "</think>"); found {
 		return trimEmptyLines(reasoning), trimEmptyLines(content)
 	}
 
@@ -47,15 +46,13 @@ func splitReasoning(s string) (reasoning string, content string) {
 func trimEmptyLines(s string) string {
 	lines := strings.Split(s, "\n")
 
-	// before
-	for len(lines) > 0 && strings.TrimSpace(lines[0]) == "" {
-		lines = lines[1:]
+	start, end := 0, len(lines)
+	for start < end && strings.TrimSpace(lines[start]) == "" {
+		start++
+	}
+	for start < end && strings.TrimSpace(lines[end-1]) == "" {
+		end--
 	}
 
-	// after
-	for len(lines) > 0 && strings.TrimSpace(lines[len(lines)-1]) == "" {
-		lines = lines[:len(lines)-1]
-	}
-
-	return strings.Join(lines, "\n")
+	return strings.Join(lines[start:end], "\n")
 }
