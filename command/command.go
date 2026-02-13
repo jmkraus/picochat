@@ -124,33 +124,37 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Output: files}
 	case "copy":
 		lastAnswer := history.GetLast().Content
-		info := "Last answer written to clipboard."
-		if lastAnswer == "" {
-			return CommandResult{Info: "Nothing to copy."}
-		}
-		if args == "think" {
+		info := "Last assistant prompt written to clipboard."
+		switch args {
+		case "":
+			if lastAnswer == "" {
+				return CommandResult{Info: "Nothing to copy."}
+			}
+		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
+			lastMessage, found := history.GetLastRole(args)
+			if found {
+				lastAnswer = lastMessage.Content
+				info = fmt.Sprintf("Last %s prompt written to clipboard.", args)
+			} else {
+				return CommandResult{Info: "Nothing to copy."}
+			}
+		case "think":
 			lastReasoning := history.GetLast().Reasoning
 			if lastReasoning != "" {
 				lastAnswer = encloseThinkingTags(lastReasoning) + lastAnswer
 			}
-		}
-		if args == "code" {
+		case "code":
 			codeBlock, found := extractCodeBlock(lastAnswer)
+			info = "First code block written to clipboard."
 			if found {
 				lastAnswer = codeBlock
 			} else {
 				return CommandResult{Info: "Nothing to copy."}
 			}
+		default:
+			return CommandResult{Error: fmt.Errorf("unknown copy argument")}
 		}
-		if args == "user" {
-			msg, found := history.GetLastRole(messages.RoleUser)
-			if found {
-				lastAnswer = msg.Content
-				info = "Last user prompt written to clipboard."
-			} else {
-				return CommandResult{Info: "Nothing to copy."}
-			}
-		}
+
 		err := clipb.WriteClipboard(lastAnswer)
 		if err != nil {
 			return CommandResult{Error: err}
