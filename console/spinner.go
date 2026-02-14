@@ -34,7 +34,7 @@ func StartSpinner(quiet bool, stop <-chan struct{}) {
 		case <-stop:
 			return // end routine
 		default:
-			fmt.Printf("\r%c", frames[i%len(frames)])
+			ColorPrint(Blue, fmt.Sprintf("\r%c", frames[i%len(frames)]))
 			i++
 			time.Sleep(100 * time.Millisecond)
 		}
