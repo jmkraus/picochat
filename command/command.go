@@ -104,13 +104,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Output: utils.FormatList(list, "Server info", false)}
 	case "message":
 		switch args {
-		case "system", "user", "assistant":
+		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			msg, found := history.GetLastRole(args)
 			if found {
 				return CommandResult{Output: msg.Content}
-			} else {
-				return CommandResult{Info: fmt.Sprintf("No element for role type '%s' found.", args)}
 			}
+			return CommandResult{Info: fmt.Sprintf("No element for role '%s' found.", args)}
 		default:
 			msg := history.GetLast().Content
 			return CommandResult{Output: msg}
@@ -123,40 +122,47 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Output: files}
 	case "copy":
-		lastAnswer := history.GetLast().Content
 		info := "Last assistant prompt written to clipboard."
+		var lastAnswer string
+
+		if args == "" {
+			args = messages.RoleAssistant
+		}
+
 		switch args {
-		case "":
-			if lastAnswer == "" {
-				return CommandResult{Info: "Nothing to copy."}
-			}
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			lastMessage, found := history.GetLastRole(args)
-			if found {
-				lastAnswer = lastMessage.Content
-				info = fmt.Sprintf("Last %s prompt written to clipboard.", args)
-			} else {
+			if !found || lastMessage.Content == "" {
 				return CommandResult{Info: "Nothing to copy."}
 			}
+			lastAnswer = lastMessage.Content
+			info = fmt.Sprintf("Last %s prompt written to clipboard.", args)
+
 		case "think":
-			lastReasoning := history.GetLast().Reasoning
-			if lastReasoning != "" {
-				lastAnswer = encloseThinkingTags(lastReasoning) + lastAnswer
-			}
-		case "code":
-			codeBlock, found := extractCodeBlock(lastAnswer)
-			info = "First code block written to clipboard."
-			if found {
-				lastAnswer = codeBlock
-			} else {
+			lastMessage, found := history.GetLastRole(messages.RoleAssistant)
+			if !found || (lastMessage.Content == "" && lastMessage.Reasoning == "") {
 				return CommandResult{Info: "Nothing to copy."}
 			}
+			lastAnswer = encloseThinkingTags(lastMessage.Reasoning) + lastMessage.Content
+			info = "Last assistant prompt (with thinking) written to clipboard."
+
+		case "code":
+			lastMessage, found := history.GetLastRole(messages.RoleAssistant)
+			if !found || lastMessage.Content == "" {
+				return CommandResult{Info: "Nothing to copy."}
+			}
+			codeBlock, found := extractCodeBlock(lastMessage.Content)
+			info = "First code block written to clipboard."
+			if !found {
+				return CommandResult{Info: "Nothing to copy."}
+			}
+			lastAnswer = codeBlock
+
 		default:
 			return CommandResult{Error: fmt.Errorf("unknown copy argument")}
 		}
 
-		err := clipb.WriteClipboard(lastAnswer)
-		if err != nil {
+		if err := clipb.WriteClipboard(lastAnswer); err != nil {
 			return CommandResult{Error: err}
 		}
 		return CommandResult{Info: info}
