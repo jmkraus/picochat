@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"picochat/paths"
@@ -247,7 +248,7 @@ func CreateTestFile(baseUrl string) error {
 
 	filename := fmt.Sprintf("test.%s", ext)
 	if err := os.WriteFile(filename, []byte(strings.Join(rows, "\n")), 0755); err != nil {
-		return fmt.Errorf("could not write test file: %w", err)
+		return fmt.Errorf("write test file %s failed: %w", filename, err)
 	}
 
 	return nil
@@ -257,27 +258,65 @@ func CreateTestFile(baseUrl string) error {
 //
 // Parameter:
 //
-//	filename (string) - the path to the image
+//	path (string) - the path to the image
 //
 // Returns:
 //
 //	string - the base64 encoded image
-//	error
-func ImageToBase64(filename string) (string, error) {
-	fn, err := paths.ExpandHomeDir(filename)
+//	error  - error if any
+func ImageToBase64(path string) (string, error) {
+	// Expand homedir if applicable
+	fullPath, err := paths.ExpandHomeDir(path)
 	if err != nil {
 		return "", err
 	}
 
-	if !paths.FileExists(fn) {
-		return "", fmt.Errorf("image file not found")
-	}
-
-	data, err := os.ReadFile(fn)
+	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return "", err
 	}
 
 	encoded := base64.StdEncoding.EncodeToString(data)
 	return encoded, nil
+}
+
+// LoadSchemaFromFile loads a json schema string file and
+// transforms it into a json object representation.
+// ollama also allows for a simple "json" string for
+// arbitrary output in json format.
+//
+// Parameters:
+//
+//	path (string) - the path to the json schema text file
+//
+// Returns:
+//
+//	any   - the json object or a "json" string
+//	error - error if any
+func LoadSchemaFromFile(path string) (any, error) {
+	// Expand homedir if applicable
+	fullPath, err := paths.ExpandHomeDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := os.ReadFile(fullPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Special case: file only contains "json"
+	// This is the arbitrary and random structured json output
+	trimmed := strings.TrimSpace(string(data))
+	if trimmed == "json" || trimmed == `"json"` {
+		return "json", nil
+	}
+
+	// Default: parse file content as json object
+	var schema map[string]any
+	if err := json.Unmarshal(data, &schema); err != nil {
+		return nil, fmt.Errorf("invalid json schema: %w", err)
+	}
+
+	return schema, nil
 }

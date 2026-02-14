@@ -11,6 +11,7 @@ import (
 	"picochat/format"
 	"picochat/messages"
 	"picochat/paths"
+	"picochat/utils"
 	"picochat/version"
 )
 
@@ -85,15 +86,25 @@ func main() {
 		cfg.Quiet = true
 	}
 
-	if *args.Format == "" {
+	if *args.Output == "" {
 		cfg.OutputFmt = "plain" // default
 	} else {
-		f, ok := format.AllowedKeys(*args.Format)
+		f, ok := format.AllowedKeys(*args.Output)
 		cfg.OutputFmt = f
 		if !ok {
 			cfg.OutputFmt = "plain"
 			console.Warn("unknown output format - fallback to plain")
 		}
+	}
+
+	if *args.Format != "" {
+		cfg.OutputFmt = "plain" // There can be only one
+		schema, err := utils.LoadSchemaFromFile(*args.Format)
+		if err != nil {
+			console.Error(fmt.Sprintf("load json schema file failed: %v", err))
+			os.Exit(1)
+		}
+		cfg.SchemaFmt = schema
 	}
 
 	if *args.Model != "" {
@@ -169,6 +180,7 @@ func main() {
 			if result.Output != "" {
 				fmt.Println(result.Output)
 			}
+
 			if result.Quit {
 				break
 			}
@@ -178,6 +190,7 @@ func main() {
 				// start the request with pasted content from clipboard
 				sendPrompt(session, result.Pasted)
 			}
+
 			if input.EOF {
 				// we come from stdin pipe
 				break

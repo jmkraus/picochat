@@ -9,6 +9,7 @@ type ChatRequest struct {
 	Options   *ChatOptions       `json:"options,omitempty"`
 	Stream    bool               `json:"stream"`
 	Think     bool               `json:"think,omitempty"`
+	Format    any                `json:"format,omitempty"`
 }
 
 type Reasoning struct {

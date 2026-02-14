@@ -21,6 +21,7 @@ type Config struct {
 	ConfigPath string `toml:"-"`
 	ImagePath  string `toml:"-"` ////IMAGES
 	OutputFmt  string `toml:"-"`
+	SchemaFmt  any    `toml:"-"`
 }
 
 var (

@@ -53,6 +53,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			Temperature: cfg.Temperature,
 			TopP:        cfg.TopP,
 		},
+		Format: cfg.SchemaFmt,
 	}
 
 	jsonData, err := json.Marshal(reqBody)
@@ -227,8 +228,8 @@ func tokenSpeed(t int, s string) float64 {
 //
 // Returns:
 //
-//	config.Config - a struct filled with config data
-//	error         - an error if anything went wrong
+//	config.Config - a struct with config data
+//	error         - error if any
 func getConfig(cfg *config.Config) (*config.Config, error) {
 	if cfg != nil {
 		return cfg, nil

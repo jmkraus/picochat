@@ -83,19 +83,24 @@ echo "/models" | picochat -quiet
 | Arg      | Description                             |
 | -------- | --------------------------------------- |
 | -config  | Loads a configuration file              |
+| -format  | Sets a path for a json schema file      |
 | -history | Loads the specific session              |
-| -model   | Overrides config setting with new model |
 | -image   | Sets a path for an image file           |
-| -format  | Defines output format of the response   |
+| -model   | Overrides config setting with new model |
+| -output  | Defines output format of the response   |
 | -quiet   | Suppresses all app messages             |
 | -version | Shows version number and quits          |
 
 
-### Output formats
+### Output formats and structured content
+ 
+#### Output format
 
 PicoChat provides output formats other than plain text. This simplifies the output processing in pipelines etc.
+this step happens *after* the inference and wraps the plain text output into a structure while preserving
+the output itself as plain text. This works with any server.
 
-Example usage: `picochat -format json`
+Example usage: `picochat -output json`
 
 The following formats are available:
 
@@ -120,17 +125,17 @@ Dairy bliss unfolds.
 
 **Example output: json**
 
-`echo "Write a Haiku about Cheese" | picochat -quiet -format json`
+`echo "Write a Haiku about Cheese" | picochat -quiet -output json`
 
-```
+```json
 {"output":"Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds.","elapsed":"00:02","tokens_per_sec":7.8}
 ```
 
 **Example output: json-pretty**
 
-`echo "Write a Haiku about Cheese" | picochat -quiet -format json-pretty`
+`echo "Write a Haiku about Cheese" | picochat -quiet -output json-pretty`
 
-```
+```json
 {
   "output": "Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds."
   "elapsed": "00:02",
@@ -140,9 +145,9 @@ Dairy bliss unfolds.
 
 **Example output: yaml**
 
-`echo "Write a Haiku about Cheese" | picochat -quiet -format yaml`
+`echo "Write a Haiku about Cheese" | picochat -quiet -output yaml`
 
-```
+```yaml
 output: "Golden, sharp, and bold,\nMelts upon your waiting tongue,\nDairy bliss unfolds."
 elapsed: "00:02",
 tokens_per_sec: 7.8
@@ -150,9 +155,58 @@ tokens_per_sec: 7.8
 
 Using formatted output enables pipelines like this:
 
+`echo "Write a Haiku about Cheese" | picochat -quiet -output json | jq -r '.elapsed'`
+
+
+#### Structured content
+
+Unlike the previously described output format, the structured content is generated during the inference.
+It is currently limited to Ollama only (untested with other local LLM servers) and works as follows:
+
+`echo "Tell me about Canada" | picochat -format ./schema.json`
+
+where the provided `schema.json` file looks like this:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "capital": {
+      "type": "string"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "capital", 
+    "languages"
+  ]
+}
 ```
-echo "Write a Haiku about Cheese" | picochat -quiet -format json | jq -r '.elapsed'
+
+In this case, the creation of the resulting json structure is integral part of the response process and
+results in a well-formed and structured content taylored to the specific needs:
+
+```json
+{
+  "capital": "Ottawa",
+  "languages": ["English", "French"],
+  "name": "Canada"
+}
 ```
+
+If the exact structure doesn't matter (as long as the result is valid json), then it's also possible to
+create a dummy file only containing `json` as text. This will be accepted as well, while any other schema file
+will be validated. For the most part this option works, but the result quality depends on the model chosen
+and may not be satisfactory.
 
 
 ### Reasoning
