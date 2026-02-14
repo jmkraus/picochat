@@ -228,11 +228,11 @@ PicoChat expects a configuration file. If no specific name is given, it looks fo
 
 The lookup for the configuration file is in the following order:
 
- 1. Full path is given with the `-config` argument.
- 2. Environment variable `CONFIG_PATH` is set.
- 3. Environment variable  `XDG_CONFIG_HOME` is set (searches for /picochat).
- 4. User home directory (searches for .config/picochat).
- 5. Same folder where the executable is placed.
+ 1. Same folder where the executable is placed.
+ 2. Full path is given with the `-config` argument.
+ 3. Environment variable `CONFIG_PATH` is set.
+ 4. Environment variable  `XDG_CONFIG_HOME` is set (searches for /picochat).
+ 5. User home directory (searches for .config/picochat).
 
 History files (see below) are always stored in a subdirectory of the PicoChat config folder, e.g. `.config/picochat/history`.
 
