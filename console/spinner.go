@@ -27,14 +27,14 @@ func StartSpinner(quiet bool, stop <-chan struct{}) {
 	fmt.Print(DisableCursor)
 	defer fmt.Print(EnableCursor)
 
-	fmt.Print(ClearLine)
+	fmt.Print(ClearLine + Blue)
 
 	for {
 		select {
 		case <-stop:
 			return // end routine
 		default:
-			ColorPrint(Blue, fmt.Sprintf("\r%c", frames[i%len(frames)]))
+			fmt.Printf("\r%c", frames[i%len(frames)])
 			i++
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -61,6 +61,6 @@ func StopSpinner(quiet bool, stop chan struct{}) {
 		return //channel already closed, do nothing
 	default:
 		close(stop)
-		fmt.Print(ClearLine)
+		fmt.Print(ClearLine + ColorReset)
 	}
 }
