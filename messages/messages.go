@@ -81,10 +81,7 @@ func (h *ChatHistory) add(role, reasoning, content, image string) error {
 		}
 
 		h.Messages = append(h.Messages, Message{Role: role, Reasoning: reasoning, Content: content, Images: img})
-
-		if h.MaxContext > 0 {
-			h.Compress(h.MaxContext)
-		}
+		h.compress()
 
 		return nil
 	default:
@@ -250,10 +247,6 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 	filename = paths.EnsureSuffix(filepath.Base(filename), suffix)
 	fullPath := filepath.Join(historyPath, filename)
 
-	if !paths.FileExists(fullPath) {
-		return nil, fmt.Errorf("file not found")
-	}
-
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("read file %s failed: %w", fullPath, err)
@@ -320,18 +313,19 @@ func (h *ChatHistory) SetContextSize(max int) error {
 //
 // Parameters:
 //
-//	max int
+//	none
 //
 // Returns:
 //
 //	none
-func (h *ChatHistory) Compress(max int) {
+func (h *ChatHistory) compress() {
+	max := h.MaxContext
 	if h.Len() < max {
 		return
 	}
 
 	if !h.MaxContextReached {
-		console.Warn(fmt.Sprintf("Context size limit of %d reached.", h.MaxContext))
+		console.Warn(fmt.Sprintf("Context size limit of %d reached.", max))
 		h.MaxContextReached = true
 	}
 
