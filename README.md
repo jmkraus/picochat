@@ -1,20 +1,20 @@
 # PicoChat - a CLI Chat Client
 
 ## Purpose
-The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, does not provide a dedicated CLI client.
+The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, doesn't provide a dedicated CLI client.
 
-This tool fills that gap and offers some additional features.
+This tool fills that gap and adds a few extra features.
 
 ## Installation
 
-The released binary is neither notarized nor signed. To use it on a Mac, there are two options:
+The released binary is neither notarized nor code-signed. To use it on macOS, there are two options:
 
- 1. Build PicoChat from the sources
+ 1. Build PicoChat from source
  2. Remove the quarantine flag from the binary
 
 ### Build PicoChat
 
- Add the required libraries to your local Go setup.
+ Install the dependencies and build.
 
  ```text
   go mod download
@@ -29,18 +29,18 @@ Navigate to the folder containing the binary and enter the following:
 
 `sudo xattr -rd com.apple.quarantine ./picochat`
 
-Enter the administrator password to confirm. After that, the binary can be started without a warning.
+Enter your administrator password to confirm. After that, you can run the binary without warnings.
 
 ## Usage
 
 ### Entering a prompt
 
-PicoChat uses a raw input mode for entering prompts.
-This provides a more natural multiline editing experience than the triple-quote (""") approach used by other applications, while still keeping the implementation simple and terminal-friendly.
+PicoChat uses raw input mode to enter prompts.
+This provides a more natural multi-line editing experience than the triple-quote (""") approach used by other applications, while still keeping the implementation simple and terminal-friendly.
 
 Users can type or paste as much text as needed for a prompt.
-Input is submitted by pressing Ctrl+D (End-of-File).
-This method ensures that pasted text — including blank lines or code blocks — is handled safely without triggering unintended input termination.
+Submit input by pressing Ctrl+D (end-of-file).
+This method ensures that pasted text — including blank lines or code blocks — is handled safely without triggering accidental termination.
 
 Input can be canceled at any time by pressing Esc, which immediately returns the user to the main prompt without sending the text.
 
@@ -51,7 +51,7 @@ Here are a few examples (↵ indicates pressing Enter):
 >>> Tell me a joke! [Ctrl]+D
 ```
 
-#### Multi line
+#### Multi-line
 ```text
 >>> Hello, PicoChat! ↵
 How are you today? ↵
@@ -60,58 +60,58 @@ How are you today? ↵
 ```
 
 #### Via stdin pipe
-Use PicoChat in scripts via Pipe, e.g.:
+Use PicoChat in scripts via pipe, e.g.:
 ```
 echo "Write a Haiku about Cheese" | picochat -quiet
 ```
 
 The `-quiet` argument is optional and suppresses all app messages, so that only the LLM response is displayed.
 
-For Windows turn the command shell into UTF-8 mode first for proper handling of non-Western characters:
+On Windows, switch the shell to UTF-8 first for proper handling of non-Western characters:
 ```
 chcp 65001
 ```
 
-It's also possible to run a PicoChat command via stdin pipe. This is experimental and has not yet been thoroughly tested and might have unexpected side effects. 
+You can also pipe a PicoChat command via stdin. This is experimental, not thoroughly tested, and may have unexpected side effects. 
 ```
 echo "/models" | picochat -quiet
 ```
 
 
-### Command line args
+### Command-line arguments
 
 | Arg      | Description                             |
 | -------- | --------------------------------------- |
 | -config  | Loads a configuration file              |
-| -format  | Sets a path for a json schema file      |
-| -history | Loads the specific session              |
+| -format  | Sets the path to a JSON schema file     |
+| -history | Loads a specific session                |
 | -image   | Sets a path for an image file           |
-| -model   | Overrides config setting with new model |
-| -output  | Defines output format of the response   |
+| -model   | Overrides the configured model          |
+| -output  | Sets the response output format         |
 | -quiet   | Suppresses all app messages             |
-| -version | Shows version number and quits          |
+| -version | Shows the version and exits             |
 
 
 ### Output formats and structured content
  
 #### Output format
 
-PicoChat provides output formats other than plain text. This simplifies the output processing in pipelines etc.
-this step happens *after* the inference and wraps the plain text output into a structure while preserving
+PicoChat provides output formats other than plain text. This simplifies output processing in pipelines, etc.
+This step happens *after* inference and wraps the plain-text output into a structure while keeping
 the output itself as plain text. This works with any server.
 
 Example usage: `picochat -output json`
 
 The following formats are available:
 
-| Format      | Description                                        |
-| ----------- | -------------------------------------------------- |
-| plain       | (default) Plain text output, can be omitted.       |
-| json        | Response formatted as json output.                 |
-| json-pretty | Response formatted as json output in pretty print. |
-| yaml        | Response formatted as yaml output.                 |
+| Format      | Description                                  |
+| ----------- | -------------------------------------------- |
+| plain       | (default) Plain text output, can be omitted. |
+| json        | Response formatted as JSON.                  |
+| json-pretty | Response formatted as pretty-printed JSON.   |
+| yaml        | Response formatted as YAML.                  |
 
-If a wrong format is given, a warning shows up and PicoChat uses plain text as fallback.
+If an invalid format is provided, PicoChat prints a warning and falls back to plain text.
 
 **Example output: plain**
 
@@ -160,8 +160,8 @@ Using formatted output enables pipelines like this:
 
 #### Structured content
 
-Unlike the previously described output format, the structured content is generated during the inference.
-It is currently limited to Ollama only (untested with other local LLM servers) and works as follows:
+Unlike the output formats above, structured content is generated *during* inference.
+It currently works only with Ollama (untested with other local LLM servers) and works as follows:
 
 `echo "Tell me about Canada" | picochat -format ./schema.json`
 
@@ -192,8 +192,8 @@ where the provided `schema.json` file looks like this:
 }
 ```
 
-In this case, the creation of the resulting json structure is integral part of the response process and
-results in a well-formed and structured content taylored to the specific needs:
+In this case, generating the resulting JSON structure is an integral part of the response process
+resulting in well-formed, structured content taylored to the specific needs:
 
 ```json
 {
@@ -204,122 +204,145 @@ results in a well-formed and structured content taylored to the specific needs:
 ```
 
 If the exact structure doesn't matter (as long as the result is valid json), then it's also possible to
-create a dummy file only containing `json` as text. This will be accepted as well, while any other schema file
-will be validated. For the most part this option works, but the result quality depends on the model chosen
+create a dummy file that contains only the word `json`. This will be accepted as well. All other schema files
+are validated. In most cases this works, but the output quality depends on the model chosen
 and may not be satisfactory.
 
 
 ### Reasoning
 
-Pico AI Server and Ollama handle reasoning differently. While Ollama separates reasoning and content output, Pico AI's content also includes reasoning, which is embedded in `<think>` tags.
+Pico AI Server and Ollama handle reasoning differently. While Ollama separates reasoning and content output,
+Pico AI's output also includes reasoning, which is embedded in `<think>` tags.
 
-PicoChat can handle both forms directly. However, there are differences in how they are displayed during output. The output in Ollama is in gray color to distinguish it from the content. Since some models in Pico AI are faulty and do not output an opening `<think>` tag, the reasoning part cannot be correctly recognized. Therefore, in this case, the reasoning remains part of the content and is not colorized.
+PicoChat can handle both forms directly. However, they are displayed differently.
+In Ollama, the reasoning is shown in gray color to distinguish it from the content.
+Because some Pico AI models sometimes omit the opening `<think>` tag,
+the reasoning part cannot be correctly recognized.
+Therefore, in that case, the reasoning remains part of the content and is not colorized.
 
-Internally, reasoning is separated from content for both, Pico AI and Ollama. This means that even if the answer is queried later using `/message`, no reasoning is displayed in Pico AI. However, the behavior of `/copy` is now consistent: only the content is copied in Pico AI as well. If reasoning is also to be included, `/copy think` can be used.
+Internally, reasoning is separated from content for both Pico AI and Ollama. This means that even if
+you later query the answer using `/message`, no reasoning is displayed in Pico AI. The 
+`/copy` behavior is consistent: only the content is copied in Pico AI as well. To include reasoning
+`/copy think` can be used.
 
-Care should also be taken to ensure that the reasoning flag is set when using reasoning models. Furthermore, reasoning behavior is highly dependent on the model used and can occasionally lead to unexpected behavior and freezes, or simply be ignored by the model.
+Make sure the reasoning flag is enabled when using reasoning models.
+Furthermore, reasoning behavior is highly dependent on the model used and
+can occasionally cause freezes, behave unexpectedly, or be ignored by the model.
 
-It should be noted that reasoning is not saved when using `/save`, as it is not considered an official part of the conversation. 
+Note that reasoning isn't saved when using `/save`, as it is not considered an official
+part of the conversation. 
 
 
 ### Configuration files
 
-PicoChat expects a configuration file. If no specific name is given, it looks for a file named `config.toml`
+PicoChat expects a configuration file. If no filename is provided, it looks for a file named `config.toml`
 
-The lookup for the configuration file is in the following order:
+PicoChat searches for the configuration file in the following order:
 
- 1. Same folder where the executable is placed.
- 2. Full path is given with the `-config` argument.
- 3. Environment variable `CONFIG_PATH` is set.
- 4. Environment variable  `XDG_CONFIG_HOME` is set (searches for /picochat).
- 5. User home directory (searches for .config/picochat).
+ 1. The same folder as the executable.
+ 2. A full path is provided with the `-config` argument.
+ 3. If the nvironment variable `CONFIG_PATH` is set.
+ 4. If the environment variable  `XDG_CONFIG_HOME` is set (looks for `/picochat`).
+ 5. Your home directory (looks for `.config/picochat`).
 
-History files (see below) are always stored in a subdirectory of the PicoChat config folder, e.g. `.config/picochat/history`.
+History files (see below) are always stored in the PicoChat config directory, e.g. `.config/picochat/history`.
 
 PicoChat currently supports the following configurable values in the config file:
 
-| Key           | Type    | Value                                                                              |
-| ------------- | ------- | ---------------------------------------------------------------------------------- |
-| `URL`         | string  | link to the core **API** endpoint (default usually `http://localhost:11434/api`).  |
-| `Model`       | string  | Model name (must be already downloaded)                                            |
-| `Context`     | integer | Context size (must be a value between 3 and 100) - this is the number of messages! |
-| `Temperature` | float   | Model temperature                                                                  |
-| `TopP`        | float   | Model top_p                                                                        |
-| `Prompt`      | string  | System prompt ("Persona") where a specific skill or background can be specified.   |
-| `Quiet`       | bool    | Suppresses all messages (except for errors)                                        |
-| `Reasoning`   | bool    | Enables or disables reasoning                                                      |
+| Key           | Type    | Value                                                                           |
+| ------------- | ------- | ------------------------------------------------------------------------------- |
+| `URL`         | string  | URL of the core **API** endpoint (default: `http://localhost:11434/api`).       |
+| `Model`       | string  | Model name (must already be downloaded)                                         |
+| `Context`     | integer | Context size (a value between 3 and 100) i.e., the maximum number of messages!  |
+| `Temperature` | float   | Model temperature                                                               |
+| `TopP`        | float   | Model top-p value                                                               |
+| `Prompt`      | string  | System prompt ("persona") used to specify a skill or background.                |
+| `Quiet`       | bool    | Suppresses all messages (except for errors)                                     |
+| `Reasoning`   | bool    | Enables or disables reasoning                                                   |
 
-Since Pico AI currently does not report token counts, it is difficult to calculate a proper context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
+Since Pico AI currently doesn't report token counts, it is difficult to calculate an accurate context size.
+This may change in the future, but for now the context size is limited by the total number of messages,
+with the oldest ones being dropped when the limit is reached.
+
 
 ### Commands
 
-| CMD             | DESCRIPTION |
-| --------------- | ------------------------------------------------- |
-| [Ctrl]+D        | Submit multiline input (EOF)                      |
-| [Esc], [Ctrl]+C | Cancel multiline input and return to prompt       |
-| [Up]/[Down]     | Browse prompt command history                     |
-| /copy, /c       | Copy the last answer to clipboard                 |
-| /paste, /v      | Get clipboard content as user input and send      |
-| /info           | Show system information                           |
-| /message        | Show last message again (e.g., after load)        |
-| /load           | Load chat history from a file                     |
-| /save           | Save current chat history to a file               |
-| /list           | List available saved history files                |
-| /models         | List (and switch) downloaded models               |
-| /clear          | Clear session context                             |
-| /set            | Set session variables (key=value)                 |
-| /image          | Set image file path                               |
-| /retry          | Sends chat history again, but without last answer |
-| /bye            | Quit PicoChat                                     |
-| /help, /?       | Show available commands                           |
+| CMD             | DESCRIPTION                                        |
+| --------------- | -------------------------------------------------- |
+| [Ctrl]+D        | Submit multiline input (EOF)                       |
+| [Esc], [Ctrl]+C | Cancel multiline input and return to prompt        |
+| [Up]/[Down]     | Browse prompt history                              |
+| /copy, /c       | Copy the last answer to clipboard                  |
+| /paste, /v      | Paste clipboard contents as user input and send    |
+| /info           | Show system information                            |
+| /message        | Show the last message again (e.g., after load)     |
+| /load           | Load chat history from a file                      |
+| /save           | Save current chat history to a file                |
+| /list           | List available saved history files                 |
+| /models         | List downloaded models (and switch models)         |
+| /clear          | Clear session context                              |
+| /set            | Set session variables (key=value)                  |
+| /image          | Set image file path                                |
+| /retry          | Resend the chat history, excluding the last answer |
+| /bye            | Quit PicoChat                                      |
+| /help, /?       | Show available commands                            |
 
-Some commands can have an argument:
+Some commands accept an argument:
 
 #### /load `<filename>`
 
-Without a filename, an input line appears, where the name can be entered. If the input is omitted (just pressing _ENTER_), the load process is canceled.
+Without a filename, you'll be prompted to enter a name. If you leave it blank
+(just pressing *ENTER*), the load process is canceled.
 
-The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted, as it defaults to `.chat`.
+The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted,
+as it defaults to `.chat`.
 
-If the command `/list` has been executed before, it is also possible to load a session by index, e.g.: `/load #3`. The hash mark indicates that an index is given rather than a filename.
+If you've run `/list` before, it is also possible to load a session by index,
+e.g.: `/load #3`. The hash mark indicates that an index is given rather than a filename.
 
 #### /save `<filename>`
 
-Without a filename, the file is stored with a timestamp as filename, e.g. `2025-05-11_20-26-32.chat`.
+Without a filename, the file is saved with a timestamp as the filename, e.g. `2025-05-11_20-26-32.chat`.
 
 
 #### /copy
 
-This command copies the entire last answer to the clipboard but removes the `<think>` section from reasoning models. If the reasoning should be retained, then `/copy think` can be used instead.
+This command copies the entire last response to the clipboard and removes the `<think>` section
+for reasoning models. To keep the reasoning `/copy think` can be used instead.
 
-If `/copy code` is entered, the first occurrence of a codeblock between ` ``` ` will be copied to the clipboard instead, skipping all descriptive text. If no codeblock is found, then the copy command is canceled.
+If `/copy code` is entered, the first occurrence of a code block between triple backticks (` ``` `)
+will be copied to the clipboard instead, ommitting surrounding explanatory text. If no code block is found,
+then the command is canceled.
 
-With the argument `/copy user` the last user prompt is put into the clipboard.
+With a role argument (system or user; e.g., `/copy user`), the most recent prompt for that role is copied
+to the clipboard.
 
 #### /models `<index>`
 
-Without an argument, this command lists the available models of the **LLM** server. If the list of models has been requested at least once, then it's possible to switch to another model by using the index of the list, e.g. `/models 3`.
+Without an argument, this command lists the available models available on the **LLM** server.
+If the list of models has been fetched at least once, then it's possible to switch to another model
+by using the list index, e.g., `/models 3`.
 
 #### /set `<key=value>`
 
-Without an argument, the command lists the available parameters and show their current values.
+Without an argument, the command lists the available parameters and shows their current values.
 
-With the optional argument the parameter values can be changed for the current session, e.g., `/set top_p=0.3`.
+With an argument the parameter values can be changed for the current session, e.g., `/set top_p=0.3`.
 
-These values are not persistent and cannot be saved. For permanent changes, edit the entries in `config.toml`.
+These changes aren't persisted and cannot be saved. For permanent changes, edit the values in `config.toml`.
 
 #### /message `<role>`
 
-Without the argument, the last entry of the chat history (usually an assistant answer) will be shown.
+Without an argument, the last entry of the chat history (usually an assistant answer) will be shown.
 
-With one of the possible roles (system, user, assistant), the specific last entry of the chat history can be chosen.
+With one of the possible roles (system, user, assistant), you can choose the most recent entry for a specific role.
 
 For example, `/message user` displays the last user question again.
 
 
 ### Image processing
 
-PicoChat allows for simple use of images. An image can either be passed as an argument:
+PicoChat supports basic image input. An image can either be passed as a command-line argument:
 
 ```
 picochat -image ./imgfile.jpg
@@ -331,34 +354,39 @@ or by using the `/image` command:
 >>> /image ./imgfile.jpg
 ```
 
-It's possible to use the tilde "~" as abbreviation for the user home directory. With the next user prompt this image will be processed and then discarded. When passing an image path to PicoChat, the existence of that file will be checked (and a warning message is shown if it doesn't exist), but not if it is a valid image.
+You can use ~ as a shortcut for the user home directory. With the next user prompt, the image is
+processed and then discarded. When passing an image path to PicoChat, the existence of that
+file will be checked (and a warning is shown if it doesn't exist), but not if it is a valid image.
 
-In combination with stdin pipe and `-model` argument a simple commandline image analytics is possible:
+In combination with stdin pipe and `-model` argument a simple command-line image analysis is possible:
 
 ```
 echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./imgfile.jpg -quiet
 ```
 
-When saving the chat history, the user prompt contains the image as base64 encoded data.
+When you save chat history, the user prompt contains the image as base64 encoded data.
 
 
 ### Personas
 
-PicoChat supports basic persona handling: it is possible to store different configuration files in the config path, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
+PicoChat supports basic personas: you can store different configuration files in the config directory,
+ e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
 
-This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because they are implied by the '@' symbol. PicoChat then starts with the specified configuration file.
+This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`.
+The path and `.toml` suffix can be omitted because '@' implies them.
+PicoChat then starts with the specified configuration file.
 
 
 ### Known issues
 
-While everything should work as expected on macOS, PicoChat is completely untested on Linux and only minimally tested on Windows.
+While everything should work as expected on macOS, PicoChat is untested on Linux and only minimally
+tested on Windows.
 
 * On Windows, the Esc key must be pressed twice to cancel a prompt input. Alternatively, Ctrl + C can be used.
-* The command history flickers on Windows when switching between entries using Up + Down keys.
-* Since Pico AI is not available on Windows, other tools (e.g., ollama) have to be used instead. These may differ in their behavior in some details.
-* Specific ollama features (e.g., new "thinking" output) are not supported.
-* Text input cannot deal with soft wrap of lines in the Terminal.
-* Stdin Pipe doesn't work with non-Western characters in Windows Powershell. Workaround: Use Command Prompt (cmd.exe) instead.
+* The command history flickers on Windows when switching between entries using the Up/Down keys.
+* Since Pico AI is not available on Windows, other tools (e.g., ollama) must be used instead. These may differ in their behavior in some ways.
+* Text input doesn't handle soft-wrapped lines in the Terminal.
+* Piping via stdin doesn't work with non-Western characters in Windows PowerShell. Workaround: Use Command Prompt (cmd.exe) instead.
 
 
 ## Acknowledgements
@@ -371,6 +399,6 @@ Special thanks to the developers of the libraries used in this project:
 
 ## License
 
-This project is licensed under the MIT license.
+This project is licensed under the MIT License.
 
 JMK 2026
