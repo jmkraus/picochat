@@ -28,7 +28,7 @@ import (
 // Returns:
 //
 //	string  - summary message with elapsed time and token speed
-//	error   - error encountered during the request or processing
+//	error   - error if any
 func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (*ChatResult, error) {
 	cfg, err := getConfig(cfg)
 	if err != nil {
@@ -69,7 +69,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	start := time.Now()
 	response, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, fmt.Errorf("http request error for model %s: %w", cfg.Model, err)
+		return nil, fmt.Errorf("http request failed: %w", err)
 	}
 	defer response.Body.Close()
 
@@ -89,7 +89,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			if err == io.EOF {
 				break
 			}
-			return nil, fmt.Errorf("stream decoding error for model %s: %w", cfg.Model, err)
+			return nil, fmt.Errorf("decode stream failed: %w", err)
 		}
 
 		if (res.Message.Content != "" ||
@@ -133,13 +133,13 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	if fullContent.Len() == 0 {
 		console.StopSpinner(cfg.Quiet, stop)
-		return nil, fmt.Errorf("no content received from model %s — possible config issue or invalid model?", cfg.Model)
+		return nil, fmt.Errorf("no content received from model %s — config issue or invalid model?", cfg.Model)
 	}
 
 	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), fullContent.String())
 	err = history.AddAssistant(cleanReasoning, cleanContent)
 	if err != nil {
-		return nil, fmt.Errorf("could not add message to history: %w", err)
+		return nil, fmt.Errorf("add message to history failed: %w", err)
 	}
 	speed := tokenSpeed(seconds, cleanReasoning+cleanContent)
 
