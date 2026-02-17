@@ -29,7 +29,7 @@ func ReadMultilineInput() InputResult {
 		// stdin is not an interactive console → pipe or file
 		data, err := io.ReadAll(os.Stdin)
 		if err != nil {
-			return InputResult{Error: fmt.Errorf("error reading stdin: %v", err)}
+			return InputResult{Error: fmt.Errorf("read stdin failed: %v", err)}
 		}
 		text := strings.TrimRight(string(data), "\n")
 		trimText := strings.TrimSpace(text)
@@ -37,7 +37,7 @@ func ReadMultilineInput() InputResult {
 	} else {
 		oldState, err := term.MakeRaw(fd)
 		if err != nil {
-			return InputResult{Error: fmt.Errorf("error enabling raw input mode: %v", err)}
+			return InputResult{Error: fmt.Errorf("enable raw input mode failed: %v", err)}
 		}
 		fmt.Print(DisableLineWrap)
 		defer func() {
@@ -62,7 +62,6 @@ func ReadMultilineInput() InputResult {
 
 		switch r {
 		case 3: // Ctrl+C
-			fmt.Println()
 			return InputResult{Aborted: true}
 
 		case 4: // Ctrl+D (EOF) → input finished
@@ -72,8 +71,8 @@ func ReadMultilineInput() InputResult {
 			}
 			return InputResult{Text: strings.Join(lines, "\n"), EOF: false}
 
-		case 27: //  or ape sequences
-			// Peek to see if there are more bytes (ape sequence)
+		case 27: //  or Escape sequences
+			// Peek to see if there are more bytes (Escape sequence)
 			_ = setNonblock(fd, true)
 			peekBuf, err := reader.Peek(2)
 			_ = setNonblock(fd, false)
@@ -82,12 +81,12 @@ func ReadMultilineInput() InputResult {
 				return InputResult{Aborted: true}
 			}
 
-			// Read the ape sequence
+			// Read the Escape sequence
 			buf := make([]byte, 2)
 			n, _ := reader.Read(buf)
 
 			if n < 2 || buf[0] != '[' {
-				// Unknown ape sequence
+				// Unknown Escape sequence
 				continue
 			}
 
@@ -117,7 +116,6 @@ func ReadMultilineInput() InputResult {
 					}
 				}
 				continue
-
 			case 'D': // Left
 				if cursorPos > 0 {
 					cursorPos--

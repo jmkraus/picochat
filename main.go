@@ -153,7 +153,8 @@ func main() {
 		}
 
 		if input.Aborted {
-			console.Info("\nInput canceled.")
+			fmt.Println()
+			console.Info("Input canceled.")
 			continue
 		}
 
