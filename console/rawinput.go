@@ -92,6 +92,9 @@ func ReadMultilineInput() InputResult {
 			_ = setNonblock(fd, false)
 			if err != nil || len(peekBuf) < 2 {
 				// Plain  → abort immediately
+				if firstLine {
+					fmt.Print(ClearLine + Prompt)
+				}
 				return InputResult{Aborted: true}
 			}
 
