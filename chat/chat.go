@@ -104,7 +104,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		if res.Message.Thinking != "" {
 			fullThinking.WriteString(res.Message.Thinking)
 			if streamPlain && cfg.Reasoning {
-				console.ColorPrint(console.BrightBlack, res.Message.Thinking)
+				console.ColorPrint(console.Gray256, res.Message.Thinking)
 			}
 		}
 
