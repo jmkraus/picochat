@@ -11,6 +11,16 @@ import (
 	"golang.org/x/term"
 )
 
+// PromptWidth returns the width of the predefined prompt symbols
+// as correct runewidth calculation.
+//
+// Pramaters:
+//
+//	none
+//
+// Returns:
+//
+//	int - the width of the symbols
 func PromptWidth() int {
 	return runewidth.StringWidth(Prompt)
 }
