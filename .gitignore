@@ -1,9 +1,8 @@
+testdata/
 *.bak
 *.txt
 *.orig
 *.json
-models.json
-release.sh
-test.sh
+*.sh
 *.jpg
 *.png

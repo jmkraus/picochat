@@ -139,12 +139,13 @@ func main() {
 		if *args.Model != "" {
 			console.Info(fmt.Sprintf("Configuration overridden by model='%s'", cfg.Model))
 		}
-		console.Info("PicoChat started. Help with '/?'")
+		console.Info("PicoChat started.")
 	}
 
 	for {
 		if !session.Quiet {
-			fmt.Printf("\n%s", console.Prompt)
+			fmt.Printf("\n%s", console.Prompt+console.Shadow)
+			fmt.Printf(console.CursorToColumn, console.PromptWidth()+1)
 		}
 
 		input := console.ReadMultilineInput()

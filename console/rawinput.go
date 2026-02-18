@@ -11,6 +11,10 @@ import (
 	"golang.org/x/term"
 )
 
+func PromptWidth() int {
+	return runewidth.StringWidth(Prompt)
+}
+
 // ReadMultilineInput reads multiline input from stdin. It handles raw mode,
 // ape sequences, command detection, and returns an InputResult containing
 // the entered text, flags for EOF, Aborted, IsCommand, and any error.
@@ -27,7 +31,7 @@ func ReadMultilineInput() InputResult {
 	fd := int(in.Fd())
 	if !term.IsTerminal(fd) {
 		// stdin is not an interactive console → pipe or file
-		data, err := io.ReadAll(os.Stdin)
+		data, err := io.ReadAll(in)
 		if err != nil {
 			return InputResult{Error: fmt.Errorf("read stdin failed: %v", err)}
 		}
@@ -142,6 +146,11 @@ func ReadMultilineInput() InputResult {
 				return InputResult{Text: trimLine, IsCommand: true}
 			}
 
+			// first line is empty
+			if firstLine && len(trimLine) == 0 {
+				fmt.Print(ClearLine + Prompt)
+			}
+
 			lines = append(lines, line)
 			currentLine = []rune{}
 			cursorPos = 0
@@ -243,7 +252,11 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 
 	visualPos := visualWidth(line, cursorPos)
 
-	fmt.Printf("%s%s", prefix, string(line))
+	if firstLine && len(line) == 0 {
+		fmt.Print(prefix + Shadow)
+	} else {
+		fmt.Print(prefix + string(line))
+	}
 	fmt.Printf(CursorToColumn, visualPos+prefixWidth+1)
 }
 
@@ -267,6 +280,24 @@ func visualWidth(line []rune, pos int) int {
 	width := 0
 	for _, r := range line[:pos] {
 		width += runewidth.RuneWidth(r)
+	}
+	return width
+}
+
+// getTerminalWidth returns the current width of the terminal window
+//
+// Parameters:
+//
+//	fd (int) - a file descriptor
+//
+// Returns:
+//
+//	int - width of the window
+func getTerminalWidth(fd int) int {
+	width, _, err := term.GetSize(fd)
+	if err != nil {
+		// Fallback to a default width if terminal size cannot be determined
+		return 80
 	}
 	return width
 }

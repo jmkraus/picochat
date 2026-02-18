@@ -15,7 +15,10 @@ type commandHistory struct {
 }
 
 // Constants
-const Prompt = ">>> "
+const (
+	Prompt = ">>> "
+	Shadow = Gray256 + "Send a message (/? for help)" + ColorReset
+)
 
 const (
 	// Cursor controls
@@ -69,6 +72,13 @@ const (
 	BgBrightMagenta string = "\033[105m"
 	BgBrightCyan    string = "\033[106m"
 	BgBrightWhite   string = "\033[107m"
+
+	// 256 color mode
+	Gray256   = "\033[38;5;244m"
+	BgGray256 = "\033[48;5;244m"
+
+	LightGray256   = "\033[38;5;252m"
+	BgLightGray256 = "\033[48;5;252m"
 
 	// Style
 	Bold        string = "\033[1m"
