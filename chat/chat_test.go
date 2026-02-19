@@ -143,25 +143,25 @@ func TestElapsedTime(t *testing.T) {
 			name:    "Zero elapsed time",
 			start:   time.Now(),
 			wantSec: 0,
-			wantStr: "00:00",
+			wantStr: "0s",
 		},
 		{
 			name:    "Exactly one minute",
 			start:   time.Now().Add(-1 * time.Minute),
 			wantSec: 60,
-			wantStr: "01:00",
+			wantStr: "1m 0s",
 		},
 		{
 			name:    "More than one minute",
 			start:   time.Now().Add(-90 * time.Second),
 			wantSec: 90,
-			wantStr: "01:30",
+			wantStr: "1m 30s",
 		},
 		{
 			name:    "Exactly one hour",
 			start:   time.Now().Add(-1 * time.Hour),
 			wantSec: 3600,
-			wantStr: "60:00",
+			wantStr: "60m 0s",
 		},
 	}
 
