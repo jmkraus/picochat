@@ -193,7 +193,11 @@ func elapsedTime(t time.Time) (int, string) {
 	minutes := totalSeconds / 60
 	seconds := totalSeconds % 60
 
-	return totalSeconds, fmt.Sprintf("%02d:%02d", minutes, seconds)
+	if minutes == 0 {
+		return totalSeconds, fmt.Sprintf("%ds", seconds)
+	}
+
+	return totalSeconds, fmt.Sprintf("%dm %ds", minutes, seconds)
 }
 
 // tokenSpeed calculates the average number of tokens processed per
