@@ -93,7 +93,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		list := []string{
-			fmt.Sprintf("Configuration file used: %s", cfg.ConfigPath),
+			fmt.Sprintf("Configuration file: %s", cfg.ConfigPath),
 			fmt.Sprintf("Response output format: %s", cfg.OutputFmt),
 			fmt.Sprintf("Current model is '%s'", cfg.Model),
 			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),

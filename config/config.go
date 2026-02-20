@@ -24,6 +24,11 @@ type Config struct {
 	SchemaFmt  any    `toml:"-"`
 }
 
+const (
+	MinCtx = 3
+	MaxCtx = 100
+)
+
 var (
 	instance *Config
 	once     sync.Once
@@ -57,18 +62,17 @@ func load() {
 		Quiet:       false,
 	}
 
-	if _, err := toml.DecodeFile(path, &cfg); err != nil {
-		loadErr = fmt.Errorf("failed to decode TOML file %q: %w", path, err)
-		return
+	if paths.FileExists(path) {
+		if _, err := toml.DecodeFile(path, &cfg); err != nil {
+			loadErr = fmt.Errorf("failed to decode TOML file %q: %w", path, err)
+			return
+		}
+	} else {
+		path = "No contig.toml found - fallback to internal defaults"
 	}
 
-	if cfg.URL == "" || cfg.Model == "" || cfg.Prompt == "" {
-		loadErr = fmt.Errorf("required fields URL, Model, or Prompt are missing in config")
-		return
-	}
-
-	if cfg.Context != 0 && (cfg.Context < 3 || cfg.Context > 100) {
-		loadErr = fmt.Errorf("context size must be between 3 and 100")
+	if cfg.Context < MinCtx || cfg.Context > MaxCtx {
+		loadErr = fmt.Errorf("context size must be between %d and %d", MinCtx, MaxCtx)
 		return
 	}
 
@@ -86,7 +90,7 @@ func load() {
 // Returns:
 //
 //	*Config - pointer to the loaded configuration
-//	 error  - an error if the loading of the config file failed
+//	error   - error if any
 func Get() (*Config, error) {
 	once.Do(load)
 	return instance, loadErr

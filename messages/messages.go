@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"picochat/config"
 	"picochat/console"
 	"picochat/paths"
 	"picochat/utils"
@@ -287,8 +288,8 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 //
 //	error
 func (h *ChatHistory) SetContextSize(max int) error {
-	if max < 3 || max > 100 {
-		return fmt.Errorf("context size must be between 3 and 100")
+	if max < config.MinCtx || max > config.MaxCtx {
+		return fmt.Errorf("context size must be between %d and %d", config.MinCtx, config.MaxCtx)
 	}
 	if h.MaxContext == max {
 		return nil
