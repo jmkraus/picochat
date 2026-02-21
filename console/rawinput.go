@@ -76,6 +76,9 @@ func ReadMultilineInput() InputResult {
 
 		switch r {
 		case 3: // Ctrl+C
+			if firstLine {
+				fmt.Print(ClearLine + Prompt)
+			}
 			return InputResult{Aborted: true}
 
 		case 4: // Ctrl+D (EOF) → input finished
