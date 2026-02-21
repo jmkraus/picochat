@@ -110,9 +110,13 @@ var overrideHistoryPath string // for Unit Tests
 //
 // Returns:
 //
-//	none
-func OverrideHistoryPath(path string) {
+//	restore func() - restores the previous history path override
+func OverrideHistoryPath(path string) (restore func()) {
+	prev := overrideHistoryPath
 	overrideHistoryPath = path
+	return func() {
+		overrideHistoryPath = prev
+	}
 }
 
 // GetHistoryPath returns the path to the history directory.

@@ -66,7 +66,8 @@ func TestSaveAndLoad(t *testing.T) {
 
 	// Force temporary directory
 	tmpDir := t.TempDir()
-	paths.OverrideHistoryPath(tmpDir)
+	restore := paths.OverrideHistoryPath(tmpDir)
+	t.Cleanup(restore)
 
 	filename, err := h.SaveHistoryToFile("")
 	if err != nil {

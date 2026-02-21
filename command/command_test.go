@@ -47,14 +47,11 @@ func TestHandleLoad_WithFilename(t *testing.T) {
   }
 ]`
 
-	tmp := t.TempDir()
+	tmpDir := t.TempDir()
+	restore := paths.OverrideHistoryPath(tmpDir)
+	t.Cleanup(restore)
 
-	paths.OverrideHistoryPath(tmp)
-	t.Cleanup(func() {
-		paths.OverrideHistoryPath("")
-	})
-
-	err := os.WriteFile(filepath.Join(tmp, "dummy.chat"), []byte(dummyChat), 0644)
+	err := os.WriteFile(filepath.Join(tmpDir, "dummy.chat"), []byte(dummyChat), 0644)
 	if err != nil {
 		t.Fatalf("failed to write dummy.chat: %v", err)
 	}
