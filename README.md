@@ -1,9 +1,22 @@
 # PicoChat - a CLI Chat Client
 
-## Purpose
-The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, doesn't provide a dedicated CLI client.
+## Introduction
+The Mac‑only app [Pico AI Server](https://picogpt.app/), unlike tools such as Ollama, doesn't provide
+a dedicated CLI client.
 
 This tool fills that gap and adds a few extra features.
+
+
+### Highlights
+
+- **Persistent chat history** – save conversations and reload them later.
+- **Stdin piping support** – feed input directly via pipes for easy scripting and automation.
+- **Structured, formatted output** – optional JSON Schema–based output for reliable machine parsing.
+- **Image analysis** – send images for interpretation alongside text prompts.
+- **Full Unicode support** – handles multi-character Unicode correctly.
+- **Cross-platform** – runs on multiple operating systems.
+- **Copy & paste helpers** – built-in commands to quickly copy responses or paste content into the chat.
+
 
 ## Installation
 
@@ -35,12 +48,9 @@ Enter your administrator password to confirm. After that, you can run the binary
 
 ### Entering a prompt
 
-PicoChat uses raw input mode to enter prompts.
-This provides a more natural multi-line editing experience than the triple-quote (""") approach used by other applications, while still keeping the implementation simple and terminal-friendly.
+PicoChat uses raw input mode to enter prompts. This provides a more natural multi-line editing experience than the triple-quote (""") approach used by other applications, while still keeping the implementation simple and terminal-friendly.
 
-Users can type or paste as much text as needed for a prompt.
-Submit input by pressing Ctrl+D (end-of-file).
-This method ensures that pasted text — including blank lines or code blocks — is handled safely without triggering accidental termination.
+Users can type or paste as much text as needed for a prompt. Submit input by pressing Ctrl+D (end-of-file). This method ensures that pasted text — including blank lines or code blocks — is handled safely without triggering accidental termination.
 
 Input can be canceled at any time by pressing Esc, which immediately returns the user to the main prompt without sending the text.
 
@@ -96,9 +106,7 @@ echo "/models" | picochat -quiet
  
 #### Output format
 
-PicoChat provides output formats other than plain text. This simplifies output processing in pipelines, etc.
-This step happens *after* inference and wraps the plain-text output into a structure while keeping
-the output itself as plain text. This works with any server.
+PicoChat provides output formats other than plain text. This simplifies output processing in pipelines, etc. This step happens *after* inference and wraps the plain-text output into a structure while keeping the output itself as plain text. This works with any server.
 
 Example usage: `picochat -output json`
 
@@ -160,8 +168,7 @@ Using formatted output enables pipelines like this:
 
 #### Structured content
 
-Unlike the output formats above, structured content is generated *during* inference.
-It currently works only with Ollama (untested with other local LLM servers) and works as follows:
+Unlike the output formats above, structured content is generated *during* inference. It currently works only with Ollama (untested with other local LLM servers) and works as follows:
 
 `echo "Tell me about Canada" | picochat -format ./schema.json`
 
@@ -192,8 +199,7 @@ where the provided `schema.json` file looks like this:
 }
 ```
 
-In this case, generating the resulting JSON structure is an integral part of the response process
-resulting in well-formed, structured content taylored to the specific needs:
+In this case, generating the resulting JSON structure is an integral part of the response process resulting in well-formed, structured content taylored to the specific needs:
 
 ```json
 {
@@ -203,41 +209,25 @@ resulting in well-formed, structured content taylored to the specific needs:
 }
 ```
 
-If the exact structure doesn't matter (as long as the result is valid json), then it's also possible to
-create a dummy file that contains only the word `json`. This will be accepted as well. All other schema files
-are validated. In most cases this works, but the output quality depends on the model chosen
-and may not be satisfactory.
+If the exact structure doesn't matter (as long as the result is valid json), then it's also possible to create a dummy file that contains only the word `json`. This will be accepted as well. All other schema files are validated. In most cases this works, but the output quality depends on the model chosen and may not be satisfactory.
 
 
 ### Reasoning
 
-Pico AI Server and Ollama handle reasoning differently. While Ollama separates reasoning and content output,
-Pico AI's output also includes reasoning, which is embedded in `<think>` tags.
+Pico AI Server and Ollama handle reasoning differently. While Ollama separates reasoning and content output, Pico AI's output also includes reasoning, which is embedded in `<think>` tags.
 
-PicoChat can handle both forms directly. However, they are displayed differently.
-In Ollama, the reasoning is shown in gray color to distinguish it from the content.
-Because some Pico AI models sometimes omit the opening `<think>` tag,
-the reasoning part cannot be correctly recognized.
-Therefore, in that case, the reasoning remains part of the content and is not colorized.
+PicoChat can handle both forms directly. However, they are displayed differently. In Ollama, the reasoning is shown in gray color to distinguish it from the content. Because some Pico AI models sometimes omit the opening `<think>` tag, the reasoning part cannot be correctly recognized. Therefore, in that case, the reasoning remains part of the content and is not colorized.
 
-Internally, reasoning is separated from content for both Pico AI and Ollama. This means that even if
-you later query the answer using `/message`, no reasoning is displayed in Pico AI. The 
-`/copy` behavior is consistent: only the content is copied in Pico AI as well. To include reasoning
-`/copy think` can be used.
+Internally, reasoning is separated from content for both Pico AI and Ollama. This means that even if you later query the answer using `/message`, no reasoning is displayed in Pico AI. The `/copy` behavior is consistent: only the content is copied in Pico AI as well. To include reasoning `/copy think` can be used.
 
-Make sure the reasoning flag is enabled when using reasoning models.
-Furthermore, reasoning behavior is highly dependent on the model used and
-can occasionally cause freezes, behave unexpectedly, or be ignored by the model.
+Make sure the reasoning flag is enabled when using reasoning models. Furthermore, reasoning behavior is highly dependent on the model used and can occasionally cause freezes, behave unexpectedly, or be ignored by the model.
 
-Note that reasoning isn't saved when using `/save`, as it is not considered an official
-part of the conversation. 
+Note that reasoning isn't saved when using `/save`, as it is not considered an official part of the conversation. 
 
 
 ### Configuration files
 
-PicoChat does not require a config file: if none is found, it falls back to sensible built-in defaults.  
-However, depending on the AI server you’re using, you may need to explicitly select a model via `-model`,
-since the default model name may not exist (or may differ) across the wide range of available models.
+PicoChat does not require a config file: if none is found, it falls back to sensible built-in defaults. However, depending on the AI server you’re using, you may need to explicitly select a model via `-model`, since the default model name may not exist (or may differ) across the wide range of available models.
 
 If no filename is provided, PicoChat looks for a file named config.toml and searches for it in the following order:
 
@@ -262,9 +252,7 @@ PicoChat currently supports the following configurable values in the config file
 | `Quiet`       | bool    | Suppresses all messages (except for errors)                                     |
 | `Reasoning`   | bool    | Enables or disables reasoning                                                   |
 
-Since Pico AI currently doesn't report token counts, it is difficult to calculate an accurate context size.
-This may change in the future, but for now the context size is limited by the total number of messages,
-with the oldest ones being dropped when the limit is reached.
+Since Pico AI currently doesn't report token counts, it is difficult to calculate an accurate context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
 
 
 ### Commands
@@ -293,14 +281,12 @@ Some commands accept an argument:
 
 #### /load `<filename>`
 
-Without a filename, you'll be prompted to enter a name. If you leave it blank
-(just pressing *ENTER*), the load process is canceled.
+Without a filename, you'll be prompted to enter a name. If you leave it blank (just pressing *ENTER*), the load process is canceled.
 
-The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted,
-as it defaults to `.chat`.
+The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted, as it defaults to `.chat`.
 
-If you've run `/list` before, it is also possible to load a session by index,
-e.g.: `/load #3`. The hash mark indicates that an index is given rather than a filename.
+If you've run `/list` before, it is also possible to load a session by index, e.g.: `/load #3`. The hash mark indicates that an index is given rather than a filename.
+
 
 #### /save `<filename>`
 
@@ -309,21 +295,17 @@ Without a filename, the file is saved with a timestamp as the filename, e.g. `20
 
 #### /copy
 
-This command copies the entire last response to the clipboard and removes the `<think>` section
-for reasoning models. To keep the reasoning `/copy think` can be used instead.
+This command copies the entire last response to the clipboard and removes the `<think>` section for reasoning models. To keep the reasoning `/copy think` can be used instead.
 
-If `/copy code` is entered, the first occurrence of a code block between triple backticks (` ``` `)
-will be copied to the clipboard instead, ommitting surrounding explanatory text. If no code block is found,
-then the command is canceled.
+If `/copy code` is entered, the first occurrence of a code block between triple backticks (` ``` `) will be copied to the clipboard instead, ommitting surrounding explanatory text. If no code block is found, then the command is canceled.
 
-With a role argument (system or user; e.g., `/copy user`), the most recent prompt for that role is copied
-to the clipboard.
+With a role argument (system or user; e.g., `/copy user`), the most recent prompt for that role is copied to the clipboard.
+
 
 #### /models `<index>`
 
-Without an argument, this command lists the available models available on the **LLM** server.
-If the list of models has been fetched at least once, then it's possible to switch to another model
-by using the list index, e.g., `/models 3`.
+Without an argument, this command lists the available models available on the **LLM** server. If the list of models has been fetched at least once, then it's possible to switch to another model by using the list index, e.g., `/models 3`.
+
 
 #### /set `<key=value>`
 
@@ -332,6 +314,7 @@ Without an argument, the command lists the available parameters and shows their 
 With an argument the parameter values can be changed for the current session, e.g., `/set top_p=0.3`.
 
 These changes aren't persisted and cannot be saved. For permanent changes, edit the values in `config.toml`.
+
 
 #### /message `<role>`
 
@@ -356,9 +339,7 @@ or by using the `/image` command:
 >>> /image ./imgfile.jpg
 ```
 
-You can use ~ as a shortcut for the user home directory. With the next user prompt, the image is
-processed and then discarded. When passing an image path to PicoChat, the existence of that
-file will be checked (and a warning is shown if it doesn't exist), but not if it is a valid image.
+You can use ~ as a shortcut for the user home directory. With the next user prompt, the image is processed and then discarded. When passing an image path to PicoChat, the existence of that file will be checked (and a warning is shown if it doesn't exist), but not if it is a valid image.
 
 In combination with stdin pipe and `-model` argument a simple command-line image analysis is possible:
 
@@ -371,18 +352,22 @@ When you save chat history, the user prompt contains the image as base64 encoded
 
 ### Personas
 
-PicoChat supports basic personas: you can store different configuration files in the config directory,
- e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
+PicoChat supports basic personas: you can store different configuration files in the config directory, e.g., `generic.toml` or `developer.toml`, each with specific system prompts.
 
-This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`.
-The path and `.toml` suffix can be omitted because '@' implies them.
-PicoChat then starts with the specified configuration file.
+This configuration can be loaded using a shortcut, e.g., `picochat -config @developer`. The path and `.toml` suffix can be omitted because '@' implies them. PicoChat then starts with the specified configuration file.
+
+
+### Debug options
+
+The following two commands are mainly for debugging and test purposes.
+
+- **`/hello`** – Sends a simple probe prompt to the LLM: *“Hello, are you there?”*
+- **`/test`** – Generates an OS-aware script in the current directory that iterates over all detected/loaded models on the AI server and sends a request via stdin asking for the translation of a Chinese text. After generating the script, PicoChat exits automatically.
 
 
 ### Known issues
 
-While everything should work as expected on macOS, PicoChat is untested on Linux and only minimally
-tested on Windows.
+While everything should work as expected on macOS, PicoChat is untested on Linux and only minimally tested on Windows.
 
 * On Windows, the Esc key must be pressed twice to cancel a prompt input. Alternatively, Ctrl + C can be used.
 * The command history flickers on Windows when switching between entries using the Up/Down keys.
