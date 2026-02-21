@@ -235,15 +235,17 @@ part of the conversation.
 
 ### Configuration files
 
-PicoChat expects a configuration file. If no filename is provided, it looks for a file named `config.toml`
+PicoChat does not require a config file: if none is found, it falls back to sensible built-in defaults.  
+However, depending on the AI server you’re using, you may need to explicitly select a model via `-model`,
+since the default model name may not exist (or may differ) across the wide range of available models.
 
-PicoChat searches for the configuration file in the following order:
+If no filename is provided, PicoChat looks for a file named config.toml and searches for it in the following order:
 
- 1. The same folder as the executable.
- 2. A full path is provided with the `-config` argument.
- 3. If the nvironment variable `CONFIG_PATH` is set.
- 4. If the environment variable  `XDG_CONFIG_HOME` is set (looks for `/picochat`).
- 5. Your home directory (looks for `.config/picochat`).
+1. The directory of the executable.
+2. The full path provided via `-config`.
+3. The path specified by the `CONFIG_PATH` environment variable.
+4. `$XDG_CONFIG_HOME/picochat` (if `XDG_CONFIG_HOME` is set).
+5. `~/.config/picochat`.
 
 History files (see below) are always stored in the PicoChat config directory, e.g. `.config/picochat/history`.
 
