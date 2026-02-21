@@ -150,7 +150,8 @@ func main() {
 
 		input := console.ReadMultilineInput()
 		if input.Error != nil {
-			console.Error(fmt.Sprintf("%v", input.Error))
+			console.Error(input.Error.Error())
+			continue
 		}
 
 		if input.Aborted {

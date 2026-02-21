@@ -43,7 +43,7 @@ func ReadMultilineInput() InputResult {
 		// stdin is not an interactive console → pipe or file
 		data, err := io.ReadAll(in)
 		if err != nil {
-			return InputResult{Error: fmt.Errorf("read stdin failed: %v", err)}
+			return InputResult{Error: fmt.Errorf("read stdin failed: %w", err)}
 		}
 		text := strings.TrimRight(string(data), "\n")
 		trimText := strings.TrimSpace(text)
@@ -51,7 +51,7 @@ func ReadMultilineInput() InputResult {
 	} else {
 		oldState, err := term.MakeRaw(fd)
 		if err != nil {
-			return InputResult{Error: fmt.Errorf("enable raw input mode failed: %v", err)}
+			return InputResult{Error: fmt.Errorf("enable raw input mode failed: %w", err)}
 		}
 		fmt.Print(DisableLineWrap)
 		defer func() {
