@@ -76,7 +76,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		if filename != "" {
-			filename = paths.EnsureSuffix(filename, messages.Suffix)
+			filename = paths.EnsureSuffix(filename, paths.HistorySuffix)
 			loaded, err := messages.LoadHistoryFromFile(filename)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}

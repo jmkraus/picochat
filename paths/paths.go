@@ -15,6 +15,8 @@ const (
 	cfgDefaultSuffix = ".toml"
 )
 
+const HistorySuffix = ".chat"
+
 // GetConfigPath returns the path to the configuration file.
 //
 // Parameters:

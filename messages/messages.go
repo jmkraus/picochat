@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-const Suffix string = ".chat"
-
 const (
 	RoleSystem    = "system"
 	RoleUser      = "user"
@@ -202,9 +200,9 @@ func (h *ChatHistory) SaveHistoryToFile(filename string) (string, error) {
 	}
 
 	if filename == "" {
-		filename = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), Suffix)
+		filename = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), paths.HistorySuffix)
 	} else {
-		filename = paths.EnsureSuffix(filepath.Base(filename), Suffix)
+		filename = paths.EnsureSuffix(filepath.Base(filename), paths.HistorySuffix)
 	}
 	fullPath := filepath.Join(historyPath, filename)
 
@@ -245,7 +243,7 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 		return nil, fmt.Errorf("empty history path returned")
 	}
 
-	filename = paths.EnsureSuffix(filepath.Base(filename), Suffix)
+	filename = paths.EnsureSuffix(filepath.Base(filename), paths.HistorySuffix)
 	fullPath := filepath.Join(historyPath, filename)
 
 	data, err := os.ReadFile(fullPath)
