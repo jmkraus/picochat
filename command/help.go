@@ -16,7 +16,6 @@ var helpTopics = map[string][]string{
 		"  /message           Show the last message again (e.g., after load)",
 		"  /load              Load chat history from a file",
 		"  /save              Save current chat history to a file",
-		"  /list              List available saved history files",
 		"  /models            List downloaded models (and switch models)",
 		"  /clear             Clear session context",
 		"  /set               Set session variables (key=value)",
@@ -33,20 +32,19 @@ var helpTopics = map[string][]string{
 		"  Valid roles: system, user, assistant",
 	},
 	"load": {
+		"  /load              Show list of history files and request filename",
 		"  /load <filename>   Load the history file with name <filename>",
 		"  /load #<number>    Load the history file with index <number>",
-		"  If <filename> is omitted, the filename is requested by input line.",
 		"  If no filename is entered, the load is canceled.",
-		"  To use the index load, enter '/list' command first & check index.",
 	},
 	"message": {
-		"  /message           Shows the last entry in the chat history",
-		"  /message <role>    Shows the last entry of the given role",
+		"  /message           Show the last entry in the chat history",
+		"  /message <role>    Show the last entry of the given role",
 		"  Valid roles: system, user, assistant",
 	},
 	"models": {
-		"  /models            Lists the available models of the LLM server",
-		"  /models <number>   Loads the model by index <number>",
+		"  /models            List the available models of the LLM server",
+		"  /models <number>   Load the model by index <number>",
 		"  To use the load option, list the available models first & check index.",
 	},
 	"save": {

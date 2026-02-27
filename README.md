@@ -268,7 +268,6 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 | /message        | Show the last message again (e.g., after load)     |
 | /load           | Load chat history from a file                      |
 | /save           | Save current chat history to a file                |
-| /list           | List available saved history files                 |
 | /models         | List downloaded models (and switch models)         |
 | /clear          | Clear session context                              |
 | /set            | Set session variables (key=value)                  |
@@ -281,11 +280,9 @@ Some commands accept an argument:
 
 #### /load `<filename>`
 
-Without a filename, you'll be prompted to enter a name. If you leave it blank (just pressing *ENTER*), the load process is canceled.
+Without a filename, a list of available history files is shown, and you'll be prompted to enter a name or a '#' followed by an index number. If you leave it blank (just pressing *ENTER*), the load process is canceled.
 
 The filename alone is sufficient because the path is predefined (see above). The suffix can be omitted, as it defaults to `.chat`.
-
-If you've run `/list` before, it is also possible to load a session by index, e.g.: `/load #3`. The hash mark indicates that an index is given rather than a filename.
 
 
 #### /save `<filename>`

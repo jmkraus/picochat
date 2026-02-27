@@ -24,20 +24,18 @@ import (
 //	string - selected filename of the history session
 //	error  - Error msg if anything went wrong
 func getHistoryFilename(f string, input io.Reader) (string, error) {
-	filename, found := strings.CutPrefix(f, "#")
-	if found {
-		return getFilenameByIndex(filename)
-	}
-
-	if filename == "" {
+	if f == "" {
 		var err error
-		filename, err = promptForFilename(input)
+		f, err = promptForFilename(input)
 		if err != nil {
 			return "", err
 		}
 	}
 
-	return filename, nil
+	if n, ok := strings.CutPrefix(f, "#"); ok {
+		return getFilenameByIndex(n)
+	}
+	return f, nil
 }
 
 // getFilenameByIndex retrieves the filename corresponding to a given index string.
@@ -73,7 +71,7 @@ func getFilenameByIndex(indexStr string) (string, error) {
 //	string - the filename entered by the user
 //	error  - error if reading input fails
 func promptForFilename(input io.Reader) (string, error) {
-	fmt.Print("Enter filename to load: ")
+	fmt.Print("\nEnter filename or #<index> to load: ")
 	reader := bufio.NewReader(input)
 	inputLine, err := reader.ReadString('\n')
 	if err != nil {

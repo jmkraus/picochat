@@ -64,7 +64,7 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 	if result.Error != nil {
 		t.Fatalf("expected no error, got: %v", result.Error)
 	}
-	if result.Info != "History loaded successfully." {
+	if result.Info != "History file 'dummy.chat' loaded successfully." {
 		t.Fatalf("unexpected info: %q", result.Info)
 	}
 

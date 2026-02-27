@@ -39,7 +39,7 @@ type CommandResult struct {
 func HandleCommand(commandLine string, history *messages.ChatHistory, input io.Reader) CommandResult {
 	cfg, err := config.Get()
 	if err != nil {
-		return CommandResult{Error: fmt.Errorf("config read failed: %w", err)}
+		return CommandResult{Error: fmt.Errorf("read config failed: %w", err)}
 	}
 
 	cmd, args := parseCommandArgs(commandLine)
@@ -50,30 +50,39 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "test":
 		err := utils.CreateTestFile(cfg.URL)
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("test file save failed: %w", err)}
+			return CommandResult{Error: fmt.Errorf("save test file failed: %w", err)}
 		}
-		return CommandResult{Info: "Test file was created.", Quit: true}
+		return CommandResult{Info: "Test file created.", Quit: true}
 	case "bye":
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
 		name, err := history.SaveHistoryToFile(args)
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("history save failed: %w", err)}
+			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
 		return CommandResult{Info: fmt.Sprintf("History saved as '%s'", name)}
 	case "load":
-		filename, err := getHistoryFilename(args, input)
-		if err != nil {
-			return CommandResult{Error: fmt.Errorf("history load failed: %w", err)}
+		if args == "" {
+			files, err := utils.ListHistoryFiles()
+			if err != nil {
+				return CommandResult{Error: fmt.Errorf("list history files failed: %w", err)}
+			}
+			fmt.Println(files)
 		}
 
-		if len(filename) > 0 {
+		filename, err := getHistoryFilename(args, input)
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("get history filename failed: %w", err)}
+		}
+
+		if filename != "" {
+			filename = paths.EnsureSuffix(filename, messages.Suffix)
 			loaded, err := messages.LoadHistoryFromFile(filename)
 			if err != nil {
-				return CommandResult{Error: fmt.Errorf("history load failed: %w", err)}
+				return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}
 			}
 			history.Replace(loaded.Get())
-			return CommandResult{Info: "History loaded successfully."}
+			return CommandResult{Info: fmt.Sprintf("History file '%s' loaded successfully.", filename)}
 		} else {
 			return CommandResult{Info: "Load canceled."}
 		}
@@ -89,7 +98,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "info":
 		serverVersion, err := requests.GetServerVersion(cfg.URL)
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("fetching server version failed: %w", err)}
+			return CommandResult{Error: fmt.Errorf("fetch server version failed: %w", err)}
 		}
 
 		list := []string{
@@ -115,14 +124,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: msg}
 
 		}
-	case "list":
-		files, err := utils.ListHistoryFiles()
-		if err != nil {
-			return CommandResult{Error: fmt.Errorf("listing history files failed: %w", err)}
-		}
-		return CommandResult{Output: files}
 	case "copy":
 		info := "Last assistant prompt written to clipboard."
+		nothing := "Nothing to copy."
 		var lastAnswer string
 
 		if args == "" {
@@ -133,7 +137,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			lastMessage, found := history.GetLastRole(args)
 			if !found || lastMessage.Content == "" {
-				return CommandResult{Info: "Nothing to copy."}
+				return CommandResult{Info: nothing}
 			}
 			lastAnswer = lastMessage.Content
 			info = fmt.Sprintf("Last %s prompt written to clipboard.", args)
@@ -141,7 +145,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		case "think":
 			lastMessage, found := history.GetLastRole(messages.RoleAssistant)
 			if !found || (lastMessage.Content == "" && lastMessage.Reasoning == "") {
-				return CommandResult{Info: "Nothing to copy."}
+				return CommandResult{Info: nothing}
 			}
 			lastAnswer = encloseThinkingTags(lastMessage.Reasoning) + lastMessage.Content
 			info = "Last assistant prompt (with thinking) written to clipboard."
@@ -149,12 +153,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		case "code":
 			lastMessage, found := history.GetLastRole(messages.RoleAssistant)
 			if !found || lastMessage.Content == "" {
-				return CommandResult{Info: "Nothing to copy."}
+				return CommandResult{Info: nothing}
 			}
 			codeBlock, found := extractCodeBlock(lastMessage.Content)
 			info = "First code block written to clipboard."
 			if !found {
-				return CommandResult{Info: "Nothing to copy."}
+				return CommandResult{Info: nothing}
 			}
 			lastAnswer = codeBlock
 
@@ -182,7 +186,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if args == "" {
 			models, err := utils.ShowAvailableModels(cfg.URL)
 			if err != nil {
-				return CommandResult{Error: fmt.Errorf("models list failed: %w", err)}
+				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
 			}
 			return CommandResult{Output: models}
 		}
