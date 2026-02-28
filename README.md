@@ -82,7 +82,7 @@ On Windows, switch the shell to UTF-8 first for proper handling of non-Western c
 chcp 65001
 ```
 
-You can also pipe a PicoChat command via stdin. This is experimental, not thoroughly tested, and may have unexpected side effects. 
+You can also pipe a PicoChat command through stdin. Technically, all commands can be used, but not all are equally useful in pipes.
 ```
 echo "/models" | picochat -quiet
 ```
@@ -278,7 +278,7 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 
 Some commands accept an argument:
 
-#### /load `<filename>`
+#### /load `<filename>` or /load `#<index>`
 
 Without a filename, a list of available history files is shown, and you'll be prompted to enter a name or a '#' followed by an index number. If you leave it blank (just pressing *ENTER*), the load process is canceled.
 
