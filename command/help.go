@@ -56,14 +56,27 @@ var helpTopics = map[string][]string{
 		"  /set <key=value>   Set the parameter <key> to new setting <value>",
 		"  Example: /set temperature=0.7",
 	},
+	"envs": {
+		"  PICOCHAT_URL         (string)",
+		"  PICOCHAT_MODEL       (string)",
+		"  PICOCHAT_CONTEXT     (integer)",
+		"  PICOCHAT_TEMPERATURE (float)",
+		"  PICOCHAT_TOP_P       (float)",
+		"  PICOCHAT_REASONING   (boolean)",
+		"  PICOCHAT_QUIET       (boolean)",
+	},
 }
 
 func HelpText(topic string) string {
 	topic = strings.ToLower(strings.TrimSpace(topic))
+	header := "Available commands:"
 
 	if lines, ok := helpTopics[topic]; ok {
-		help := append([]string{"Available commands:"}, lines...)
+		if topic != "" {
+			header = fmt.Sprintf("Details for %s", topic)
+		}
+		help := append([]string{header}, lines...)
 		return strings.Join(help, "\n")
 	}
-	return fmt.Sprintf("No help available for: %s. Use /help for a list of commands.", topic)
+	return fmt.Sprintf("No help available for: %s. Use /? for a list of commands.", topic)
 }
