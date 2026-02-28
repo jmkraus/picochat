@@ -22,12 +22,12 @@ import (
 func GetAvailableModels(apiBaseURL string) ([]string, error) {
 	tagsURL, err := BuildCleanUrl(apiBaseURL, "tags")
 	if err != nil {
-		return nil, fmt.Errorf("error fetching models: %w", err)
+		return nil, fmt.Errorf("fetch models failed: %w", err)
 	}
 
 	resp, err := http.Get(tagsURL)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching models: %w", err)
+		return nil, fmt.Errorf("fetch models failed: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -38,7 +38,7 @@ func GetAvailableModels(apiBaseURL string) ([]string, error) {
 
 	var result ModelTagsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("error decoding response: %w", err)
+		return nil, fmt.Errorf("decode response failed: %w", err)
 	}
 
 	var names []string
@@ -62,12 +62,12 @@ func GetAvailableModels(apiBaseURL string) ([]string, error) {
 func GetServerVersion(apiBaseURL string) (string, error) {
 	versionURL, err := BuildCleanUrl(apiBaseURL, "version")
 	if err != nil {
-		return "", fmt.Errorf("error fetching version: %w", err)
+		return "", fmt.Errorf("fetch version failed: %w", err)
 	}
 
 	resp, err := http.Get(versionURL)
 	if err != nil {
-		return "", fmt.Errorf("error fetching version: %w", err)
+		return "", fmt.Errorf("fetch version failed: %w", err)
 	}
 	defer resp.Body.Close()
 

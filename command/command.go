@@ -60,7 +60,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
-		return CommandResult{Info: fmt.Sprintf("History saved as '%s'", name)}
+		return CommandResult{Info: fmt.Sprintf("History saved as %s", name)}
 	case "load":
 		if args == "" {
 			files, err := utils.ListHistoryFiles()
@@ -82,7 +82,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}
 			}
 			history.Replace(loaded.Get())
-			return CommandResult{Info: fmt.Sprintf("History file '%s' loaded successfully.", filename)}
+			return CommandResult{Info: fmt.Sprintf("History file %s loaded successfully.", filename)}
 		} else {
 			return CommandResult{Info: "Load canceled."}
 		}
