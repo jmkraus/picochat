@@ -32,7 +32,7 @@ import (
 func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (*ChatResult, error) {
 	cfg, err := getConfig(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("config load failed: %w", err)
+		return nil, fmt.Errorf("read config failed: %w", err)
 	}
 
 	// evaluate reasoning
@@ -58,7 +58,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return nil, fmt.Errorf("json marshal failed: %w", err)
+		return nil, fmt.Errorf("marshal json failed: %w", err)
 	}
 
 	chatURL, err := requests.BuildCleanUrl(cfg.URL, "chat")
@@ -78,7 +78,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	var fullContent strings.Builder
 
 	seconds := 0
-	elapsed := "--:--"
+	elapsed := "0m 0s"
 	firstToken := true
 	firstContent := true
 	streamPlain := cfg.OutputFmt == "plain"
@@ -89,7 +89,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			if err == io.EOF {
 				break
 			}
-			return nil, fmt.Errorf("decode stream failed: %w", err)
+			return nil, fmt.Errorf("decode response failed: %w", err)
 		}
 
 		if (res.Message.Content != "" ||
@@ -133,7 +133,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	if fullContent.Len() == 0 {
 		console.StopSpinner(cfg.Quiet, stop)
-		return nil, fmt.Errorf("no content received from model %s — config issue or invalid model?", cfg.Model)
+		return nil, fmt.Errorf("no content received from model %s", cfg.Model)
 	}
 
 	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), fullContent.String())
