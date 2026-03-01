@@ -57,13 +57,15 @@ var helpTopics = map[string][]string{
 		"  Example: /set temperature=0.7",
 	},
 	"envs": {
-		"  PICOCHAT_URL         (string)",
-		"  PICOCHAT_MODEL       (string)",
-		"  PICOCHAT_CONTEXT     (integer)",
-		"  PICOCHAT_TEMPERATURE (float)",
-		"  PICOCHAT_TOP_P       (float)",
-		"  PICOCHAT_REASONING   (boolean)",
-		"  PICOCHAT_QUIET       (boolean)",
+		"  Env                   Type       Default",
+		"  --------------------- ---------- --------------------------",
+		"  PICOCHAT_URL          (string)   http://localhost:11434/api",
+		"  PICOCHAT_MODEL        (string)   gpt-oss:latest",
+		"  PICOCHAT_CONTEXT      (integer)  20",
+		"  PICOCHAT_TEMPERATURE  (float)    0.7",
+		"  PICOCHAT_TOP_P        (float)    0.9",
+		"  PICOCHAT_REASONING    (boolean)  0",
+		"  PICOCHAT_QUIET        (boolean)  0",
 	},
 }
 
