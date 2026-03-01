@@ -66,6 +66,20 @@ func NewLine(quiet bool) {
 	fmt.Println()
 }
 
+// SetCursorPos places the cursor into the given column
+//
+// Parameters:
+//
+//	col (int) - the column of the new cursor position
+//
+// Returns:
+//
+//	none
+func SetCursorPos(col int) {
+	fmt.Printf(CursorToColumn, col)
+
+}
+
 // colorize is a Helper function for enclosing text in color esc sequences.
 //
 // Parameters:

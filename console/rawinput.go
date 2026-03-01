@@ -263,17 +263,17 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 	prefixWidth := 0
 	if firstLine {
 		prefix = Prompt
-		prefixWidth = runewidth.StringWidth(Prompt)
+		prefixWidth = PromptWidth()
 	}
 
 	visualPos := visualWidth(line, cursorPos)
 
 	if firstLine && len(line) == 0 {
-		fmt.Print(prefix + Shadow)
+		fmt.Print(Prompt + Shadow)
 	} else {
 		fmt.Print(prefix + string(line))
 	}
-	fmt.Printf(CursorToColumn, visualPos+prefixWidth+1)
+	SetCursorPos(visualPos + prefixWidth + 1)
 }
 
 // visualWidth calculates the visual display width of a rune slice up to

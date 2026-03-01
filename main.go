@@ -23,7 +23,7 @@ type Session struct {
 
 func sendPrompt(session *Session, prompt string) {
 	if err := session.History.AddUser(prompt, session.Config.ImagePath); err != nil {
-		console.Error(fmt.Sprintf("%v", err))
+		console.Error(err.Error())
 		return
 	}
 
@@ -53,7 +53,7 @@ func runChat(session *Session) {
 
 	result, err := chat.HandleChat(session.Config, session.History, stop)
 	if err != nil {
-		console.Error(fmt.Sprintf("%v", err))
+		console.Error(err.Error())
 		return
 	}
 
@@ -114,7 +114,8 @@ func main() {
 	if *args.Image != "" {
 		cfg.ImagePath = *args.Image
 		if !paths.FileExists(cfg.ImagePath) {
-			console.Warn("image file not found")
+			console.Error("image file not found")
+			os.Exit(1)
 		}
 	}
 
@@ -137,15 +138,16 @@ func main() {
 
 	if !session.Quiet {
 		if *args.Model != "" {
-			console.Info(fmt.Sprintf("Configuration overridden by model='%s'", cfg.Model))
+			console.Info(fmt.Sprintf("Configuration overridden by model=%s", cfg.Model))
 		}
 		console.Info("PicoChat started.")
 	}
 
 	for {
 		if !session.Quiet {
-			fmt.Printf("\n%s", console.Prompt+console.Shadow)
-			fmt.Printf(console.CursorToColumn, console.PromptWidth()+1)
+			fmt.Println()
+			fmt.Print(console.Prompt + console.Shadow)
+			console.SetCursorPos(console.PromptWidth() + 1)
 		}
 
 		input := console.ReadMultilineInput()
@@ -155,8 +157,10 @@ func main() {
 		}
 
 		if input.Aborted {
-			fmt.Println()
-			console.Info("Input canceled.")
+			if !session.Quiet {
+				console.NewLine(session.Quiet)
+				console.Info("Input canceled.")
+			}
 			continue
 		}
 
@@ -172,7 +176,7 @@ func main() {
 
 		if input.IsCommand {
 			console.NewLine(session.Quiet)
-			result := command.HandleCommand(input.Text, history, os.Stdin)
+			result := command.HandleCommand(input.Text, session.History, os.Stdin)
 			if result.Error != nil {
 				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
 			}
