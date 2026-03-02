@@ -39,6 +39,7 @@ var helpTopics = map[string][]string{
 	},
 	"message": {
 		"  /message           Show the last entry in the chat history",
+		"  /message #<number> Show the message with index <number>",
 		"  /message <role>    Show the last entry of the given role",
 		"  Valid roles: system, user, assistant",
 	},
