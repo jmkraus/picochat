@@ -162,6 +162,24 @@ func (h *ChatHistory) GetLastRole(role string) (Message, bool) {
 	return Message{}, false
 }
 
+// GetByIndex returns the message with the given index
+//
+// Parameters:
+//
+//	index (int) - the index of the message in the history
+//
+// Returns:
+//
+//	Message - Struct containing the message
+//	error   - error if any
+func (h *ChatHistory) GetByIndex(index int) (Message, error) {
+	if index < 0 || index >= h.Len() {
+		return Message{}, fmt.Errorf("index %d out of bounds", index)
+	}
+
+	return h.Messages[index], nil
+}
+
 // Replace replaces the entire message slice with newMessages.
 //
 // Parameters:

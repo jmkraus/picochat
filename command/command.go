@@ -112,6 +112,19 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		return CommandResult{Output: utils.FormatList(list, "Server info", false)}
 	case "message":
+		ok := false
+		if args, ok = strings.CutPrefix(args, "#"); ok {
+			index, err := strconv.Atoi(args)
+			if err != nil {
+				return CommandResult{Error: fmt.Errorf("get message failed: value not an integer")}
+			}
+			msg, err := history.GetByIndex(index)
+			if err != nil {
+				return CommandResult{Error: fmt.Errorf("get message failed: %w", err)}
+			}
+			return CommandResult{Output: fmt.Sprintf("(%s)\n%s", msg.Role, msg.Content)}
+		}
+
 		switch args {
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			msg, found := history.GetLastRole(args)
