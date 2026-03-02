@@ -98,14 +98,14 @@ func TestHandleChat_BrokenStream(t *testing.T) {
 	history.AddUser("test", "")
 
 	_, err := dummyHandleChat(cfg, history)
-	if err == nil || !strings.Contains(err.Error(), "stream") {
-		t.Errorf("expected stream decoding error, got: %v", err)
+	if err == nil || !strings.Contains(err.Error(), "decode response") {
+		t.Errorf("expected decode response failed, got: %v", err)
 	}
 }
 
 func prematureEOFHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, `{"message":{"content":"Teilantwort"}}`) // no done==True
+	fmt.Fprintln(w, `{"message":{"content":"Partial answer"}}`) // no done==True
 	// then EOF
 }
 
@@ -125,9 +125,9 @@ func TestHandleChat_EOFWithoutDone(t *testing.T) {
 		t.Errorf("expected no error despite missing done=true, got: %v", err)
 	}
 
-	// Optional: Test, ob Antwort trotzdem gespeichert wurde
+	// Optional: Test, if partial answer has ben stored nevertheless
 	last := history.Get()[len(history.Get())-1]
-	if !strings.Contains(last.Content, "Teilantwort") {
+	if !strings.Contains(last.Content, "Partial answer") {
 		t.Errorf("expected partial content, got: %v", last.Content)
 	}
 }
