@@ -421,3 +421,24 @@ func CalculateTokens(s string) float64 {
 	words := strings.Fields(s)
 	return float64(len(words)) * 1.3
 }
+
+func (h *ChatHistory) FullConversation() string {
+	var builder strings.Builder
+
+	for _, msg := range h.Messages {
+		header := console.Bold + "(" + msg.Role + ")" + console.Regular
+		output := ""
+		switch msg.Role {
+		case "system":
+			output = console.Colorize(console.Magenta, fmt.Sprintf("%s\n%s", header, msg.Content))
+		case "user":
+			output = console.Colorize(console.Cyan, fmt.Sprintf("%s\n%s", header, msg.Content))
+		case "assistant":
+			output = fmt.Sprintf("%s\n%s", header, msg.Content)
+		}
+		builder.WriteString(output)
+		builder.WriteString("\n\n") // Maintains the double newline between messages
+	}
+
+	return builder.String()
+}

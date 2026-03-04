@@ -126,6 +126,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		switch args {
+		case "all":
+			conversation := history.FullConversation()
+			return CommandResult{Output: conversation}
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			msg, found := history.GetLastRole(args)
 			if found {

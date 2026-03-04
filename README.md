@@ -313,13 +313,17 @@ With an argument the parameter values can be changed for the current session, e.
 These changes aren't persisted and cannot be saved. For permanent changes, edit the values in `config.toml`.
 
 
-#### /message `<role>`
+#### /message `<role>`; /message `#<index>`; /message `all`
 
 Without an argument, the last entry of the chat history (usually an assistant answer) will be shown.
 
 With one of the possible roles (system, user, assistant), you can choose the most recent entry for a specific role.
 
 For example, `/message user` displays the last user question again.
+
+With a given index, the respective element is shown, e.g., `/message #0` shows the initial system prompt.
+
+If you want a full conversation with all elemeents, then `/message all` shows the entire conversation so far, with each role printed in a different color.
 
 
 ### Image processing

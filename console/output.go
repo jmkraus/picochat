@@ -90,7 +90,7 @@ func SetCursorPos(col int) {
 // Returns:
 //
 //	string - text enclosed in esc sequences
-func colorize(color, text string) string {
+func Colorize(color, text string) string {
 	return color + text + ColorReset
 }
 
@@ -106,7 +106,7 @@ func colorize(color, text string) string {
 //
 //	none
 func colorPrint(color string, newline bool, a ...any) {
-	text := colorize(color, fmt.Sprint(a...))
+	text := Colorize(color, fmt.Sprint(a...))
 	if newline {
 		fmt.Println(text)
 	} else {

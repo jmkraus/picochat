@@ -81,6 +81,7 @@ const (
 	BgLightGray256 = "\033[48;5;252m"
 
 	// Style
+	Regular     string = "\033[22m"
 	Bold        string = "\033[1m"
 	Italics     string = "\033[3m"
 	BoldItalics string = "\033[1;3m"
