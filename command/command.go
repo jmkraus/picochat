@@ -253,7 +253,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Info: "History cleared (system prompt retained)."}
 	case "help":
-		return CommandResult{Info: HelpText(args)}
+		return CommandResult{Output: HelpText(args)}
 	default:
 		return CommandResult{Error: fmt.Errorf("unknown command")}
 	}
