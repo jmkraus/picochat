@@ -26,7 +26,7 @@ func TestHandleClear(t *testing.T) {
 func TestHandleHelp(t *testing.T) {
 	h := messages.NewHistory("prompt", 50)
 	result := command.HandleCommand("/help", h, strings.NewReader(""))
-	if !strings.Contains(result.Info, "/save") {
+	if !strings.Contains(result.Output, "/save") {
 		t.Errorf("expected help to contain /save, got: %s", result.Info)
 	}
 }
