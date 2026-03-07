@@ -44,22 +44,3 @@ var ConfigEnvVars = []Config{
 func GetEnv(envvar EnvVar) string {
 	return os.Getenv(string(envvar))
 }
-
-// GetSetEnvVars returns a list of set variables.
-//
-// Parameters:
-//
-//	vars ([]EnvVar) - slice of envvars
-//
-// Returns:
-//
-//	[]EnvVar - slice of set envvars
-func GetSetEnvVars(vars []EnvVar) []EnvVar {
-	out := make([]EnvVar, 0, len(vars))
-	for _, k := range vars {
-		if GetEnv(k) != "" {
-			out = append(out, k)
-		}
-	}
-	return out
-}
