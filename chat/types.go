@@ -18,8 +18,8 @@ type Reasoning struct {
 
 type ChatOptions struct {
 	Temperature   float64 `json:"temperature,omitempty"`
-	TopP          float64 `json:"top_p,omitempty"`
-	TopK          int     `json:"top_k,omitempty"`
+	Top_p         float64 `json:"top_p,omitempty"`
+	Top_k         int     `json:"top_k,omitempty"`
 	RepeatPenalty float64 `json:"repeat_penalty,omitempty"`
 	NumCtx        int     `json:"num_ctx,omitempty"`
 }

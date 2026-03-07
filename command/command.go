@@ -6,6 +6,8 @@ import (
 	"math"
 	"picochat/clipb"
 	"picochat/config"
+	"picochat/console"
+	"picochat/convert"
 	"picochat/messages"
 	"picochat/paths"
 	"picochat/requests"
@@ -60,7 +62,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
-		return CommandResult{Info: fmt.Sprintf("History saved as %s", name)}
+		return CommandResult{Info: fmt.Sprintf("History saved as %s.", name)}
 	case "load":
 		if args == "" {
 			files, err := utils.ListHistoryFiles()
@@ -82,7 +84,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}
 			}
 			history.Replace(loaded.Get())
-			return CommandResult{Info: fmt.Sprintf("History file %s loaded successfully.", filename)}
+			return CommandResult{Info: fmt.Sprintf("History file %s loaded.", filename)}
 		} else {
 			return CommandResult{Info: "Load canceled."}
 		}
@@ -122,7 +124,8 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("get message failed: %w", err)}
 			}
-			return CommandResult{Output: fmt.Sprintf("(%s)\n%s", msg.Role, msg.Content)}
+			role := console.Bold + "(" + msg.Role + ")" + console.Regular
+			return CommandResult{Output: fmt.Sprintf("%s\n%s", role, msg.Content)}
 		}
 
 		switch args {
@@ -224,14 +227,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				fmt.Sprintf("model = %s", cfg.Model),
 				fmt.Sprintf("context = %d", cfg.Context),
 				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
-				fmt.Sprintf("top_p = %.2f", cfg.TopP),
+				fmt.Sprintf("top_p = %.2f", cfg.Top_p),
 				fmt.Sprintf("reasoning = %t", cfg.Reasoning),
 			}
-
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}
 
-		key, value, err := parseArgs(args)
+		key, value, err := convert.ParseKeyVal(args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
@@ -240,16 +242,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("apply to config failed: %w", err)}
 		}
 		if key == "context" {
-			intVal, ok := value.(int)
-			if !ok {
-				return CommandResult{Error: fmt.Errorf("value not an integer")}
-			}
+			intVal, _ := value.(int)
 			err := history.SetContextSize(intVal)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("set context size failed: %w", err)}
 			}
 		}
-		return CommandResult{Info: fmt.Sprintf("Config updated: %s = %v", key, value)}
+		return CommandResult{Info: fmt.Sprintf("Config updated: %s = %v.", key, value)}
 	case "clear":
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Info: "History cleared (system prompt retained)."}

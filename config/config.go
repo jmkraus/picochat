@@ -2,9 +2,7 @@ package config
 
 import (
 	"fmt"
-	"picochat/envs"
 	"picochat/paths"
-	"strconv"
 	"sync"
 
 	"github.com/BurntSushi/toml"
@@ -16,7 +14,7 @@ type Config struct {
 	Prompt      string
 	Context     int
 	Temperature float64
-	TopP        float64
+	Top_p       float64
 	Reasoning   bool
 	Quiet       bool
 
@@ -60,7 +58,7 @@ func load() {
 		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
 		Context:     20,
 		Temperature: 0.7,
-		TopP:        0.9,
+		Top_p:       0.9,
 		Reasoning:   false,
 		Quiet:       false,
 	}
@@ -73,12 +71,6 @@ func load() {
 		}
 	} else {
 		path = "No config.toml found - fallback to internal defaults"
-	}
-
-	// 3. Environment variables
-	if err := applyEnvOverrides(&cfg); err != nil {
-		loadErr = fmt.Errorf("set config with env vars failed: %w", err)
-		return
 	}
 
 	if cfg.Context < MinCtx || cfg.Context > MaxCtx {
@@ -160,89 +152,11 @@ func Set(key string, value any) error {
 		if !ok {
 			return fmt.Errorf("value for key '%s' must be a float", key)
 		}
-		cfg.TopP = floatVal
+		cfg.Top_p = floatVal
 		return nil
 
 	default:
-		// Don't forget to update command/parser.go --> validateAndConvert()
+		// Don't forget to update convert/convert.go --> ValidateAndConvert()
 		return fmt.Errorf("unsupported config key '%s'", key)
-	}
-}
-
-// applyEnvOverrides checks all environment variables if set
-// and updates the respective config entry accordingly.
-//
-// Parameters:
-//
-//	cfg (*Config) - the instance of the Config struct
-//
-// Returns:
-//
-//	error - error if any
-func applyEnvOverrides(cfg *Config) error {
-	if v := envs.GetEnv(envs.PICOCHAT_URL); v != "" {
-		cfg.URL = v
-	}
-	if v := envs.GetEnv(envs.PICOCHAT_MODEL); v != "" {
-		cfg.Model = v
-	}
-	if v := envs.GetEnv(envs.PICOCHAT_CONTEXT); v != "" {
-		n, err := strconv.Atoi(v)
-		if err != nil {
-			return fmt.Errorf("invalid %s %q: %w", envs.PICOCHAT_CONTEXT, v, err)
-		}
-		cfg.Context = n
-	}
-	if v := envs.GetEnv(envs.PICOCHAT_TEMPERATURE); v != "" {
-		f, err := strconv.ParseFloat(v, 64)
-		if err != nil {
-			return fmt.Errorf("invalid %s %q: %w", envs.PICOCHAT_TEMPERATURE, v, err)
-		}
-		cfg.Temperature = f
-	}
-	if v := envs.GetEnv(envs.PICOCHAT_TOP_P); v != "" {
-		f, err := strconv.ParseFloat(v, 64)
-		if err != nil {
-			return fmt.Errorf("invalid %s %q: %w", envs.PICOCHAT_TOP_P, v, err)
-		}
-		cfg.TopP = f
-	}
-	if v := envs.GetEnv(envs.PICOCHAT_REASONING); v != "" {
-		b, err := parseBool01(v)
-		if err != nil {
-			return fmt.Errorf("invalid %s %q: %w", envs.PICOCHAT_REASONING, v, err)
-		}
-		cfg.Reasoning = b
-	}
-	if v := envs.GetEnv(envs.PICOCHAT_QUIET); v != "" {
-		b, err := parseBool01(v)
-		if err != nil {
-			return fmt.Errorf("invalid %s %q: %w", envs.PICOCHAT_QUIET, v, err)
-		}
-		cfg.Quiet = b
-	}
-
-	return nil
-}
-
-// parseBool01 is a helper function, checking for 0 or 1
-// and returning a matching boolean value.
-//
-// Parameters:
-//
-//	s (string) - the value to be parsed
-//
-// Returns:
-//
-//	bool  - the parsed boolean value
-//	error - error if any
-func parseBool01(s string) (bool, error) {
-	switch s {
-	case "0":
-		return false, nil
-	case "1":
-		return true, nil
-	default:
-		return false, fmt.Errorf("expected 0 or 1")
 	}
 }

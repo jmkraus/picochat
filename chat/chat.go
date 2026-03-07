@@ -51,7 +51,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		Think:     cfg.Reasoning,
 		Options: &ChatOptions{
 			Temperature: cfg.Temperature,
-			TopP:        cfg.TopP,
+			Top_p:       cfg.Top_p,
 		},
 		Format: cfg.SchemaFmt,
 	}

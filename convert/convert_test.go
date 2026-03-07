@@ -1,4 +1,4 @@
-package command
+package convert
 
 import (
 	"reflect"
@@ -18,7 +18,7 @@ func TestParseArgs_Valid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		key, val, err := parseArgs(tt.input)
+		key, val, err := ParseKeyVal(tt.input)
 		if err != nil {
 			t.Errorf("unexpected error for input %q: %v", tt.input, err)
 			continue
@@ -43,7 +43,7 @@ func TestParseArgs_Invalid(t *testing.T) {
 	}
 
 	for _, input := range tests {
-		_, _, err := parseArgs(input)
+		_, _, err := ParseKeyVal(input)
 		if err == nil {
 			t.Errorf("expected error for input %q, got nil", input)
 		}

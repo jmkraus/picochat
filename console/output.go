@@ -5,8 +5,11 @@ import (
 	"os"
 )
 
+const info_prefix string = BrightGreen + Bold + "✓" + ColorReset
+const warn_prefix string = BrightYellow + Bold + "⚠" + ColorReset
 const err_prefix string = BrightRed + Bold + "×" + ColorReset
-const warn_prefix string = BrightYellow + Bold + "!" + ColorReset
+
+// const warn_prefix string = BrightYellow + Bold + "!" + ColorReset
 
 // Error prints a custom error message to stderr
 //
@@ -47,7 +50,7 @@ func Warn(msg string) {
 //	none
 func Info(msg string) {
 	fmt.Print(ClearLine)
-	fmt.Fprintln(os.Stdout, msg)
+	fmt.Fprintf(os.Stdout, "%s %s\n", info_prefix, msg)
 }
 
 // NewLine writes a newline if the current mode isn't "quiet".

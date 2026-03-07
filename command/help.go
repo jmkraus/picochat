@@ -58,17 +58,6 @@ var helpTopics = map[string][]string{
 		"  /set <key=value>   Set the parameter <key> to new setting <value>",
 		"  Example: /set temperature=0.7",
 	},
-	"envs": {
-		"  Env                   Type       Default",
-		"  --------------------- ---------- --------------------------",
-		"  PICOCHAT_URL          (string)   http://localhost:11434/api",
-		"  PICOCHAT_MODEL        (string)   gpt-oss:latest",
-		"  PICOCHAT_CONTEXT      (integer)  20",
-		"  PICOCHAT_TEMPERATURE  (float)    0.7",
-		"  PICOCHAT_TOP_P        (float)    0.9",
-		"  PICOCHAT_REASONING    (boolean)  0",
-		"  PICOCHAT_QUIET        (boolean)  0",
-	},
 }
 
 func HelpText(topic string) string {

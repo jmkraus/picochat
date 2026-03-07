@@ -11,28 +11,28 @@ const (
 	CONFIG_PATH     EnvVar = "CONFIG_PATH"
 	TMUX            EnvVar = "TMUX"
 	XDG_CONFIG_HOME EnvVar = "XDG_CONFIG_HOME"
-
-	PICOCHAT_URL         EnvVar = "PICOCHAT_URL"
-	PICOCHAT_MODEL       EnvVar = "PICOCHAT_MODEL"
-	PICOCHAT_CONTEXT     EnvVar = "PICOCHAT_CONTEXT"
-	PICOCHAT_TEMPERATURE EnvVar = "PICOCHAT_TEMPERATURE"
-	PICOCHAT_TOP_P       EnvVar = "PICOCHAT_TOP_P"
-	PICOCHAT_REASONING   EnvVar = "PICOCHAT_REASONING"
-	PICOCHAT_QUIET       EnvVar = "PICOCHAT_QUIET"
 )
 
-var PicochatEnvVars = []EnvVar{
-	PICOCHAT_URL,
-	PICOCHAT_MODEL,
-	PICOCHAT_CONTEXT,
-	PICOCHAT_TEMPERATURE,
-	PICOCHAT_TOP_P,
-	PICOCHAT_REASONING,
-	PICOCHAT_QUIET,
+// Preparation for future use
+type Config struct {
+	Env     string
+	Type    string
+	Field   string
+	Default any
+}
+
+var ConfigEnvVars = []Config{
+	{Env: "PICOCHAT_URL", Type: "string", Field: "url", Default: "http://localhost:11434/api"},
+	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model", Default: "gpt-oss:latest"},
+	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context", Default: 20},
+	{Env: "PICOCHAT_TEMPERATURE", Type: "float", Field: "temperature", Default: 0.70},
+	{Env: "PICOCHAT_TOP_P", Type: "float", Field: "top_p", Default: 0.90},
+	{Env: "PICOCHAT_REASONING", Type: "bool", Field: "reasoning", Default: false},
+	{Env: "PICOCHAT_QUIET", Type: "bool", Field: "quiet", Default: false},
 }
 
 // GetEnv encapsulates reading environment variables
-// and ensures with the use of constants proper naming.
+// and ensures with the use of constants their proper naming.
 //
 // Parameters:
 //

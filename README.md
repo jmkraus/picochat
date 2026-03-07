@@ -247,7 +247,7 @@ PicoChat currently supports the following configurable values in the config file
 | `Model`       | string  | Model name (must already be downloaded)                                         |
 | `Context`     | integer | Context size (a value between 3 and 100) i.e., the maximum number of messages!  |
 | `Temperature` | float   | Model temperature                                                               |
-| `TopP`        | float   | Model top-p value                                                               |
+| `Top_p`       | float   | Model top_p value                                                               |
 | `Prompt`      | string  | System prompt ("persona") used to specify a skill or background.                |
 | `Quiet`       | bool    | Suppresses all messages (except for errors)                                     |
 | `Reasoning`   | bool    | Enables or disables reasoning                                                   |

@@ -8,8 +8,8 @@ import (
 	"picochat/command"
 	"picochat/config"
 	"picochat/console"
-	"picochat/format"
 	"picochat/messages"
+	"picochat/output"
 	"picochat/paths"
 	"picochat/utils"
 	"picochat/version"
@@ -57,7 +57,7 @@ func runChat(session *Session) {
 		return
 	}
 
-	if err := format.RenderResult(
+	if err := output.RenderResult(
 		os.Stdout,
 		result,
 		session.Config.OutputFmt,
@@ -71,7 +71,8 @@ func main() {
 	args.Parse()
 
 	if *args.ShowVersion {
-		console.Info(fmt.Sprintf("picochat version is %s", version.Version))
+		fmt.Printf("picochat version is %s", version.Version)
+		fmt.Println()
 		os.Exit(0)
 	}
 
@@ -89,7 +90,7 @@ func main() {
 	if *args.Output == "" {
 		cfg.OutputFmt = "plain" // default
 	} else {
-		f, ok := format.AllowedKeys(*args.Output)
+		f, ok := output.AllowedKeys(*args.Output)
 		cfg.OutputFmt = f
 		if !ok {
 			cfg.OutputFmt = "plain"
@@ -158,7 +159,7 @@ func main() {
 
 		if input.Aborted {
 			if !session.Quiet {
-				console.NewLine(session.Quiet)
+				console.NewLine(false)
 				console.Info("Input canceled.")
 			}
 			continue
