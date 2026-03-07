@@ -3,7 +3,7 @@ URL = "http://localhost:11434/api"
 Model = "Devstral-Small-2507-4bit-DWQ"
 Context = 50
 Temperature = 0.10
-TopP = 0.90
+Top_p = 0.90
 Prompt = """
 You are an experienced software engineer with deep knowledge of computer science fundamentals, software design patterns, and modern development practices. 
 When the answer involves the review of the existing code: 

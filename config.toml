@@ -4,5 +4,5 @@ Model = "DeepSeek-R1-Distill-Qwen-14B-6bit"
 Quiet = false
 Context = 20
 Temperature = 0.70
-TopP = 0.90
+Top_p = 0.90
 Prompt = "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging."
