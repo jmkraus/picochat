@@ -193,7 +193,7 @@ func applyEnvValues(cfg *Config) error {
 
 		v, err := convert.TypeConvert(spec.Type, envVal)
 		if err != nil {
-			return fmt.Errorf("convert value failed: %w", err)
+			return fmt.Errorf("convert type for env %s failed: %w", spec.Env, err)
 		}
 		applyConfigValue(cfg, spec.Field, v)
 	}
