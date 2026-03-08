@@ -64,13 +64,13 @@ func TypeConvert(varType, value string) (any, error) {
 	case "float":
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid float value '%s'", varType)
+			return nil, fmt.Errorf("invalid float value '%s'", value)
 		}
 		return v, nil
 	case "int":
 		v, err := strconv.Atoi(value)
 		if err != nil {
-			return nil, fmt.Errorf("invalid integer value '%s'", varType)
+			return nil, fmt.Errorf("invalid integer value '%s'", value)
 		}
 		return v, nil
 	case "string":
