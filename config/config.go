@@ -128,15 +128,21 @@ func Set(key string, value any) error {
 	if err != nil {
 		return fmt.Errorf("cannot apply config change: %w", err)
 	}
+
 	if !envs.AllowedRuntimeField(key) {
 		return fmt.Errorf("unsupported config key '%s'", key)
 	}
-	if err := applyConfig(cfg, key, value); err != nil {
+
+	next := *cfg // work on copy to avoid compromised config
+	if err := applyConfig(&next, key, value); err != nil {
 		return fmt.Errorf("apply config failed: %w", err)
 	}
-	if key == "context" && (cfg.Context < MinCtx || cfg.Context > MaxCtx) {
+
+	if key == "context" && (next.Context < MinCtx || next.Context > MaxCtx) {
 		return fmt.Errorf("context size must be between %d and %d", MinCtx, MaxCtx)
 	}
+
+	*cfg = next
 	return nil
 }
 

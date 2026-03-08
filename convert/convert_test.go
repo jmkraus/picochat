@@ -1,6 +1,8 @@
 package convert
 
 import (
+	"fmt"
+	"picochat/envs"
 	"reflect"
 	"testing"
 )
@@ -48,6 +50,35 @@ func TestParseArgs_Invalid(t *testing.T) {
 		_, _, err := ParseKeyVal(input)
 		if err == nil {
 			t.Errorf("expected error for input %q, got nil", input)
+		}
+	}
+}
+
+// Ensures envs runtime schema and ParseKeyVal stay in sync.
+func TestParseKeyVal_RuntimeFieldsFromEnvSpec(t *testing.T) {
+	for _, spec := range envs.ConfigEnvVars {
+		var sample string
+		switch spec.Type {
+		case "string":
+			sample = "abc"
+		case "int":
+			sample = "7"
+		case "float":
+			sample = "0.5"
+		case "bool":
+			sample = "true"
+		default:
+			t.Fatalf("unsupported spec type %q for field %q", spec.Type, spec.Field)
+		}
+
+		input := fmt.Sprintf("%s=%s", spec.Field, sample)
+		_, _, err := ParseKeyVal(input)
+
+		if spec.Runtime && err != nil {
+			t.Errorf("expected runtime field %q to parse, got error: %v", spec.Field, err)
+		}
+		if !spec.Runtime && err == nil {
+			t.Errorf("expected non-runtime field %q to be rejected", spec.Field)
 		}
 	}
 }

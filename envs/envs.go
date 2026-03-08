@@ -13,15 +13,14 @@ const (
 	XDG_CONFIG_HOME EnvVar = "XDG_CONFIG_HOME"
 )
 
-// Preparation for future use
-type Config struct {
+type EnvSpec struct {
 	Env     string
 	Type    string
 	Field   string
 	Runtime bool
 }
 
-var ConfigEnvVars = []Config{
+var ConfigEnvVars = []EnvSpec{
 	{Env: "PICOCHAT_URL", Type: "string", Field: "url", Runtime: false},
 	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model", Runtime: true},
 	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context", Runtime: true},
@@ -32,11 +31,11 @@ var ConfigEnvVars = []Config{
 }
 
 var allowedRuntimeFields map[string]bool
-var configByField map[string]Config
+var configByField map[string]EnvSpec
 
 func init() {
 	allowedRuntimeFields = make(map[string]bool, len(ConfigEnvVars))
-	configByField = make(map[string]Config, len(ConfigEnvVars))
+	configByField = make(map[string]EnvSpec, len(ConfigEnvVars))
 	for _, v := range ConfigEnvVars {
 		configByField[v.Field] = v
 		if v.Runtime {
@@ -80,9 +79,9 @@ func AllowedRuntimeField(field string) bool {
 //
 // Returns:
 //
-//	Config - metadata for the field
-//	bool   - true if field exists
-func ConfigByField(field string) (Config, bool) {
+//	EnvSpec - metadata for the field
+//	bool    - true if field exists
+func ConfigByField(field string) (EnvSpec, bool) {
 	cfg, ok := configByField[field]
 	return cfg, ok
 }
