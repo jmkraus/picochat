@@ -323,7 +323,7 @@ For example, `/message user` displays the last user question again.
 
 With a given index, the respective element is shown, e.g., `/message #0` shows the initial system prompt.
 
-If you want a full conversation with all elemeents, then `/message all` shows the entire conversation so far, with each role printed in a different color.
+If you want a full conversation with all elements, then `/message all` shows the entire conversation so far, with each role printed in a different color.
 
 
 ### Image processing
