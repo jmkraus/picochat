@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"picochat/convert"
 	"picochat/envs"
 	"picochat/paths"
 	"sync"
@@ -63,7 +64,14 @@ func load() {
 			return
 		}
 	} else {
-		path = "No config.toml found - fallback to internal defaults"
+		path = "none"
+	}
+
+	// 3. Environment variables
+	err = applyEnvValues(&cfg)
+	if err != nil {
+		loadErr = fmt.Errorf("apply env var values failed: %w", err)
+		return
 	}
 
 	if cfg.Context < MinCtx || cfg.Context > MaxCtx {
@@ -134,8 +142,8 @@ func Set(key string, value any) error {
 	}
 
 	next := *cfg // work on copy to avoid compromised config
-	if err := applyConfig(&next, key, value); err != nil {
-		return fmt.Errorf("apply config failed: %w", err)
+	if err := applyConfigValue(&next, key, value); err != nil {
+		return fmt.Errorf("apply config value failed: %w", err)
 	}
 
 	if key == "context" && (next.Context < MinCtx || next.Context > MaxCtx) {
@@ -146,7 +154,7 @@ func Set(key string, value any) error {
 	return nil
 }
 
-// applyConfig alters a specific config element.
+// applyConfig updates a specific config element.
 //
 // Parameters:
 //
@@ -157,11 +165,37 @@ func Set(key string, value any) error {
 // Returns:
 //
 //	error - error if any
-func applyConfig(cfg *Config, key string, val any) error {
+func applyConfigValue(cfg *Config, key string, val any) error {
 	patch := map[string]any{key: val}
 	b, err := json.Marshal(patch)
 	if err != nil {
 		return err
 	}
 	return json.Unmarshal(b, cfg)
+}
+
+// applyEnvValues updates config fields according to
+// set environment variables.
+//
+// Parameters:
+//
+//	cfg (*Config) - the instance of the configuration struct
+//
+// Returns:
+//
+//	error - error if any
+func applyEnvValues(cfg *Config) error {
+	for _, spec := range envs.ConfigEnvVars {
+		envVal := envs.GetEnv(spec.Env)
+		if envVal == "" {
+			continue // Skip if not set or empty
+		}
+
+		v, err := convert.TypeConvert(spec.Type, envVal)
+		if err != nil {
+			return fmt.Errorf("convert value failed: %w", err)
+		}
+		applyConfigValue(cfg, spec.Field, v)
+	}
+	return nil
 }

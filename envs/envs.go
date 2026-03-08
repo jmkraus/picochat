@@ -14,7 +14,7 @@ const (
 )
 
 type EnvSpec struct {
-	Env     string
+	Env     EnvVar
 	Type    string
 	Field   string
 	Runtime bool
