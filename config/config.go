@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"picochat/paths"
 	"sync"
@@ -9,14 +10,14 @@ import (
 )
 
 type Config struct {
-	URL         string
-	Model       string
-	Prompt      string
-	Context     int
-	Temperature float64
-	Top_p       float64
-	Reasoning   bool
-	Quiet       bool
+	URL         string  `json:"url"`
+	Model       string  `json:"model"`
+	Prompt      string  `json:"prompt"`
+	Context     int     `json:"context"`
+	Temperature float64 `json:"temperature"`
+	Top_p       float64 `json:"top_p"`
+	Reasoning   bool    `json:"reasoning"`
+	Quiet       bool    `json:"quiet"`
 
 	ConfigPath string `toml:"-"`
 	ImagePath  string `toml:"-"` ////IMAGES
@@ -52,16 +53,7 @@ func load() {
 	}
 
 	// 1. Default values
-	var cfg = Config{
-		URL:         "http://localhost:11434/api",
-		Model:       "gpt-oss:latest",
-		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
-		Context:     20,
-		Temperature: 0.7,
-		Top_p:       0.9,
-		Reasoning:   false,
-		Quiet:       false,
-	}
+	cfg := DefaultConfig()
 
 	// 2. Config file
 	if paths.FileExists(path) {
@@ -80,6 +72,28 @@ func load() {
 
 	cfg.ConfigPath = path
 	instance = &cfg
+}
+
+// DefaultConfig defines the default values before loading the config file or evaluation env vars.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	Config - a filled Config struct
+func DefaultConfig() Config {
+	return Config{
+		URL:         "http://localhost:11434/api",
+		Model:       "gpt-oss:latest",
+		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
+		Context:     20,
+		Temperature: 0.7,
+		Top_p:       0.9,
+		Reasoning:   false,
+		Quiet:       false,
+	}
 }
 
 // Get loads the configuration once and returns the instance of the
@@ -159,4 +173,13 @@ func Set(key string, value any) error {
 		// Don't forget to update convert/convert.go --> ValidateAndConvert()
 		return fmt.Errorf("unsupported config key '%s'", key)
 	}
+}
+
+func ApplyConfig(cfg *Config, key string, val any) error {
+	patch := map[string]any{key: val}
+	b, err := json.Marshal(patch)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(b, cfg)
 }

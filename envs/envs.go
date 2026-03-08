@@ -22,13 +22,22 @@ type Config struct {
 }
 
 var ConfigEnvVars = []Config{
-	{Env: "PICOCHAT_URL", Type: "string", Field: "url", Default: "http://localhost:11434/api"},
-	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model", Default: "gpt-oss:latest"},
-	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context", Default: 20},
-	{Env: "PICOCHAT_TEMPERATURE", Type: "float", Field: "temperature", Default: 0.70},
-	{Env: "PICOCHAT_TOP_P", Type: "float", Field: "top_p", Default: 0.90},
-	{Env: "PICOCHAT_REASONING", Type: "bool", Field: "reasoning", Default: false},
-	{Env: "PICOCHAT_QUIET", Type: "bool", Field: "quiet", Default: false},
+	{Env: "PICOCHAT_URL", Type: "string", Field: "url"},
+	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model"},
+	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context"},
+	{Env: "PICOCHAT_TEMPERATURE", Type: "float", Field: "temperature"},
+	{Env: "PICOCHAT_TOP_P", Type: "float", Field: "top_p"},
+	{Env: "PICOCHAT_REASONING", Type: "bool", Field: "reasoning"},
+	{Env: "PICOCHAT_QUIET", Type: "bool", Field: "quiet"},
+}
+
+var allowedFields map[string]bool
+
+func init() {
+	allowedFields = make(map[string]bool)
+	for _, envVar := range ConfigEnvVars {
+		allowedFields[envVar.Field] = true
+	}
 }
 
 // GetEnv encapsulates reading environment variables
@@ -43,4 +52,17 @@ var ConfigEnvVars = []Config{
 //	string - the value of the environment variable
 func GetEnv(envvar EnvVar) string {
 	return os.Getenv(string(envvar))
+}
+
+// AllowedField checks if the given field name is valid.
+//
+// Parameters:
+//
+//	field (string) - the field name to be checked
+//
+// Returns:
+//
+//	bool - field name is valid: true or false
+func AllowedField(field string) bool {
+	return allowedFields[field]
 }
