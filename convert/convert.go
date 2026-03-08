@@ -2,6 +2,7 @@ package convert
 
 import (
 	"fmt"
+	"picochat/envs"
 	"strconv"
 	"strings"
 )
@@ -11,13 +12,13 @@ import (
 //
 // Parameters:
 //
-//	args - the input string to parse
+//	args (string) - the input string to parse
 //
 // Returns:
 //
-//	key   - the parsed key in lower case
-//	value - the parsed and converted value
-//	error - error if any
+//	string - the parsed key in lower case
+//	any    - the parsed and converted value
+//	error  - error if any
 func ParseKeyVal(args string) (string, any, error) {
 	parts := strings.SplitN(args, "=", 2)
 	if len(parts) != 2 {
@@ -34,51 +35,17 @@ func ParseKeyVal(args string) (string, any, error) {
 		return "", nil, fmt.Errorf("invalid format, missing value")
 	}
 
-	convertedValue, err := validateAndConvert(key, value)
+	fieldCfg, ok := envs.ConfigByField(key)
+	if !ok || !fieldCfg.Runtime {
+		return "", nil, fmt.Errorf("unsupported config key '%s'", key)
+	}
+
+	convertedValue, err := TypeConvert(fieldCfg.Type, value)
 	if err != nil {
-		return "", nil, err
+		return "", nil, fmt.Errorf("convert type for key %s failed: %w", key, err)
 	}
 
 	return key, convertedValue, nil
-}
-
-// ValidateAndConvert validates the key and converts the value to the appropriate type.
-//
-// Parameters:
-//
-//	key   - the configuration key
-//	value - the string representation of the value
-//
-// Returns:
-//
-//	any   - the converted value
-//	error - error if any
-func validateAndConvert(key, value string) (any, error) {
-	switch key {
-	case "temperature", "top_p":
-		v, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid float value for key '%s'", key)
-		}
-		return v, nil
-	case "context":
-		v, err := strconv.Atoi(value)
-		if err != nil {
-			return nil, fmt.Errorf("invalid integer value for key '%s'", key)
-		}
-		return v, nil
-	case "url", "model":
-		return value, nil
-	case "reasoning", "quiet":
-		v, err := StringToBool(value)
-		if err != nil {
-			return nil, err
-		}
-		return v, nil
-	default:
-		// Don't forget to update config/config.go --> Set()
-		return nil, fmt.Errorf("unsupported config key '%s'", key)
-	}
 }
 
 // TypeConvert converts the value to the given var type.

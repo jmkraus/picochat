@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"picochat/envs"
 	"picochat/paths"
 	"sync"
 
@@ -127,55 +128,30 @@ func Set(key string, value any) error {
 	if err != nil {
 		return fmt.Errorf("cannot apply config change: %w", err)
 	}
-
-	switch key {
-	case "context":
-		intVal, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("value for key '%s' must be an integer", key)
-		}
-		cfg.Context = intVal
-		return nil
-
-	case "model":
-		strVal, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("value for key '%s' must be a string", key)
-		}
-		cfg.Model = strVal
-		return nil
-
-	case "reasoning":
-		boolVal, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("value for key '%s' must be a boolean", key)
-		}
-		cfg.Reasoning = boolVal
-		return nil
-
-	case "temperature":
-		floatVal, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("value for key '%s' must be a float", key)
-		}
-		cfg.Temperature = floatVal
-		return nil
-
-	case "top_p":
-		floatVal, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("value for key '%s' must be a float", key)
-		}
-		cfg.Top_p = floatVal
-		return nil
-
-	default:
-		// Don't forget to update convert/convert.go --> ValidateAndConvert()
+	if !envs.AllowedRuntimeField(key) {
 		return fmt.Errorf("unsupported config key '%s'", key)
 	}
+	if err := applyConfig(cfg, key, value); err != nil {
+		return fmt.Errorf("apply config failed: %w", err)
+	}
+	if key == "context" && (cfg.Context < MinCtx || cfg.Context > MaxCtx) {
+		return fmt.Errorf("context size must be between %d and %d", MinCtx, MaxCtx)
+	}
+	return nil
 }
 
-func ApplyConfig(cfg *Config, key string, val any) error {
+// applyConfig alters a specific config element.
+//
+// Parameters:
+//
+//	cfg (*Config) - the instance of the configuration struct
+//	key (string)  - the configuration key to modify
+//	value (any)   - the new value for the key
+//
+// Returns:
+//
+//	error - error if any
+func applyConfig(cfg *Config, key string, val any) error {
 	patch := map[string]any{key: val}
 	b, err := json.Marshal(patch)
 	if err != nil {

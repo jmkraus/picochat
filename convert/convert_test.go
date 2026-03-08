@@ -39,6 +39,8 @@ func TestParseArgs_Invalid(t *testing.T) {
 		"novalue=",
 		"temperature=abc",
 		"unknown=123",
+		"url=http://example.com",
+		"quiet=true",
 		"context=notanint",
 	}
 

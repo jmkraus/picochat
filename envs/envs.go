@@ -18,25 +18,30 @@ type Config struct {
 	Env     string
 	Type    string
 	Field   string
-	Default any
+	Runtime bool
 }
 
 var ConfigEnvVars = []Config{
-	{Env: "PICOCHAT_URL", Type: "string", Field: "url"},
-	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model"},
-	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context"},
-	{Env: "PICOCHAT_TEMPERATURE", Type: "float", Field: "temperature"},
-	{Env: "PICOCHAT_TOP_P", Type: "float", Field: "top_p"},
-	{Env: "PICOCHAT_REASONING", Type: "bool", Field: "reasoning"},
-	{Env: "PICOCHAT_QUIET", Type: "bool", Field: "quiet"},
+	{Env: "PICOCHAT_URL", Type: "string", Field: "url", Runtime: false},
+	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model", Runtime: true},
+	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context", Runtime: true},
+	{Env: "PICOCHAT_TEMPERATURE", Type: "float", Field: "temperature", Runtime: true},
+	{Env: "PICOCHAT_TOP_P", Type: "float", Field: "top_p", Runtime: true},
+	{Env: "PICOCHAT_REASONING", Type: "bool", Field: "reasoning", Runtime: true},
+	{Env: "PICOCHAT_QUIET", Type: "bool", Field: "quiet", Runtime: false},
 }
 
-var allowedFields map[string]bool
+var allowedRuntimeFields map[string]bool
+var configByField map[string]Config
 
 func init() {
-	allowedFields = make(map[string]bool)
-	for _, envVar := range ConfigEnvVars {
-		allowedFields[envVar.Field] = true
+	allowedRuntimeFields = make(map[string]bool, len(ConfigEnvVars))
+	configByField = make(map[string]Config, len(ConfigEnvVars))
+	for _, v := range ConfigEnvVars {
+		configByField[v.Field] = v
+		if v.Runtime {
+			allowedRuntimeFields[v.Field] = true
+		}
 	}
 }
 
@@ -54,7 +59,7 @@ func GetEnv(envvar EnvVar) string {
 	return os.Getenv(string(envvar))
 }
 
-// AllowedField checks if the given field name is valid.
+// AllowedRuntimeField checks if the given field name is valid.
 //
 // Parameters:
 //
@@ -63,6 +68,21 @@ func GetEnv(envvar EnvVar) string {
 // Returns:
 //
 //	bool - field name is valid: true or false
-func AllowedField(field string) bool {
-	return allowedFields[field]
+func AllowedRuntimeField(field string) bool {
+	return allowedRuntimeFields[field]
+}
+
+// ConfigByField returns the config metadata for a field.
+//
+// Parameters:
+//
+//	field (string) - the config field name
+//
+// Returns:
+//
+//	Config - metadata for the field
+//	bool   - true if field exists
+func ConfigByField(field string) (Config, bool) {
+	cfg, ok := configByField[field]
+	return cfg, ok
 }
