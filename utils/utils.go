@@ -12,12 +12,6 @@ import (
 	"unicode"
 )
 
-// Global cache for list selections (/list, /models)
-var (
-	ModelsList  []string
-	HistoryList []string
-)
-
 // Indexed list
 var (
 	ModelsMap  = make(map[int]string)
@@ -94,7 +88,6 @@ func ShowAvailableModels(baseUrl string) (string, error) {
 //
 //	none
 func setHistoryList(list []string) {
-	HistoryList = list
 	HistoryMap = make(map[int]string)
 	for i, name := range list {
 		HistoryMap[i+1] = name
@@ -126,7 +119,6 @@ func GetHistoryByIndex(i int) (string, bool) {
 //
 //	none
 func setModelsList(list []string) {
-	ModelsList = list
 	ModelsMap = make(map[int]string)
 	for i, name := range list {
 		ModelsMap[i+1] = name
