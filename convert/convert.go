@@ -3,7 +3,7 @@ package convert
 import (
 	"fmt"
 	"picochat/envs"
-	"strconv"
+	"picochat/vartypes"
 	"strings"
 )
 
@@ -59,50 +59,6 @@ func ParseKeyVal(args string) (string, any, error) {
 //
 //	any   - the converted value
 //	error - error if any
-func TypeConvert(varType, value string) (any, error) {
-	switch varType {
-	case "float":
-		v, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid float value '%s'", value)
-		}
-		return v, nil
-	case "int":
-		v, err := strconv.Atoi(value)
-		if err != nil {
-			return nil, fmt.Errorf("invalid integer value '%s'", value)
-		}
-		return v, nil
-	case "string":
-		return value, nil
-	case "bool":
-		v, err := StringToBool(value)
-		if err != nil {
-			return nil, err
-		}
-		return v, nil
-	default:
-		return nil, fmt.Errorf("unsupported var type '%s'", varType)
-	}
-}
-
-// StringToBool converts a string representation of a bool to a boolean value.
-//
-// Parameters:
-//
-//	s (string) - the string representation
-//
-// Returns:
-//
-//	bool  - the boolean value of the string
-//	error - error if any
-func StringToBool(s string) (bool, error) {
-	switch strings.ToLower(s) {
-	case "true", "1", "t", "y", "yes":
-		return true, nil
-	case "false", "0", "f", "n", "no":
-		return false, nil
-	default:
-		return false, fmt.Errorf("invalid boolean value '%s'", s)
-	}
+func TypeConvert(varType vartypes.VarType, value string) (any, error) {
+	return vartypes.Convert(varType, value)
 }

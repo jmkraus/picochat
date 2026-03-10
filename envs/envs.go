@@ -2,6 +2,7 @@ package envs
 
 import (
 	"os"
+	"picochat/vartypes"
 )
 
 // EnvVar represents the valid environment variables in this package.
@@ -15,19 +16,19 @@ const (
 
 type EnvSpec struct {
 	Env     EnvVar
-	Type    string
+	Type    vartypes.VarType
 	Field   string
 	Runtime bool
 }
 
 var ConfigEnvVars = []EnvSpec{
-	{Env: "PICOCHAT_URL", Type: "string", Field: "url", Runtime: false},
-	{Env: "PICOCHAT_MODEL", Type: "string", Field: "model", Runtime: true},
-	{Env: "PICOCHAT_CONTEXT", Type: "int", Field: "context", Runtime: true},
-	{Env: "PICOCHAT_TEMPERATURE", Type: "float", Field: "temperature", Runtime: true},
-	{Env: "PICOCHAT_TOP_P", Type: "float", Field: "top_p", Runtime: true},
-	{Env: "PICOCHAT_REASONING", Type: "bool", Field: "reasoning", Runtime: true},
-	{Env: "PICOCHAT_QUIET", Type: "bool", Field: "quiet", Runtime: false},
+	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "url", Runtime: false},
+	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model", Runtime: true},
+	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "context", Runtime: true},
+	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "temperature", Runtime: true},
+	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "top_p", Runtime: true},
+	{Env: "PICOCHAT_REASONING", Type: vartypes.VarBool, Field: "reasoning", Runtime: true},
+	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "quiet", Runtime: false},
 }
 
 var allowedRuntimeFields map[string]bool

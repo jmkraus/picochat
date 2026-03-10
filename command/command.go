@@ -12,7 +12,7 @@ import (
 	"picochat/paths"
 	"picochat/requests"
 	"picochat/utils"
-	"strconv"
+	"picochat/vartypes"
 	"strings"
 )
 
@@ -116,10 +116,11 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "message":
 		ok := false
 		if args, ok = strings.CutPrefix(args, "#"); ok {
-			index, err := strconv.Atoi(args)
+			indexAny, err := convert.TypeConvert(vartypes.VarInt, args)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("get message failed: value not an integer")}
 			}
+			index := indexAny.(int)
 			msg, err := history.GetByIndex(index)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("get message failed: %w", err)}
@@ -211,10 +212,11 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		args, _ := strings.CutPrefix(args, "#") // accept and ignore # prefix
-		index, err := strconv.Atoi(args)
+		indexAny, err := convert.TypeConvert(vartypes.VarInt, args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("value not an integer")}
 		}
+		index := indexAny.(int)
 		model, ok := utils.GetModelsByIndex(index)
 		if !ok {
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}

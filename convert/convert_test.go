@@ -3,6 +3,7 @@ package convert
 import (
 	"fmt"
 	"picochat/envs"
+	"picochat/vartypes"
 	"reflect"
 	"testing"
 )
@@ -59,13 +60,13 @@ func TestParseKeyVal_RuntimeFieldsFromEnvSpec(t *testing.T) {
 	for _, spec := range envs.ConfigEnvVars {
 		var sample string
 		switch spec.Type {
-		case "string":
+		case vartypes.VarString:
 			sample = "abc"
-		case "int":
+		case vartypes.VarInt:
 			sample = "7"
-		case "float":
+		case vartypes.VarFloat:
 			sample = "0.5"
-		case "bool":
+		case vartypes.VarBool:
 			sample = "true"
 		default:
 			t.Fatalf("unsupported spec type %q for field %q", spec.Type, spec.Field)

@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"picochat/convert"
 	"picochat/utils"
+	"picochat/vartypes"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -49,13 +50,14 @@ func getHistoryFilename(f string, input io.Reader) (string, error) {
 //	string - the filename associated with the index
 //	error  - error if index is invalid or not found
 func getFilenameByIndex(indexStr string) (string, error) {
-	index, err := strconv.Atoi(indexStr)
+	indexAny, err := convert.TypeConvert(vartypes.VarInt, indexStr)
 	if err != nil {
 		return "", fmt.Errorf("value not an integer")
 	}
+	index := indexAny.(int)
 	fname, ok := utils.GetHistoryByIndex(index)
 	if !ok {
-		return "", fmt.Errorf("no value for given index found")
+		return "", fmt.Errorf("index %d out of bounds", index)
 	}
 	return fname, nil
 }
