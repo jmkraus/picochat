@@ -48,7 +48,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	switch cmd {
 	case "hello":
 		hello := "Hello, are you there?"
-		return CommandResult{Info: hello, Pasted: hello}
+		return CommandResult{Output: hello, Pasted: hello}
 	case "test":
 		err := utils.CreateTestFile(cfg.URL)
 		if err != nil {
