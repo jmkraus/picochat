@@ -312,3 +312,49 @@ func LoadSchemaFromFile(path string) (any, error) {
 
 	return schema, nil
 }
+
+func MarkdownTable(tabledata [][]string) string {
+	numColumns := len(tabledata[0])
+	border := "|" + strings.Repeat(" %s |", numColumns)
+
+	maxWidths := make([]int, numColumns)
+	separator := make([]string, numColumns)
+	for i := range separator {
+		separator[i] = "---"
+	}
+
+	tabledata = append(tabledata, []string{})
+	copy(tabledata[1:], tabledata)
+	tabledata[1] = separator
+
+	for _, row := range tabledata {
+		for cIdx, col := range row {
+			if len(col) > maxWidths[cIdx] {
+				maxWidths[cIdx] = len(col)
+			}
+		}
+	}
+
+	for rIdx, row := range tabledata {
+		fill := " "
+		if rIdx == 1 {
+			fill = "-"
+		}
+		for cIdx, col := range row {
+			tabledata[rIdx][cIdx] = fmt.Sprintf("%-"+fmt.Sprint(maxWidths[cIdx])+"s", col)
+			tabledata[rIdx][cIdx] = strings.ReplaceAll(tabledata[rIdx][cIdx], " ", fill)
+		}
+	}
+
+	rows := make([]string, len(tabledata))
+	for i, row := range tabledata {
+		rowValues := make([]any, len(row))
+		for j, v := range row {
+			rowValues[j] = v
+		}
+		rows[i] = fmt.Sprintf(border, rowValues...)
+	}
+
+	table := strings.Join(rows, "\n")
+	return table
+}
