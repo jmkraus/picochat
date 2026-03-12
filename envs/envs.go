@@ -54,9 +54,10 @@ func init() {
 //
 // Returns:
 //
-//	string - the value of the environment variable
-func GetEnv(envvar EnvVar) string {
-	return os.Getenv(string(envvar))
+//		string - the value of the environment variable
+//	 bool   - environment variable is actually set (but can be empty)
+func GetEnv(envvar EnvVar) (string, bool) {
+	return os.LookupEnv(string(envvar))
 }
 
 // AllowedRuntimeField checks if the given field name is valid.

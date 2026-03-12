@@ -19,7 +19,8 @@ import (
 //
 //	bool - app is running in a tmux session (true / false)
 func isTmuxSession() bool {
-	return envs.GetEnv(envs.TMUX) != ""
+	tmux, _ := envs.GetEnv(envs.TMUX)
+	return tmux != ""
 }
 
 // copyToTmuxBufferStdin loads the given text into the tmux buffer via stdin.
