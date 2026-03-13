@@ -17,6 +17,15 @@ const (
 	VarBool
 )
 
+// String returns the string representation of the VarType.
+//
+// Parameters:
+//
+//	t (VarType) - the VarType value
+//
+// Returns:
+//
+//	string - the string representation of the VarType
 func (t VarType) String() string {
 	switch t {
 	case VarFloat:
@@ -33,6 +42,16 @@ func (t VarType) String() string {
 }
 
 // Convert converts a string to the target VarType.
+//
+// Parameters:
+//
+//	varType (VarType) - the target type for conversion
+//	value   (string)  - the raw string value to convert
+//
+// Returns:
+//
+//	any   - the converted value
+//	error - error if conversion fails or type is unsupported
 func Convert(varType VarType, value string) (any, error) {
 	switch varType {
 	case VarFloat:
@@ -50,7 +69,7 @@ func Convert(varType VarType, value string) (any, error) {
 	case VarString:
 		return value, nil
 	case VarBool:
-		v, err := StringToBool(value)
+		v, err := stringToBool(value)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +79,7 @@ func Convert(varType VarType, value string) (any, error) {
 	}
 }
 
-// StringToBool converts a string representation of a bool to a boolean value.
+// stringToBool converts a string representation of a bool to a boolean value.
 //
 // Parameters:
 //
@@ -70,7 +89,7 @@ func Convert(varType VarType, value string) (any, error) {
 //
 //	bool  - the boolean value of the string
 //	error - error if any
-func StringToBool(s string) (bool, error) {
+func stringToBool(s string) (bool, error) {
 	switch strings.ToLower(s) {
 	case "true", "1", "t", "y", "yes":
 		return true, nil
