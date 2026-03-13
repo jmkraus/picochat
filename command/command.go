@@ -7,12 +7,11 @@ import (
 	"picochat/clipb"
 	"picochat/config"
 	"picochat/console"
-	"picochat/convert"
+	"picochat/envs"
 	"picochat/messages"
 	"picochat/paths"
 	"picochat/requests"
 	"picochat/utils"
-	"picochat/vartypes"
 	"strings"
 )
 
@@ -116,17 +115,11 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "message":
 		ok := false
 		if args, ok = strings.CutPrefix(args, "#"); ok {
-			indexAny, err := convert.TypeConvert(vartypes.VarInt, args)
+			msg, err := getMessageByIndex(args, history)
 			if err != nil {
-				return CommandResult{Error: fmt.Errorf("get message failed: value not an integer")}
+				return CommandResult{Error: err}
 			}
-			index := indexAny.(int)
-			msg, err := history.GetByIndex(index)
-			if err != nil {
-				return CommandResult{Error: fmt.Errorf("get message failed: %w", err)}
-			}
-			role := console.Bold + "(" + msg.Role + ")" + console.Regular
-			return CommandResult{Output: fmt.Sprintf("%s\n%s", role, msg.Content)}
+			return CommandResult{Output: msg}
 		}
 
 		switch args {
@@ -148,6 +141,18 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		info := "Last assistant prompt written to clipboard."
 		nothing := "Nothing to copy."
 		var lastAnswer string
+
+		ok := false
+		if args, ok = strings.CutPrefix(args, "#"); ok {
+			msg, err := getMessageByIndex(args, history)
+			if err != nil {
+				return CommandResult{Error: err}
+			}
+			if err := clipb.WriteClipboard(msg); err != nil {
+				return CommandResult{Error: err}
+			}
+			return CommandResult{Info: fmt.Sprintf("Message #%s written to clipboard", args)}
+		}
 
 		if args == "" {
 			args = messages.RoleAssistant
@@ -212,17 +217,19 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		args, _ := strings.CutPrefix(args, "#") // accept and ignore # prefix
-		indexAny, err := convert.TypeConvert(vartypes.VarInt, args)
+		index, err := parseIndex(args)
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("value not an integer")}
+			return CommandResult{Error: err}
 		}
-		index := indexAny.(int)
 		model, ok := utils.GetModelsByIndex(index)
 		if !ok {
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
 		cfg.Model = model
 		return CommandResult{Info: fmt.Sprintf("Switched model to '%s'.", model)}
+	case "envs":
+		envSetup := envs.ConfigEnvVarsMarkdownTable()
+		return CommandResult{Output: envSetup}
 	case "set":
 		if args == "" {
 			list := []string{
@@ -235,7 +242,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}
 
-		key, value, err := convert.ParseKeyVal(args)
+		key, value, err := parseKeyVal(args)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
@@ -297,4 +304,18 @@ func parseCommandArgs(input string) (string, string) {
 		arg = strings.TrimSpace(strings.Join(parts[1:], " "))
 	}
 	return cmd, arg
+}
+
+func getMessageByIndex(args string, history *messages.ChatHistory) (string, error) {
+	index, err := parseIndex(args)
+	if err != nil {
+		return "", fmt.Errorf("get message failed: %w", err)
+	}
+	msg, err := history.GetByIndex(index)
+	if err != nil {
+		return "", fmt.Errorf("get message failed: %w", err)
+	}
+	headerText := fmt.Sprintf("(%d:%s)", index, msg.Role)
+	header := console.Style(console.Bold, headerText)
+	return fmt.Sprintf("%s\n%s", header, msg.Content), nil
 }

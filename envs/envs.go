@@ -2,17 +2,12 @@ package envs
 
 import (
 	"os"
+	"picochat/utils"
 	"picochat/vartypes"
 )
 
 // EnvVar represents the valid environment variables in this package.
 type EnvVar string
-
-const (
-	CONFIG_PATH     EnvVar = "CONFIG_PATH"
-	TMUX            EnvVar = "TMUX"
-	XDG_CONFIG_HOME EnvVar = "XDG_CONFIG_HOME"
-)
 
 type EnvSpec struct {
 	Env     EnvVar
@@ -86,4 +81,32 @@ func AllowedRuntimeField(field string) bool {
 func ConfigByField(field string) (EnvSpec, bool) {
 	cfg, ok := configByField[field]
 	return cfg, ok
+}
+
+// ConfigEnvVarsMarkdownTable returns a markdown table with env var state and values.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	string - the full markdown table
+func ConfigEnvVarsMarkdownTable() string {
+	tableData := make([][]string, 0, len(ConfigEnvVars)+1)
+	tableData = append(tableData, []string{"Env", "Set", "Value"})
+
+	for _, spec := range ConfigEnvVars {
+		val, lookup := GetEnv(spec.Env)
+		set := "true"
+		if !lookup {
+			set = "false"
+		}
+		if lookup && val == "" {
+			val = "<empty>"
+		}
+		tableData = append(tableData, []string{string(spec.Env), set, val})
+	}
+
+	return utils.MarkdownTable(tableData)
 }

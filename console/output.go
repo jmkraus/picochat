@@ -6,7 +6,7 @@ import (
 )
 
 const info_prefix string = BrightGreen + Bold + "✓" + ColorReset
-const warn_prefix string = BrightYellow + Bold + "!" + ColorReset // or ⚠
+const warn_prefix string = BrightYellow + Bold + "!" + ColorReset
 const err_prefix string = BrightRed + Bold + "×" + ColorReset
 
 // const warn_prefix string = BrightYellow + Bold + "!" + ColorReset
@@ -83,7 +83,8 @@ func SetCursorPos(col int) {
 
 }
 
-// colorize is a Helper function for enclosing text in color esc sequences.
+// Colorize is a Helper function for enclosing text in color Esc sequences.
+// A reset Esc sequence is added to the end of string.
 //
 // Parameters:
 //
@@ -95,6 +96,21 @@ func SetCursorPos(col int) {
 //	string - text enclosed in esc sequences
 func Colorize(color, text string) string {
 	return color + text + ColorReset
+}
+
+// Style is a Helper function for enclosing text in font style Esc sequences.
+// A reset Esc sequence is added to the end of string.
+//
+// Parameters:
+//
+//	fontstyle (string) - esc sequence for the font style (use constants)
+//	text (string)      - the text
+//
+// Returns:
+//
+//	string - text enclosed in esc sequences
+func Style(fontstyle, text string) string {
+	return fontstyle + text + Regular
 }
 
 // colorPrint is a Helper function for printing colorized text

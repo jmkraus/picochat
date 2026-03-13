@@ -2,8 +2,8 @@ package clipb
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
-	"picochat/envs"
 	"strings"
 
 	"github.com/atotto/clipboard"
@@ -19,7 +19,7 @@ import (
 //
 //	bool - app is running in a tmux session (true / false)
 func isTmuxSession() bool {
-	tmux, _ := envs.GetEnv(envs.TMUX)
+	tmux, _ := os.LookupEnv("TMUX")
 	return tmux != ""
 }
 

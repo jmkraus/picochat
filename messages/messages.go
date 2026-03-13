@@ -424,11 +424,25 @@ func CalculateTokens(s string) float64 {
 	return float64(len(words)) * 1.3
 }
 
+func (h *ChatHistory) FormattedMessage(header bool) string {
+	return ""
+}
+
+// FullConversation returns a color coded full conversation text.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	string - the full conversation text (without reasoning)
 func (h *ChatHistory) FullConversation() string {
 	var builder strings.Builder
 
-	for _, msg := range h.Messages {
-		header := console.Bold + "(" + msg.Role + ")" + console.Regular
+	for index, msg := range h.Messages {
+		headerText := fmt.Sprintf("(%d:%s)", index, msg.Role)
+		header := console.Style(console.Bold, headerText)
 		output := ""
 		switch msg.Role {
 		case "system":

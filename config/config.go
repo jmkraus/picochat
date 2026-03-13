@@ -3,9 +3,9 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"picochat/convert"
 	"picochat/envs"
 	"picochat/paths"
+	"picochat/vartypes"
 	"sync"
 
 	"github.com/BurntSushi/toml"
@@ -186,12 +186,12 @@ func applyConfigValue(cfg *Config, key string, val any) error {
 //	error - error if any
 func applyEnvValues(cfg *Config) error {
 	for _, spec := range envs.ConfigEnvVars {
-		envVal := envs.GetEnv(spec.Env)
-		if envVal == "" {
+		envVal, lookup := envs.GetEnv(spec.Env)
+		if !lookup || envVal == "" {
 			continue // Skip if not set or empty
 		}
 
-		v, err := convert.TypeConvert(spec.Type, envVal)
+		v, err := vartypes.Convert(spec.Type, envVal)
 		if err != nil {
 			return fmt.Errorf("convert type for env %s failed: %w", spec.Env, err)
 		}
