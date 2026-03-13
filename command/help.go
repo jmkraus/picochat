@@ -19,6 +19,7 @@ var helpTopics = map[string][]string{
 		"  /models            List downloaded models (and switch models)",
 		"  /clear             Clear session context",
 		"  /set               Set session variables (key=value)",
+		"  /envs              Show table of PicoChat environment vars and their status",
 		"  /image             Set image file path",
 		"  /retry             Resend the chat history, excluding the last answer",
 		"  /bye               Quit PicoChat",
