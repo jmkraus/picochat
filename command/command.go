@@ -138,63 +138,17 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		}
 	case "copy":
-		info := "Last assistant prompt written to clipboard."
-		nothing := "Nothing to copy."
-		var lastAnswer string
-
-		ok := false
-		if args, ok = strings.CutPrefix(args, "#"); ok {
-			msg, err := getMessageByIndex(args, history)
-			if err != nil {
-				return CommandResult{Error: err}
-			}
-			if err := clipb.WriteClipboard(msg); err != nil {
-				return CommandResult{Error: err}
-			}
-			return CommandResult{Info: fmt.Sprintf("Message #%s written to clipboard", args)}
-		}
-
-		if args == "" {
-			args = messages.RoleAssistant
-		}
-
-		switch args {
-		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
-			lastMessage, found := history.GetLastRole(args)
-			if !found || lastMessage.Content == "" {
-				return CommandResult{Info: nothing}
-			}
-			lastAnswer = lastMessage.Content
-			info = fmt.Sprintf("Last %s prompt written to clipboard.", args)
-
-		case "think":
-			lastMessage, found := history.GetLastRole(messages.RoleAssistant)
-			if !found || (lastMessage.Content == "" && lastMessage.Reasoning == "") {
-				return CommandResult{Info: nothing}
-			}
-			lastAnswer = encloseThinkingTags(lastMessage.Reasoning) + lastMessage.Content
-			info = "Last assistant prompt (with thinking) written to clipboard."
-
-		case "code":
-			lastMessage, found := history.GetLastRole(messages.RoleAssistant)
-			if !found || lastMessage.Content == "" {
-				return CommandResult{Info: nothing}
-			}
-			codeBlock, found := extractCodeBlock(lastMessage.Content)
-			info = "First code block written to clipboard."
-			if !found {
-				return CommandResult{Info: nothing}
-			}
-			lastAnswer = codeBlock
-
-		default:
-			return CommandResult{Error: fmt.Errorf("unknown copy argument")}
-		}
-
-		if err := clipb.WriteClipboard(lastAnswer); err != nil {
+		payload, err := resolveCopyPayload(args, history)
+		if err != nil {
 			return CommandResult{Error: err}
 		}
-		return CommandResult{Info: info}
+		if payload.Text == "" {
+			return CommandResult{Info: payload.Info}
+		}
+		if err := clipb.WriteClipboard(payload.Text); err != nil {
+			return CommandResult{Error: err}
+		}
+		return CommandResult{Info: payload.Info}
 	case "paste":
 		text, err := clipb.ReadClipboard()
 		if err != nil {

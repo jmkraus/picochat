@@ -3,8 +3,10 @@ package command
 import (
 	"fmt"
 	"picochat/envs"
+	"picochat/messages"
 	"picochat/vartypes"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -122,6 +124,54 @@ func TestParseIndex_Invalid(t *testing.T) {
 		t.Fatal("expected error, got nil")
 	}
 	if got, want := err.Error(), "value not an integer"; got != want {
+		t.Fatalf("expected %q, got %q", want, got)
+	}
+}
+
+func TestResolveCopyPayload_DefaultAssistant(t *testing.T) {
+	h := messages.NewHistory("sys", 10)
+	if err := h.AddAssistant("", "assistant answer"); err != nil {
+		t.Fatalf("failed to add assistant message: %v", err)
+	}
+
+	payload, err := resolveCopyPayload("", h)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if got, want := payload.Text, "assistant answer"; got != want {
+		t.Fatalf("expected %q, got %q", want, got)
+	}
+	if got, want := payload.Info, "Last assistant prompt written to clipboard."; got != want {
+		t.Fatalf("expected %q, got %q", want, got)
+	}
+}
+
+func TestResolveCopyPayload_ByIndex(t *testing.T) {
+	h := messages.NewHistory("sys", 10)
+	if err := h.AddUser("hello", ""); err != nil {
+		t.Fatalf("failed to add user message: %v", err)
+	}
+
+	payload, err := resolveCopyPayload("#1", h)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if got, want := payload.Info, "Message #1 written to clipboard"; got != want {
+		t.Fatalf("expected %q, got %q", want, got)
+	}
+	if !strings.Contains(payload.Text, "(1:user)") || !strings.Contains(payload.Text, "hello") {
+		t.Fatalf("unexpected payload text: %q", payload.Text)
+	}
+}
+
+func TestResolveCopyPayload_UnknownArg(t *testing.T) {
+	h := messages.NewHistory("sys", 10)
+
+	_, err := resolveCopyPayload("invalid", h)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if got, want := err.Error(), "unknown copy argument"; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
 }

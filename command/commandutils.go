@@ -5,11 +5,17 @@ import (
 	"fmt"
 	"io"
 	"picochat/envs"
+	"picochat/messages"
 	"picochat/utils"
 	"picochat/vartypes"
 	"regexp"
 	"strings"
 )
+
+type copyPayload struct {
+	Text string
+	Info string
+}
 
 // parseKeyVal parses a string of the form "key=value" and returns
 // the key, converted value, and error.
@@ -173,4 +179,73 @@ func extractCodeBlock(s string) (string, bool) {
 //	string - the tagged text
 func encloseThinkingTags(s string) string {
 	return fmt.Sprintf("<think>\n%s\n</think>\n\n", s)
+}
+
+// resolveCopyPayload determines which text should be copied based on the given
+// /copy arguments and returns the text plus the corresponding status info.
+//
+// Parameters:
+//
+//	args (string) - argument passed to the /copy command (e.g. "#3", "assistant", "code")
+//	history (*messages.ChatHistory) - chat history used as source for message lookup
+//
+// Returns:
+//
+//	copyPayload - resolved text and info message for clipboard handling
+//	error       - error if argument is invalid or index lookup fails
+func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload, error) {
+	nothing := "Nothing to copy."
+	if index, ok := strings.CutPrefix(args, "#"); ok {
+		msg, err := getMessageByIndex(index, history)
+		if err != nil {
+			return copyPayload{}, err
+		}
+		return copyPayload{
+			Text: msg,
+			Info: fmt.Sprintf("Message #%s written to clipboard", index),
+		}, nil
+	}
+
+	if args == "" {
+		args = messages.RoleAssistant
+	}
+
+	switch args {
+	case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
+		lastMessage, found := history.GetLastRole(args)
+		if !found || lastMessage.Content == "" {
+			return copyPayload{Info: nothing}, nil
+		}
+		return copyPayload{
+			Text: lastMessage.Content,
+			Info: fmt.Sprintf("Last %s prompt written to clipboard.", args),
+		}, nil
+
+	case "think":
+		lastMessage, found := history.GetLastRole(messages.RoleAssistant)
+		if !found || (lastMessage.Content == "" && lastMessage.Reasoning == "") {
+			return copyPayload{Info: nothing}, nil
+		}
+		return copyPayload{
+			Text: encloseThinkingTags(lastMessage.Reasoning) + lastMessage.Content,
+			Info: "Last assistant prompt (with thinking) written to clipboard.",
+		}, nil
+
+	case "code":
+		lastMessage, found := history.GetLastRole(messages.RoleAssistant)
+		if !found || lastMessage.Content == "" {
+			return copyPayload{Info: nothing}, nil
+		}
+		codeBlock, found := extractCodeBlock(lastMessage.Content)
+		if !found {
+			return copyPayload{Info: nothing}, nil
+		}
+		return copyPayload{
+			Text: codeBlock,
+			Info: "First code block written to clipboard.",
+		}, nil
+
+	default:
+		return copyPayload{}, fmt.Errorf("unknown copy argument")
+	}
 }
