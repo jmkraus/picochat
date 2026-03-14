@@ -195,14 +195,18 @@ func encloseThinkingTags(s string) string {
 //	error       - error if argument is invalid or index lookup fails
 func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload, error) {
 	nothing := "Nothing to copy."
-	if index, ok := strings.CutPrefix(args, "#"); ok {
-		msg, err := getMessageByIndex(index, history)
+	if indexStr, ok := strings.CutPrefix(args, "#"); ok {
+		index, err := parseIndex(indexStr)
+		if err != nil {
+			return copyPayload{}, err
+		}
+		msg, err := history.GetByIndex(index)
 		if err != nil {
 			return copyPayload{}, err
 		}
 		return copyPayload{
-			Text: msg,
-			Info: fmt.Sprintf("Message #%s written to clipboard", index),
+			Text: msg.Content,
+			Info: fmt.Sprintf("Message #%d written to clipboard", index),
 		}, nil
 	}
 

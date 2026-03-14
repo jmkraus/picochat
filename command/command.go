@@ -6,7 +6,6 @@ import (
 	"math"
 	"picochat/clipb"
 	"picochat/config"
-	"picochat/console"
 	"picochat/envs"
 	"picochat/messages"
 	"picochat/output"
@@ -141,7 +140,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "copy":
 		payload, err := resolveCopyPayload(args, history)
 		if err != nil {
-			return CommandResult{Error: err}
+			return CommandResult{Error: fmt.Errorf("copy message data failed: %w", err)}
 		}
 		if payload.Text == "" {
 			return CommandResult{Info: payload.Info}
@@ -270,7 +269,5 @@ func getMessageByIndex(args string, history *messages.ChatHistory) (string, erro
 	if err != nil {
 		return "", fmt.Errorf("get message failed: %w", err)
 	}
-	headerText := fmt.Sprintf("(%d:%s)", index, msg.Role)
-	header := console.Style(console.Bold, headerText)
-	return fmt.Sprintf("%s\n%s", header, msg.Content), nil
+	return output.FormatMessage(msg, index, true, false), nil
 }
