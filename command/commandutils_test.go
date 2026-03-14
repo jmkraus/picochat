@@ -6,7 +6,6 @@ import (
 	"picochat/messages"
 	"picochat/vartypes"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -159,8 +158,8 @@ func TestResolveCopyPayload_ByIndex(t *testing.T) {
 	if got, want := payload.Info, "Message #1 written to clipboard"; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
-	if !strings.Contains(payload.Text, "(1:user)") || !strings.Contains(payload.Text, "hello") {
-		t.Fatalf("unexpected payload text: %q", payload.Text)
+	if got, want := payload.Text, "hello"; got != want {
+		t.Fatalf("expected %q, got %q", want, got)
 	}
 }
 
