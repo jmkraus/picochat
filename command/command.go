@@ -9,6 +9,7 @@ import (
 	"picochat/console"
 	"picochat/envs"
 	"picochat/messages"
+	"picochat/output"
 	"picochat/paths"
 	"picochat/requests"
 	"picochat/utils"
@@ -124,7 +125,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		switch args {
 		case "all":
-			conversation := history.FullConversation()
+			conversation := output.FormatConversation(history.Get())
 			return CommandResult{Output: conversation}
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			msg, found := history.GetLastRole(args)

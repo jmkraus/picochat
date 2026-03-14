@@ -423,38 +423,3 @@ func CalculateTokens(s string) float64 {
 	words := strings.Fields(s)
 	return float64(len(words)) * 1.3
 }
-
-func (h *ChatHistory) FormattedMessage(header bool) string {
-	return ""
-}
-
-// FullConversation returns a color coded full conversation text.
-//
-// Parameters:
-//
-//	none
-//
-// Returns:
-//
-//	string - the full conversation text (without reasoning)
-func (h *ChatHistory) FullConversation() string {
-	var builder strings.Builder
-
-	for index, msg := range h.Messages {
-		headerText := fmt.Sprintf("(%d:%s)", index, msg.Role)
-		header := console.Style(console.Bold, headerText)
-		output := ""
-		switch msg.Role {
-		case "system":
-			output = console.Colorize(console.Magenta, fmt.Sprintf("%s\n%s", header, msg.Content))
-		case "user":
-			output = console.Colorize(console.Cyan, fmt.Sprintf("%s\n%s", header, msg.Content))
-		case "assistant":
-			output = fmt.Sprintf("%s\n%s", header, msg.Content)
-		}
-		builder.WriteString(output)
-		builder.WriteString("\n\n") // Maintains the double newline between messages
-	}
-
-	return builder.String()
-}
