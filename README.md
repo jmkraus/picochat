@@ -209,7 +209,7 @@ In this case, generating the resulting JSON structure is an integral part of the
 }
 ```
 
-If the exact structure doesn't matter (as long as the result is valid json), then it's also possible to create a dummy file that contains only the word `json`. This will be accepted as well. All other schema files are validated. In most cases this works, but the output quality depends on the model chosen and may not be satisfactory.
+If the exact structure doesn't matter (as long as the result is valid JSON), then it's also possible to create a dummy file that contains only the word `JSON`. This will be accepted as well. All other schema files are validated. In most cases this works, but the output quality depends on the model chosen and may not be satisfactory.
 
 
 ### Reasoning
@@ -255,26 +255,42 @@ PicoChat currently supports the following configurable values in the config file
 Since Pico AI currently doesn't report token counts, it is difficult to calculate an accurate context size. This may change in the future, but for now the context size is limited by the total number of messages, with the oldest ones being dropped when the limit is reached.
 
 
+### Environment variables
+
+The configuration defaults or file entries can be overridden by setting environment variables. The list of possible values is nearly identical to the config file (omitting 'Prompt'):
+
+| Env                    |
+| ---------------------- |
+| `PICOCHAT_URL`         |
+| `PICOCHAT_MODEL`       |
+| `PICOCHAT_CONTEXT`     |
+| `PICOCHAT_TEMPERATURE` |
+| `PICOCHAT_TOP_P`       |
+| `PICOCHAT_REASONING`   |
+| `PICOCHAT_QUIET`       |
+
+
 ### Commands
 
-| CMD             | DESCRIPTION                                        |
-| --------------- | -------------------------------------------------- |
-| [Ctrl]+D        | Submit multiline input (EOF)                       |
-| [Esc], [Ctrl]+C | Cancel multiline input and return to prompt        |
-| [Up]/[Down]     | Browse prompt history                              |
-| /copy, /c       | Copy the last answer to clipboard                  |
-| /paste, /v      | Paste clipboard contents as user input and send    |
-| /info           | Show system information                            |
-| /message        | Show the last message again (e.g., after load)     |
-| /load           | Load chat history from a file                      |
-| /save           | Save current chat history to a file                |
-| /models         | List downloaded models (and switch models)         |
-| /clear          | Clear session context                              |
-| /set            | Set session variables (key=value)                  |
-| /image          | Set image file path                                |
-| /retry          | Resend the chat history, excluding the last answer |
-| /bye            | Quit PicoChat                                      |
-| /help, /?       | Show available commands                            |
+| CMD             | DESCRIPTION                                              |
+| --------------- | -------------------------------------------------------- |
+| [Ctrl]+D        | Submit multiline input (EOF)                             |
+| [Esc], [Ctrl]+C | Cancel multiline input and return to prompt              |
+| [Up]/[Down]     | Browse prompt history                                    |
+| /copy, /c       | Copy the last answer to clipboard                        |
+| /paste, /v      | Paste clipboard contents as user input and send          |
+| /info           | Show system information                                  |
+| /message        | Show the last message again (e.g., after load)           |
+| /load           | Load chat history from a file                            |
+| /save           | Save current chat history to a file                      |
+| /models         | List downloaded models (and switch models)               |
+| /clear          | Clear chat history (retaining system prompt)             |
+| /set            | Set session variables (key=value)                        |
+| /envs           | Show table of PicoChat environment vars and their status | 
+| /image          | Set image file path                                      |
+| /retry          | Resend the chat history, excluding the last answer       |
+| /bye            | Quit PicoChat                                            |
+| /help, /?       | Show available commands                                  |
 
 Some commands accept an argument:
 

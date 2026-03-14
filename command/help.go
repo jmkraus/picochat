@@ -17,7 +17,7 @@ var helpTopics = map[string][]string{
 		"  /load              Load chat history from a file",
 		"  /save              Save current chat history to a file",
 		"  /models            List downloaded models (and switch models)",
-		"  /clear             Clear session context",
+		"  /clear             Clear chat history (retaining system prompt)",
 		"  /set               Set session variables (key=value)",
 		"  /envs              Show table of PicoChat environment vars and their status",
 		"  /image             Set image file path",
