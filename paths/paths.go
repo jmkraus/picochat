@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"picochat/args"
 	"strings"
 )
 
@@ -26,21 +25,24 @@ const HistorySuffix = ".chat"
 //
 //	string - the configuration file path
 //	error - error if any
-func GetConfigPath() (string, error) {
+func GetConfigPath(configPathArg string) (string, error) {
+	if configPathArg != "" {
+		name, found := strings.CutPrefix(configPathArg, "@")
+		if !found {
+			return configPathArg, nil
+		}
+		name = EnsureSuffix(name, cfgDefaultSuffix)
+		cfgDir, err := getConfigDir()
+		if err != nil {
+			return "", err
+		}
+		return filepath.Join(cfgDir, name), nil
+	}
+
 	cfgDir, err := getConfigDir()
 	if err != nil {
 		return "", err
 	}
-
-	if *args.ConfigPath != "" {
-		name, found := strings.CutPrefix(*args.ConfigPath, "@")
-		if !found {
-			return *args.ConfigPath, nil
-		}
-		name = EnsureSuffix(name, cfgDefaultSuffix)
-		return filepath.Join(cfgDir, name), nil
-	}
-
 	return filepath.Join(cfgDir, cfgDefaultName), nil
 }
 

@@ -33,10 +33,24 @@ const (
 )
 
 var (
-	instance *Config
-	once     sync.Once
-	loadErr  error
+	instance       *Config
+	once           sync.Once
+	loadErr        error
+	initConfigPath string
 )
+
+// Init sets startup config path override.
+//
+// Parameters:
+//
+//	configPath (string) - the path to the config file
+//
+// Returns:
+//
+//	none
+func Init(configPath string) {
+	initConfigPath = configPath
+}
 
 // load reads and caches the configuration.
 //
@@ -47,8 +61,8 @@ var (
 // Returns:
 //
 //	none
-func load() {
-	path, err := paths.GetConfigPath()
+func load(configPathArg string) {
+	path, err := paths.GetConfigPath(configPathArg)
 	if err != nil {
 		loadErr = err
 		return
@@ -117,7 +131,9 @@ func DefaultConfig() Config {
 //	*Config - pointer to the loaded configuration
 //	error   - error if any
 func Get() (*Config, error) {
-	once.Do(load)
+	once.Do(func() {
+		load(initConfigPath) // load takes string arg
+	})
 	return instance, loadErr
 }
 

@@ -76,6 +76,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	config.Init(*args.ConfigPath)
 	cfg, err := config.Get()
 	if err != nil {
 		console.Error(fmt.Sprintf("load configuration failed: %v", err))
