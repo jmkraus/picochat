@@ -58,7 +58,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "bye":
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
-		name, err := messages.SaveHistoryToFile(args, history)
+		name, err := messages.SaveHistoryToFile(args, history.Get())
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}

@@ -51,14 +51,14 @@ func LoadHistoryFromFile(fileName string) (*ChatHistory, error) {
 //
 // Parameters:
 //
-//	fileName (string)      - optional fileName (or timestamp if omitted)
-//	history (*ChatHistory) - the complete current chat history
+//	fileName (string)    - optional fileName (or timestamp if omitted)
+//	messages ([]Message) - the complete current chat history messages
 //
 // Returns:
 //
 //	string - the actual fileName
 //	error  - error if any
-func SaveHistoryToFile(fileName string, history *ChatHistory) (string, error) {
+func SaveHistoryToFile(fileName string, messages []Message) (string, error) {
 	if strings.HasPrefix(fileName, "#") {
 		return "", fmt.Errorf("fileName must not start with '#'")
 	}
@@ -79,7 +79,7 @@ func SaveHistoryToFile(fileName string, history *ChatHistory) (string, error) {
 	fullPath := filepath.Join(historyPath, fileName)
 
 	if !paths.FileExists(fullPath) {
-		data, err := json.MarshalIndent(history.Messages, "", "  ")
+		data, err := json.MarshalIndent(messages, "", "  ")
 		if err != nil {
 			return "", fmt.Errorf("marshal messages failed: %w", err)
 		}

@@ -17,7 +17,7 @@ func TestSaveAndLoad(t *testing.T) {
 	restore := paths.OverrideHistoryPath(tmpDir)
 	t.Cleanup(restore)
 
-	filename, err := SaveHistoryToFile("", h)
+	filename, err := SaveHistoryToFile("", h.Get())
 	if err != nil {
 		t.Fatalf("save failed: %v", err)
 	}
@@ -45,7 +45,7 @@ func TestSaveAndLoad_DropsReasoning(t *testing.T) {
 	restore := paths.OverrideHistoryPath(tmpDir)
 	t.Cleanup(restore)
 
-	filename, err := SaveHistoryToFile("", h)
+	filename, err := SaveHistoryToFile("", h.Get())
 	if err != nil {
 		t.Fatalf("save failed: %v", err)
 	}
@@ -73,7 +73,7 @@ func TestSaveHistoryToFile_RejectsInvalidFilename(t *testing.T) {
 	restore := paths.OverrideHistoryPath(tmpDir)
 	t.Cleanup(restore)
 
-	if _, err := SaveHistoryToFile("#12", h); err == nil {
+	if _, err := SaveHistoryToFile("#12", h.Get()); err == nil {
 		t.Fatal("expected error for filename starting with '#', got nil")
 	}
 }
