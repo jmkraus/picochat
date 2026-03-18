@@ -15,13 +15,13 @@ import (
 //
 // Parameters:
 //
-//	filename string
+//	fileName string
 //
 // Returns:
 //
 //	*ChatHistory
 //	error
-func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
+func LoadHistoryFromFile(fileName string) (*ChatHistory, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
 		return nil, fmt.Errorf("history path not found: %w", err)
@@ -30,8 +30,8 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 		return nil, fmt.Errorf("empty history path returned")
 	}
 
-	filename = paths.EnsureSuffix(filepath.Base(filename), paths.HistorySuffix)
-	fullPath := filepath.Join(historyPath, filename)
+	fileName = paths.EnsureSuffix(filepath.Base(fileName), paths.HistorySuffix)
+	fullPath := filepath.Join(historyPath, fileName)
 
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
@@ -40,27 +40,27 @@ func LoadHistoryFromFile(filename string) (*ChatHistory, error) {
 
 	var messages []Message
 	if err := json.Unmarshal(data, &messages); err != nil {
-		return nil, fmt.Errorf("parse json in file %s failed: %w", filename, err)
+		return nil, fmt.Errorf("parse json in file %s failed: %w", fileName, err)
 	}
 
 	return &ChatHistory{Messages: messages}, nil
 }
 
 // SaveHistoryToFile writes the chat history to a file in the history
-// directory and returns the filename.
+// directory and returns the fileName.
 //
 // Parameters:
 //
-//	filename (string)      - optional filename (or timestamp if omitted)
+//	fileName (string)      - optional fileName (or timestamp if omitted)
 //	history (*ChatHistory) - the complete current chat history
 //
 // Returns:
 //
-//	string - the actual filename
+//	string - the actual fileName
 //	error  - error if any
-func SaveHistoryToFile(filename string, history *ChatHistory) (string, error) {
-	if strings.HasPrefix(filename, "#") {
-		return "", fmt.Errorf("filename must not start with '#'")
+func SaveHistoryToFile(fileName string, history *ChatHistory) (string, error) {
+	if strings.HasPrefix(fileName, "#") {
+		return "", fmt.Errorf("fileName must not start with '#'")
 	}
 
 	historyPath, err := paths.GetHistoryPath()
@@ -71,12 +71,12 @@ func SaveHistoryToFile(filename string, history *ChatHistory) (string, error) {
 		return "", fmt.Errorf("empty history path returned")
 	}
 
-	if filename == "" {
-		filename = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), paths.HistorySuffix)
+	if fileName == "" {
+		fileName = paths.EnsureSuffix(time.Now().Format("2006-01-02_15-04-05"), paths.HistorySuffix)
 	} else {
-		filename = paths.EnsureSuffix(filepath.Base(filename), paths.HistorySuffix)
+		fileName = paths.EnsureSuffix(filepath.Base(fileName), paths.HistorySuffix)
 	}
-	fullPath := filepath.Join(historyPath, filename)
+	fullPath := filepath.Join(historyPath, fileName)
 
 	if !paths.FileExists(fullPath) {
 		data, err := json.MarshalIndent(history.Messages, "", "  ")
@@ -85,12 +85,12 @@ func SaveHistoryToFile(filename string, history *ChatHistory) (string, error) {
 		}
 
 		if err := os.WriteFile(fullPath, data, 0644); err != nil {
-			return "", fmt.Errorf("write file %s failed: %w", filename, err)
+			return "", fmt.Errorf("write file %s failed: %w", fileName, err)
 		}
 
-		return filename, nil
+		return fileName, nil
 	} else {
-		return "", fmt.Errorf("filename already exists")
+		return "", fmt.Errorf("fileName already exists")
 	}
 }
 
