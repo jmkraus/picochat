@@ -18,6 +18,7 @@ import (
 type CommandResult struct {
 	Output string
 	Info   string
+	Warn   string
 	Error  error
 	Quit   bool
 	Pasted string
@@ -85,7 +86,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			history.Replace(loaded.Get())
 			return CommandResult{Info: fmt.Sprintf("History file %s loaded.", filename)}
 		} else {
-			return CommandResult{Info: "Load canceled."}
+			return CommandResult{Warn: "Load canceled."}
 		}
 	case "image":
 		if args != "" {

@@ -182,6 +182,9 @@ func main() {
 			if result.Error != nil {
 				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
 			}
+			if result.Warn != "" {
+				console.Warn(result.Warn)
+			}
 			console.AddCommand(input.Text)
 			if result.Info != "" && !session.Quiet {
 				console.Info(result.Info)
