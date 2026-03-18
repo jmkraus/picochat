@@ -1,9 +1,10 @@
 package envs
 
 import (
+	"fmt"
 	"os"
-	"picochat/utils"
 	"picochat/vartypes"
+	"strings"
 )
 
 // EnvVar represents the valid environment variables in this package.
@@ -83,7 +84,7 @@ func ConfigByField(field string) (EnvSpec, bool) {
 	return cfg, ok
 }
 
-// ConfigEnvVarsMarkdownTable returns a markdown table with env var state and values.
+// ConfigEnvVarsTable builds a table from env var state and values.
 //
 // Parameters:
 //
@@ -92,7 +93,7 @@ func ConfigByField(field string) (EnvSpec, bool) {
 // Returns:
 //
 //	string - the full markdown table
-func ConfigEnvVarsMarkdownTable() string {
+func ConfigEnvVarsTable() string {
 	tableData := make([][]string, 0, len(ConfigEnvVars)+1)
 	tableData = append(tableData, []string{"Env", "Set", "Value"})
 
@@ -108,5 +109,61 @@ func ConfigEnvVarsMarkdownTable() string {
 		tableData = append(tableData, []string{string(spec.Env), set, val})
 	}
 
-	return utils.MarkdownTable(tableData)
+	return markdownTable(tableData)
+}
+
+// markdownTable creates a markdown table from a 2-dim array
+// and adjusts the column widths according to content.
+//
+// Parameters:
+//
+//	tableData ([][]string) - the rows and columns of the table
+//
+// Returns:
+//
+//	string - markdown string with all line breaks
+func markdownTable(tableData [][]string) string {
+	numColumns := len(tableData[0])
+	border := "|" + strings.Repeat(" %s |", numColumns)
+
+	maxWidths := make([]int, numColumns)
+	separator := make([]string, numColumns)
+	for i := range separator {
+		separator[i] = "---"
+	}
+
+	tableData = append(tableData, []string{})
+	copy(tableData[1:], tableData)
+	tableData[1] = separator
+
+	for _, row := range tableData {
+		for cIdx, col := range row {
+			if len(col) > maxWidths[cIdx] {
+				maxWidths[cIdx] = len(col)
+			}
+		}
+	}
+
+	for rIdx, row := range tableData {
+		fill := " "
+		if rIdx == 1 {
+			fill = "-"
+		}
+		for cIdx, col := range row {
+			tableData[rIdx][cIdx] = fmt.Sprintf("%-"+fmt.Sprint(maxWidths[cIdx])+"s", col)
+			tableData[rIdx][cIdx] = strings.ReplaceAll(tableData[rIdx][cIdx], " ", fill)
+		}
+	}
+
+	rows := make([]string, len(tableData))
+	for i, row := range tableData {
+		rowValues := make([]any, len(row))
+		for j, v := range row {
+			rowValues[j] = v
+		}
+		rows[i] = fmt.Sprintf(border, rowValues...)
+	}
+
+	table := strings.Join(rows, "\n")
+	return table
 }

@@ -27,8 +27,9 @@ import (
 //
 // Returns:
 //
-//	string  - summary message with elapsed time and token speed
-//	error   - error if any
+//	string     - summary message with elapsed time and token speed
+//	ChatResult - a struct containing output, elapsed time, and estimated tokens/s
+//	error      - error if any
 func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan struct{}) (*ChatResult, error) {
 	cfg, err := getConfig(cfg)
 	if err != nil {

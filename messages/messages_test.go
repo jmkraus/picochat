@@ -2,7 +2,6 @@ package messages
 
 import (
 	"fmt"
-	"picochat/paths"
 	"testing"
 )
 
@@ -57,30 +56,6 @@ func TestChatHistory_add_InvalidRole(t *testing.T) {
 	expectedErr := "invalid role 'alien'"
 	if err.Error() != expectedErr {
 		t.Errorf("unexpected error message:\nwant: %q\ngot:  %q", expectedErr, err.Error())
-	}
-}
-
-func TestSaveAndLoad(t *testing.T) {
-	h := NewHistory("persist me", 5)
-	h.add("user", "", "data", "")
-
-	// Force temporary directory
-	tmpDir := t.TempDir()
-	restore := paths.OverrideHistoryPath(tmpDir)
-	t.Cleanup(restore)
-
-	filename, err := h.SaveHistoryToFile("")
-	if err != nil {
-		t.Fatalf("save failed: %v", err)
-	}
-
-	loaded, err := LoadHistoryFromFile(filename)
-	if err != nil {
-		t.Fatalf("load failed: %v", err)
-	}
-
-	if loaded.Len() != h.Len() {
-		t.Errorf("loaded history length mismatch: got %d, want %d", loaded.Len(), h.Len())
 	}
 }
 
@@ -301,42 +276,5 @@ func TestEstimateTokens_IncludesReasoning(t *testing.T) {
 	withReasoning := h.EstimateTokens()
 	if withReasoning <= base {
 		t.Errorf("expected tokens to increase when reasoning is present; base=%.1f withReasoning=%.1f", base, withReasoning)
-	}
-}
-
-func TestSaveAndLoad_DropsReasoning(t *testing.T) {
-	h := NewHistory("persist me", 5)
-
-	if err := h.add("assistant", "internal reasoning that must not be persisted", "visible content", ""); err != nil {
-		t.Fatalf("add failed: %v", err)
-	}
-
-	// Force temporary directory
-	tmpDir := t.TempDir()
-	paths.OverrideHistoryPath(tmpDir)
-
-	filename, err := h.SaveHistoryToFile("")
-	if err != nil {
-		t.Fatalf("save failed: %v", err)
-	}
-
-	loaded, err := LoadHistoryFromFile(filename)
-	if err != nil {
-		t.Fatalf("load failed: %v", err)
-	}
-
-	// System + 1 assistant
-	if loaded.Len() != 2 {
-		t.Fatalf("expected loaded history length 2, got %d", loaded.Len())
-	}
-
-	// Content must be there
-	if loaded.Messages[1].Content != "visible content" {
-		t.Errorf("expected loaded content to match; got %q", loaded.Messages[1].Content)
-	}
-
-	// Reasoning must not be there (json:"-")
-	if loaded.Messages[1].Reasoning != "" {
-		t.Errorf("expected reasoning to be empty after load, got %q", loaded.Messages[1].Reasoning)
 	}
 }

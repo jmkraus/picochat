@@ -57,7 +57,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "bye":
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
-		name, err := history.SaveHistoryToFile(args)
+		name, err := messages.SaveHistoryToFile(args, history)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
@@ -182,7 +182,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		cfg.Model = model
 		return CommandResult{Info: fmt.Sprintf("Switched model to '%s'.", model)}
 	case "envs":
-		envSetup := envs.ConfigEnvVarsMarkdownTable()
+		envSetup := envs.ConfigEnvVarsTable()
 		return CommandResult{Output: envSetup}
 	case "set":
 		if args == "" {

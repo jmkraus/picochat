@@ -161,7 +161,7 @@ func main() {
 		if input.Aborted {
 			if !session.Quiet {
 				console.NewLine(false)
-				console.Info("Input canceled.")
+				console.Warn("Input canceled.")
 			}
 			continue
 		}
