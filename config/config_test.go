@@ -6,7 +6,7 @@ import (
 )
 
 func TestDefaultConfig(t *testing.T) {
-	cfg := DefaultConfig()
+	cfg := defaultConfig()
 
 	if cfg.URL != "http://localhost:11434/api" {
 		t.Errorf("URL default = %q, want %q", cfg.URL, "http://localhost:11434/api")
@@ -48,7 +48,7 @@ func TestDefaultConfig(t *testing.T) {
 }
 
 func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
-	cfg := DefaultConfig()
+	cfg := defaultConfig()
 
 	t.Setenv("PICOCHAT_URL", "https://example.org/api")
 	t.Setenv("PICOCHAT_MODEL", "gpt-4.1-mini")
@@ -86,7 +86,7 @@ func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
 }
 
 func TestApplyEnvValues_InvalidValueReturnsError(t *testing.T) {
-	cfg := DefaultConfig()
+	cfg := defaultConfig()
 
 	t.Setenv("PICOCHAT_CONTEXT", "not-an-int")
 
@@ -100,7 +100,7 @@ func TestApplyEnvValues_InvalidValueReturnsError(t *testing.T) {
 }
 
 func TestApplyEnvValues_EmptyValueIsIgnored(t *testing.T) {
-	cfg := DefaultConfig()
+	cfg := defaultConfig()
 
 	t.Setenv("PICOCHAT_MODEL", "")
 	t.Setenv("PICOCHAT_QUIET", "")

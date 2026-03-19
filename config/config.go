@@ -69,7 +69,7 @@ func load(configPathArg string) {
 	}
 
 	// 1. Default values
-	cfg := DefaultConfig()
+	cfg := defaultConfig()
 
 	// 2. Config file
 	if paths.FileExists(path) {
@@ -97,7 +97,7 @@ func load(configPathArg string) {
 	instance = &cfg
 }
 
-// DefaultConfig defines the default values before loading the config file or evaluation env vars.
+// defaultConfig defines the default values before loading the config file or evaluation env vars.
 //
 // Parameters:
 //
@@ -106,7 +106,7 @@ func load(configPathArg string) {
 // Returns:
 //
 //	Config - a filled Config struct
-func DefaultConfig() Config {
+func defaultConfig() Config {
 	return Config{
 		URL:         "http://localhost:11434/api",
 		Model:       "gpt-oss:latest",
