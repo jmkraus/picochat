@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"picochat/config"
 	"picochat/console"
@@ -172,57 +171,6 @@ func postProcessingChat(thinking, content string) (string, string) {
 	// This is the case for AI servers which embed thinking in the content part
 	// If no think tag is found, the function returns an empty Reasoning part
 	return splitReasoning(content)
-}
-
-// elapsedTime returns the elapsed time in seconds and a formatted
-// "MM:SS" string.  All calculations are performed in whole seconds
-// to avoid floating‑point rounding differences.
-//
-// Parameters:
-//
-//	t - start time
-//
-// Returns:
-//
-//	int    - total elapsed seconds
-//	string - formatted elapsed time "MM:SS"
-func elapsedTime(t time.Time) (int, string) {
-	elapsed := time.Since(t)
-
-	totalSeconds := int(elapsed.Seconds())
-
-	minutes := totalSeconds / 60
-	seconds := totalSeconds % 60
-
-	if minutes == 0 {
-		return totalSeconds, fmt.Sprintf("%ds", seconds)
-	}
-
-	return totalSeconds, fmt.Sprintf("%dm %ds", minutes, seconds)
-}
-
-// tokenSpeed calculates the average number of tokens processed per
-// unit of time (t).  It returns 0 when t is zero to avoid division by
-// zero.  The result is rounded to one decimal place.
-//
-// Parameters:
-//
-//	t (int)    - elapsed time in seconds
-//	s (string) - string containing the full reply
-//
-// Returns:
-//
-//	float64 - tokens per second
-func tokenSpeed(t int, s string) float64 {
-	if (t == 0) || (s == "") {
-		return 0
-	}
-
-	tokens := messages.CalculateTokens(s)
-	speed := float64(tokens) / float64(t)
-	roundFactor := 10.0
-
-	return math.Round(speed*roundFactor) / roundFactor
 }
 
 // getConfig is a factory function to ensure a properly loaded config.
