@@ -55,10 +55,10 @@ func (h *commandHistory) add(cmd string) {
 		return
 	}
 	// Optional: avoid duplicate entries
-	if len(h.entries) == 0 || h.entries[len(h.entries)-1] != cmd {
+	if h.len() == 0 || h.entries[h.len()-1] != cmd {
 		h.entries = append(h.entries, cmd)
 	}
-	h.index = len(h.entries)
+	h.index = h.len()
 }
 
 // prev returns the previous command in the history.
@@ -71,7 +71,7 @@ func (h *commandHistory) add(cmd string) {
 //
 //	string - the previous command
 func (h *commandHistory) prev() string {
-	if len(h.entries) == 0 {
+	if h.len() == 0 {
 		return ""
 	}
 	if h.index > 0 {
@@ -90,13 +90,26 @@ func (h *commandHistory) prev() string {
 //
 //	string - the next command
 func (h *commandHistory) next() string {
-	if len(h.entries) == 0 {
+	if h.len() == 0 {
 		return ""
 	}
-	if h.index < len(h.entries)-1 {
+	if h.index < h.len()-1 {
 		h.index++
 		return h.entries[h.index]
 	}
-	h.index = len(h.entries)
+	h.index = h.len()
 	return ""
+}
+
+// len returns the length of the command history.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	int - length
+func (h *commandHistory) len() int {
+	return len(h.entries)
 }
