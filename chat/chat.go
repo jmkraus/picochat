@@ -72,13 +72,17 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		return nil, fmt.Errorf("http request failed: %w", err)
 	}
 	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(response.Body)
+		return nil, fmt.Errorf("non-200 response: %d - %s", response.StatusCode, string(body))
+	}
 
 	decoder := json.NewDecoder(response.Body)
 	var fullThinking strings.Builder
 	var fullContent strings.Builder
 
 	seconds := 0
-	elapsed := "0m 0s"
+	elapsed := "0s"
 	firstToken := true
 	firstContent := true
 	streamPlain := cfg.OutputFmt == "plain"
@@ -113,7 +117,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			fullContent.WriteString(res.Message.Content)
 			if streamPlain {
 				if firstContent {
-					if fullThinking.String() != "" && cfg.Reasoning {
+					if fullThinking.Len() != 0 && cfg.Reasoning {
 						fmt.Println()
 					}
 					firstContent = false

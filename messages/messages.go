@@ -231,8 +231,7 @@ func (h *ChatHistory) SetContextSize(max int) error {
 		h.Messages = append([]Message{h.Messages[0]}, h.Messages[start:]...)
 	}
 
-	// h.MaxContextReached = h.Len() >= h.MaxContext
-	h.MaxContextReached = false
+	h.MaxContextReached = h.Len() >= h.MaxContext
 	return nil
 }
 
