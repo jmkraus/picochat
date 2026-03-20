@@ -6,7 +6,7 @@ var (
 	HistoryMap = make(map[int]string)
 )
 
-// Filled by /list command
+// Filled by /load command
 //
 // Parameters:
 //
