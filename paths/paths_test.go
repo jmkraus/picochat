@@ -49,7 +49,7 @@ func TestExpandHomeDir(t *testing.T) {
 		},
 		{
 			path:        "~/",
-			expected:    homeDir + "/",
+			expected:    homeDir,
 			description: "Expand home directory only",
 		},
 		{
