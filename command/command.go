@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"picochat/backend"
 	"picochat/clipb"
 	"picochat/config"
 	"picochat/envs"
 	"picochat/messages"
 	"picochat/output"
 	"picochat/paths"
-	"picochat/requests"
 	"picochat/utils"
 	"strings"
 )
@@ -98,7 +98,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Error: fmt.Errorf("no image file path provided")}
 	case "info":
-		serverVersion, err := requests.GetServerVersion(cfg.URL)
+		serverVersion, err := backend.New(cfg).GetServerVersion()
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("fetch server version failed: %w", err)}
 		}
@@ -164,7 +164,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: "Repeating last chat history user prompt.", Repeat: true}
 	case "models":
 		if args == "" {
-			models, err := utils.ShowAvailableModels(cfg.URL)
+			client := backend.New(cfg)
+			list, err := client.GetAvailableModels()
+			if err != nil {
+				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
+			}
+
+			models, err := utils.ShowAvailableModels(list)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
 			}

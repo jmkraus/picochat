@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"picochat/requests"
 	"strings"
 	"unicode"
 )
@@ -17,12 +16,7 @@ import (
 //
 //	string - formatted list of available models
 //	error
-func ShowAvailableModels(baseUrl string) (string, error) {
-	models, err := requests.GetAvailableModels(baseUrl)
-	if err != nil {
-		return "", err
-	}
-
+func ShowAvailableModels(models []string) (string, error) {
 	if len(models) == 0 {
 		return "", fmt.Errorf("no models available.")
 	}

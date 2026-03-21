@@ -1,15 +1,11 @@
 package chat
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
+	"picochat/backend"
 	"picochat/config"
 	"picochat/console"
 	"picochat/messages"
-	"picochat/requests"
 	"strings"
 	"time"
 )
@@ -35,49 +31,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		return nil, fmt.Errorf("read config failed: %w", err)
 	}
 
-	// evaluate reasoning
-	var reasoning *Reasoning
-	if cfg.Reasoning {
-		reasoning = &Reasoning{Effort: "medium"}
-	} else {
-		reasoning = nil
-	}
-
-	reqBody := ChatRequest{
-		Model:     cfg.Model,
-		Messages:  history.Messages,
-		Stream:    true,
-		Reasoning: reasoning,
-		Think:     cfg.Reasoning,
-		Options: &ChatOptions{
-			Temperature: cfg.Temperature,
-			Top_p:       cfg.Top_p,
-		},
-		Format: cfg.SchemaFmt,
-	}
-
-	jsonData, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, fmt.Errorf("marshal json failed: %w", err)
-	}
-
-	chatURL, err := requests.BuildCleanUrl(cfg.URL, "chat")
-	if err != nil {
-		return nil, err
-	}
-
 	start := time.Now()
-	response, err := http.Post(chatURL, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, fmt.Errorf("http request failed: %w", err)
-	}
-	defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(response.Body)
-		return nil, fmt.Errorf("non-200 response: %d - %s", response.StatusCode, string(body))
-	}
-
-	decoder := json.NewDecoder(response.Body)
 	var fullThinking strings.Builder
 	var fullContent strings.Builder
 
@@ -87,17 +41,17 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	firstContent := true
 	streamPlain := cfg.OutputFmt == "plain"
 
-	for {
-		var res StreamResponse
-		if err := decoder.Decode(&res); err != nil {
-			if err == io.EOF {
-				break
-			}
-			return nil, fmt.Errorf("decode response failed: %w", err)
-		}
-
-		if (res.Message.Content != "" ||
-			(res.Message.Thinking != "" && cfg.Reasoning)) &&
+	client := backend.New(cfg)
+	_, err = client.ChatStream(backend.ChatInput{
+		Model:       cfg.Model,
+		Messages:    history.Messages,
+		Temperature: cfg.Temperature,
+		TopP:        cfg.Top_p,
+		Reasoning:   cfg.Reasoning,
+		Format:      cfg.SchemaFmt,
+	}, func(chunk backend.ChatChunk) error {
+		if (chunk.Content != "" ||
+			(chunk.Thinking != "" && cfg.Reasoning)) &&
 			firstToken &&
 			streamPlain {
 			console.StopSpinner(cfg.Quiet, stop)
@@ -105,16 +59,16 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		}
 
 		// Reasoning
-		if res.Message.Thinking != "" {
-			fullThinking.WriteString(res.Message.Thinking)
+		if chunk.Thinking != "" {
+			fullThinking.WriteString(chunk.Thinking)
 			if streamPlain && cfg.Reasoning {
-				console.ColorPrint(console.Gray256, res.Message.Thinking)
+				console.ColorPrint(console.Gray256, chunk.Thinking)
 			}
 		}
 
 		// Content
-		if res.Message.Content != "" {
-			fullContent.WriteString(res.Message.Content)
+		if chunk.Content != "" {
+			fullContent.WriteString(chunk.Content)
 			if streamPlain {
 				if firstContent {
 					if fullThinking.Len() != 0 && cfg.Reasoning {
@@ -122,17 +76,20 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 					}
 					firstContent = false
 				}
-				fmt.Print(res.Message.Content)
+				fmt.Print(chunk.Content)
 			}
 		}
 
-		if res.Done {
+		if chunk.Done {
 			if firstToken {
 				console.StopSpinner(cfg.Quiet, stop)
 			}
 			seconds, elapsed = elapsedTime(start)
-			break
 		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	if fullContent.Len() == 0 {
