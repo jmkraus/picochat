@@ -6,3 +6,4 @@ testdata/
 *.sh
 *.jpg
 *.png
+openai.toml
