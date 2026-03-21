@@ -257,7 +257,10 @@ Since Pico AI currently doesn't report token counts, it is difficult to calculat
 
 ### Environment variables
 
-The configuration defaults or file entries can be overridden by setting environment variables. The list of possible values is nearly identical to the config file (omitting 'Prompt'):
+Environment variables override built-in defaults and config file values.
+Load order: defaults -> config file -> environment variables.
+Runtime flags still take precedence for overlapping keys (`-model`, `-quiet`).
+Supported variables (same scope as config keys, except `Prompt`):
 
 | Env                    |
 | ---------------------- |
