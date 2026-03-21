@@ -132,7 +132,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			if found {
 				return CommandResult{Output: msg.Content}
 			}
-			return CommandResult{Info: fmt.Sprintf("No element for role '%s' found.", args)}
+			return CommandResult{Warn: fmt.Sprintf("No element for role '%s' found.", args)}
 		default:
 			msg := history.GetLast().Content
 			return CommandResult{Output: msg}
@@ -144,7 +144,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("copy message data failed: %w", err)}
 		}
 		if payload.Text == "" {
-			return CommandResult{Info: payload.Info}
+			return CommandResult{Warn: payload.Info}
 		}
 		if err := clipb.WriteClipboard(payload.Text); err != nil {
 			return CommandResult{Error: err}
