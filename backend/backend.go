@@ -3,6 +3,7 @@ package backend
 import (
 	"picochat/config"
 	"picochat/messages"
+	"strings"
 )
 
 type ChatInput struct {
@@ -32,6 +33,12 @@ type Client interface {
 }
 
 func New(cfg *config.Config) Client {
-	// Keep existing behavior for now: ollama API semantics.
-	return newOllamaClient(cfg.URL)
+	switch strings.ToLower(strings.TrimSpace(cfg.Backend)) {
+	case "openai":
+		return NewOpenAIClient(cfg.URL, cfg.APIKey)
+	case "", "ollama":
+		fallthrough
+	default:
+		return newOllamaClient(cfg.URL)
+	}
 }

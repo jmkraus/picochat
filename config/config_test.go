@@ -11,6 +11,12 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.URL != "http://localhost:11434/api" {
 		t.Errorf("URL default = %q, want %q", cfg.URL, "http://localhost:11434/api")
 	}
+	if cfg.Backend != "ollama" {
+		t.Errorf("Backend default = %q, want %q", cfg.Backend, "ollama")
+	}
+	if cfg.APIKey != "" {
+		t.Errorf("APIKey default = %q, want empty string", cfg.APIKey)
+	}
 	if cfg.Model != "gpt-oss:latest" {
 		t.Errorf("Model default = %q, want %q", cfg.Model, "gpt-oss:latest")
 	}
@@ -51,6 +57,8 @@ func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
 	cfg := defaultConfig()
 
 	t.Setenv("PICOCHAT_URL", "https://example.org/api")
+	t.Setenv("PICOCHAT_BACKEND", "openai")
+	t.Setenv("PICOCHAT_API_KEY", "sk-test")
 	t.Setenv("PICOCHAT_MODEL", "gpt-4.1-mini")
 	t.Setenv("PICOCHAT_CONTEXT", "42")
 	t.Setenv("PICOCHAT_TEMPERATURE", "0.2")
@@ -64,6 +72,12 @@ func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
 
 	if cfg.URL != "https://example.org/api" {
 		t.Errorf("URL = %q, want %q", cfg.URL, "https://example.org/api")
+	}
+	if cfg.Backend != "openai" {
+		t.Errorf("Backend = %q, want %q", cfg.Backend, "openai")
+	}
+	if cfg.APIKey != "sk-test" {
+		t.Errorf("APIKey = %q, want %q", cfg.APIKey, "sk-test")
 	}
 	if cfg.Model != "gpt-4.1-mini" {
 		t.Errorf("Model = %q, want %q", cfg.Model, "gpt-4.1-mini")

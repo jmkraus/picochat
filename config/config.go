@@ -12,7 +12,9 @@ import (
 )
 
 type Config struct {
+	Backend     string  `json:"backend"`
 	URL         string  `json:"url"`
+	APIKey      string  `json:"api_key"`
 	Model       string  `json:"model"`
 	Prompt      string  `json:"prompt"`
 	Context     int     `json:"context"`
@@ -108,7 +110,9 @@ func load(configPathArg string) {
 //	Config - a filled Config struct
 func defaultConfig() Config {
 	return Config{
+		Backend:     "ollama",
 		URL:         "http://localhost:11434/api",
+		APIKey:      "",
 		Model:       "gpt-oss:latest",
 		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
 		Context:     20,

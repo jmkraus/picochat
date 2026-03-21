@@ -194,6 +194,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "set":
 		if args == "" {
 			list := []string{
+				fmt.Sprintf("backend = %s", cfg.Backend),
 				fmt.Sprintf("model = %s", cfg.Model),
 				fmt.Sprintf("context = %d", cfg.Context),
 				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
