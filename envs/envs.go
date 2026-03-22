@@ -11,22 +11,23 @@ import (
 type EnvVar string
 
 type EnvSpec struct {
-	Env     EnvVar
-	Type    vartypes.VarType
-	Field   string
-	Runtime bool
+	Env       EnvVar
+	Type      vartypes.VarType
+	Field     string
+	Runtime   bool
+	Sensitive bool
 }
 
 var ConfigEnvVars = []EnvSpec{
-	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "backend", Runtime: true},
-	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "url", Runtime: false},
-	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "api_key", Runtime: false},
-	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model", Runtime: true},
-	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "context", Runtime: true},
-	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "temperature", Runtime: true},
-	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "top_p", Runtime: true},
-	{Env: "PICOCHAT_REASONING", Type: vartypes.VarBool, Field: "reasoning", Runtime: true},
-	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "quiet", Runtime: false},
+	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "backend", Runtime: true, Sensitive: false},
+	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "url", Runtime: false, Sensitive: false},
+	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "api_key", Runtime: false, Sensitive: true},
+	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model", Runtime: true, Sensitive: false},
+	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "context", Runtime: true, Sensitive: false},
+	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "temperature", Runtime: true, Sensitive: false},
+	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "top_p", Runtime: true, Sensitive: false},
+	{Env: "PICOCHAT_REASONING", Type: vartypes.VarBool, Field: "reasoning", Runtime: true, Sensitive: false},
+	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "quiet", Runtime: false, Sensitive: false},
 }
 
 var allowedRuntimeFields map[string]bool
@@ -106,7 +107,10 @@ func ConfigEnvVarsTable() string {
 			set = "false"
 		}
 		if lookup && val == "" {
-			val = "<empty>"
+			val = "[empty]"
+		}
+		if lookup && spec.Sensitive && val != "" {
+			val = "[hidden]"
 		}
 		tableData = append(tableData, []string{string(spec.Env), set, val})
 	}
