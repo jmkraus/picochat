@@ -19,8 +19,8 @@ import (
 //
 // Returns:
 //
-//	*ChatHistory
-//	error
+//	*ChatHistory - the successfully loaded JSON file
+//	error        - error if any
 func LoadHistoryFromFile(fileName string) (*ChatHistory, error) {
 	historyPath, err := paths.GetHistoryPath()
 	if err != nil {
@@ -98,12 +98,25 @@ func SaveHistoryToFile(fileName string, messages []Message) (string, error) {
 //
 // Parameters:
 //
-//	s (string) - the input string.
+//	s (string) - the input string
 //
 // Returns:
 //
-//	float64 - the estimated token count.
+//	float64 - the estimated token count
 func CalculateTokens(s string) float64 {
 	words := strings.Fields(s)
 	return float64(len(words)) * 1.3
+}
+
+// CalculateBase64Tokens estimates the number of tokenks for a base64 encoded image.
+//
+// Parameters:
+//
+//	base64 (string) - the input string
+//
+// Returns:
+//
+//	float64 - the estimated token count
+func CalculateBase64Tokens(base64 string) int {
+	return int(float64(len(base64)) / 3.3)
 }
