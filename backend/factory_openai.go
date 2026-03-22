@@ -2,8 +2,8 @@ package backend
 
 import "strings"
 
-// NewOpenAIClient creates a backend client for OpenAI Responses API.
-// It is intentionally not wired into New(cfg) yet.
+// NewOpenAIClient creates a backend client for OpenAI-compatible
+// Chat Completions API.
 func NewOpenAIClient(baseURL, apiKey string) Client {
 	if strings.TrimSpace(baseURL) == "" {
 		baseURL = "https://api.openai.com"

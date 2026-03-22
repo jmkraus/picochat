@@ -18,29 +18,34 @@ type openAIClient struct {
 	apiKey  string
 }
 
-type openAIResponsesRequest struct {
-	Model       string            `json:"model"`
-	Input       []openAIInputItem `json:"input"`
-	Stream      bool              `json:"stream"`
-	Temperature float64           `json:"temperature,omitempty"`
-	TopP        float64           `json:"top_p,omitempty"`
+type openAIChatCompletionsRequest struct {
+	Model       string              `json:"model"`
+	Messages    []openAIChatMessage `json:"messages"`
+	Stream      bool                `json:"stream"`
+	Temperature float64             `json:"temperature,omitempty"`
+	TopP        float64             `json:"top_p,omitempty"`
 }
 
-type openAIInputItem struct {
-	Role    string            `json:"role"`
-	Content []openAIInputPart `json:"content"`
-}
-
-type openAIInputPart struct {
-	Type     string `json:"type"`
-	Text     string `json:"text,omitempty"`
-	ImageURL string `json:"image_url,omitempty"`
+type openAIChatMessage struct {
+	Role    string `json:"role"`
+	Content any    `json:"content"`
 }
 
 type openAIModelsResponse struct {
 	Data []struct {
 		ID string `json:"id"`
 	} `json:"data"`
+}
+
+type openAIStreamEvent struct {
+	Choices []struct {
+		Delta struct {
+			Content          string `json:"content"`
+			ReasoningContent string `json:"reasoning_content"`
+			Reasoning        string `json:"reasoning"`
+		} `json:"delta"`
+		FinishReason any `json:"finish_reason"`
+	} `json:"choices"`
 }
 
 func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
@@ -51,9 +56,9 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		return ChatFinal{}, fmt.Errorf("missing OpenAI base URL")
 	}
 
-	payload := openAIResponsesRequest{
+	payload := openAIChatCompletionsRequest{
 		Model:       input.Model,
-		Input:       mapMessagesToOpenAIInput(input.Messages),
+		Messages:    mapMessagesToOpenAIChatMessages(input.Messages),
 		Stream:      true,
 		Temperature: input.Temperature,
 		TopP:        input.TopP,
@@ -64,7 +69,7 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		return ChatFinal{}, fmt.Errorf("marshal json failed: %w", err)
 	}
 
-	endpoint, err := joinURL(c.baseURL, "/v1/responses")
+	endpoint, err := joinURL(c.baseURL, "/v1/chat/completions")
 	if err != nil {
 		return ChatFinal{}, err
 	}
@@ -115,7 +120,7 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 			break
 		}
 
-		thinking, content, done, err := parseOpenAIEvent(data)
+		thinking, content, done, err := parseOpenAIChatCompletionEvent(data)
 		if err != nil {
 			return ChatFinal{}, err
 		}
@@ -128,20 +133,13 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		}
 
 		if onChunk != nil {
-			if err := onChunk(ChatChunk{
-				Thinking: thinking,
-				Content:  content,
-				Done:     done,
-			}); err != nil {
+			if err := onChunk(ChatChunk{Thinking: thinking, Content: content, Done: done}); err != nil {
 				return ChatFinal{}, err
 			}
 		}
 	}
 
-	return ChatFinal{
-		Reasoning: fullThinking.String(),
-		Content:   fullContent.String(),
-	}, nil
+	return ChatFinal{Reasoning: fullThinking.String(), Content: fullContent.String()}, nil
 }
 
 func (c *openAIClient) GetAvailableModels() ([]string, error) {
@@ -187,51 +185,60 @@ func (c *openAIClient) GetAvailableModels() ([]string, error) {
 }
 
 func (c *openAIClient) GetServerVersion() (string, error) {
-	return "OpenAI Responses API", nil
+	return "OpenAI-compatible Chat Completions API", nil
 }
 
-func parseOpenAIEvent(data string) (thinking, content string, done bool, err error) {
-	var evt map[string]any
+func parseOpenAIChatCompletionEvent(data string) (thinking, content string, done bool, err error) {
+	var evt openAIStreamEvent
 	if err := json.Unmarshal([]byte(data), &evt); err != nil {
 		return "", "", false, fmt.Errorf("decode response failed: %w", err)
 	}
-
-	eventType, _ := evt["type"].(string)
-	switch eventType {
-	case "response.output_text.delta":
-		content, _ = evt["delta"].(string)
-	case "response.reasoning_summary_text.delta", "response.reasoning.delta":
-		thinking, _ = evt["delta"].(string)
-	case "response.completed":
-		done = true
+	if len(evt.Choices) == 0 {
+		return "", "", false, nil
 	}
 
+	delta := evt.Choices[0].Delta
+	content = delta.Content
+	if delta.ReasoningContent != "" {
+		thinking = delta.ReasoningContent
+	} else {
+		thinking = delta.Reasoning
+	}
+
+	if evt.Choices[0].FinishReason != nil {
+		done = true
+	}
 	return thinking, content, done, nil
 }
 
-func mapMessagesToOpenAIInput(in []messages.Message) []openAIInputItem {
-	out := make([]openAIInputItem, 0, len(in))
+func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage {
+	out := make([]openAIChatMessage, 0, len(in))
 	for _, msg := range in {
-		parts := make([]openAIInputPart, 0, 1+len(msg.Images))
+		if len(msg.Images) == 0 {
+			out = append(out, openAIChatMessage{Role: msg.Role, Content: msg.Content})
+			continue
+		}
+
+		parts := make([]map[string]any, 0, 1+len(msg.Images))
 		if strings.TrimSpace(msg.Content) != "" {
-			parts = append(parts, openAIInputPart{
-				Type: "input_text",
-				Text: msg.Content,
+			parts = append(parts, map[string]any{
+				"type": "text",
+				"text": msg.Content,
 			})
 		}
 		for _, img := range msg.Images {
 			if strings.TrimSpace(img) == "" {
 				continue
 			}
-			parts = append(parts, openAIInputPart{
-				Type:     "input_image",
-				ImageURL: "data:image/png;base64," + img,
+			parts = append(parts, map[string]any{
+				"type": "image_url",
+				"image_url": map[string]any{
+					"url": "data:image/png;base64," + img,
+				},
 			})
 		}
-		out = append(out, openAIInputItem{
-			Role:    msg.Role,
-			Content: parts,
-		})
+
+		out = append(out, openAIChatMessage{Role: msg.Role, Content: parts})
 	}
 	return out
 }
