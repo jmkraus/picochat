@@ -201,14 +201,13 @@ func fallbackToExecutableDir() (string, error) {
 //
 //	string - the expanded path
 //	error  - error if any
-
 func ExpandHomeDir(path string) (string, error) {
-	if rest, ok := strings.CutPrefix(path, "~/"); ok {
+	if after, ok := strings.CutPrefix(path, "~/"); ok {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
 			return "", err
 		}
-		return filepath.Join(homeDir, rest), nil
+		return filepath.Join(homeDir, after), nil
 	}
 	return path, nil
 }

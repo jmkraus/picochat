@@ -177,7 +177,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: models}
 		}
 
-		args, _ := strings.CutPrefix(args, "#") // accept and ignore # prefix
+		args := strings.TrimPrefix(args, "#") // accept and ignore # prefix
 		index, err := parseIndex(args)
 		if err != nil {
 			return CommandResult{Error: err}
