@@ -35,7 +35,7 @@ type Client interface {
 func New(cfg *config.Config) Client {
 	switch strings.ToLower(strings.TrimSpace(cfg.Backend)) {
 	case "openai":
-		return NewOpenAIClient(cfg.URL, cfg.APIKey)
+		return newOpenAIClient(cfg.URL, cfg.APIKey)
 	case "", "ollama":
 		fallthrough
 	default:

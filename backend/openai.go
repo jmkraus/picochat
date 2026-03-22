@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"picochat/messages"
 	"strings"
 	"time"
@@ -69,7 +68,7 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		return ChatFinal{}, fmt.Errorf("marshal json failed: %w", err)
 	}
 
-	endpoint, err := joinURL(c.baseURL, "/v1/chat/completions")
+	endpoint, err := buildOpenAIURL(c.baseURL, "chat/completions")
 	if err != nil {
 		return ChatFinal{}, err
 	}
@@ -147,7 +146,7 @@ func (c *openAIClient) GetAvailableModels() ([]string, error) {
 		return nil, fmt.Errorf("missing OpenAI API key")
 	}
 
-	endpoint, err := joinURL(c.baseURL, "/v1/models")
+	endpoint, err := buildOpenAIURL(c.baseURL, "models")
 	if err != nil {
 		return nil, err
 	}
@@ -241,13 +240,4 @@ func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage 
 		out = append(out, openAIChatMessage{Role: msg.Role, Content: parts})
 	}
 	return out
-}
-
-func joinURL(baseURL, path string) (string, error) {
-	u, err := url.Parse(strings.TrimSpace(baseURL))
-	if err != nil {
-		return "", fmt.Errorf("invalid http url string %w", err)
-	}
-	u.Path = strings.TrimRight(u.Path, "/") + path
-	return u.String(), nil
 }

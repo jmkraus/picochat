@@ -1,6 +1,6 @@
 # Configuration for PicoChat
 Backend = "ollama"
-URL = "http://localhost:11434/api"
+URL = "http://localhost:11434"
 Model = "Devstral-Small-2507-4bit-DWQ"
 Context = 50
 Temperature = 0.10

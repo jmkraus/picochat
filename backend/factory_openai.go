@@ -4,7 +4,7 @@ import "strings"
 
 // NewOpenAIClient creates a backend client for OpenAI-compatible
 // Chat Completions API.
-func NewOpenAIClient(baseURL, apiKey string) Client {
+func newOpenAIClient(baseURL, apiKey string) Client {
 	if strings.TrimSpace(baseURL) == "" {
 		baseURL = "https://api.openai.com"
 	}

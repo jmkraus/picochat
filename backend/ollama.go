@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"picochat/messages"
 	"strings"
 )
@@ -78,7 +77,7 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		return ChatFinal{}, fmt.Errorf("marshal json failed: %w", err)
 	}
 
-	chatURL, err := buildCleanURL(c.baseURL, "chat")
+	chatURL, err := buildOllamaURL(c.baseURL, "chat")
 	if err != nil {
 		return ChatFinal{}, err
 	}
@@ -132,7 +131,7 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 }
 
 func (c *ollamaClient) GetAvailableModels() ([]string, error) {
-	tagsURL, err := buildCleanURL(c.baseURL, "tags")
+	tagsURL, err := buildOllamaURL(c.baseURL, "tags")
 	if err != nil {
 		return nil, fmt.Errorf("fetch models failed: %w", err)
 	}
@@ -161,7 +160,7 @@ func (c *ollamaClient) GetAvailableModels() ([]string, error) {
 }
 
 func (c *ollamaClient) GetServerVersion() (string, error) {
-	versionURL, err := buildCleanURL(c.baseURL, "version")
+	versionURL, err := buildOllamaURL(c.baseURL, "version")
 	if err != nil {
 		return "", fmt.Errorf("fetch version failed: %w", err)
 	}
@@ -187,19 +186,4 @@ func (c *ollamaClient) GetServerVersion() (string, error) {
 	}
 
 	return v.Version, nil
-}
-
-func buildCleanURL(apiBaseURL, endPoint string) (string, error) {
-	u, err := url.Parse(apiBaseURL)
-	if err != nil {
-		return "", fmt.Errorf("invalid http url string %w", err)
-	}
-
-	path := strings.TrimSuffix(u.Path, "/")
-	if !strings.HasSuffix(path, "/api") {
-		path = path + "/api"
-	}
-
-	u.Path = fmt.Sprintf("%s/%s", path, endPoint)
-	return u.String(), nil
 }
