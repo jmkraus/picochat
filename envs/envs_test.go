@@ -1,6 +1,9 @@
 package envs
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestAllowedRuntimeField_FollowsConfigRuntimeFlag(t *testing.T) {
 	for _, cfg := range ConfigEnvVars {
@@ -18,5 +21,32 @@ func TestAllowedRuntimeField_InvalidFieldsAreRejected(t *testing.T) {
 		if AllowedRuntimeField(field) {
 			t.Errorf("expected field %q to be rejected", field)
 		}
+	}
+}
+
+func TestConfigEnvVarsTable_HidesSensitiveValues(t *testing.T) {
+	t.Setenv("PICOCHAT_API_KEY", "sk-secret-value")
+
+	table := ConfigEnvVarsTable()
+	if strings.Contains(table, "sk-secret-value") {
+		t.Fatalf("table leaked sensitive value")
+	}
+	if !strings.Contains(table, "PICOCHAT_API_KEY") {
+		t.Fatalf("table does not contain API key row")
+	}
+	if !strings.Contains(table, "[hidden]") {
+		t.Fatalf("table does not mark sensitive value as hidden")
+	}
+}
+
+func TestConfigEnvVarsTable_ShowsNonSensitiveValues(t *testing.T) {
+	t.Setenv("PICOCHAT_MODEL", "test-model")
+
+	table := ConfigEnvVarsTable()
+	if !strings.Contains(table, "PICOCHAT_MODEL") {
+		t.Fatalf("table does not contain model row")
+	}
+	if !strings.Contains(table, "test-model") {
+		t.Fatalf("non-sensitive value should be visible")
 	}
 }
