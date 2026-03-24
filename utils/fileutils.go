@@ -118,7 +118,6 @@ func CreateTestFile(baseUrl string) error {
 //	string - the base64 encoded image
 //	error  - error if any
 func ImageToBase64(path string) (string, error) {
-	// Expand homedir if applicable
 	fullPath, err := paths.ExpandHomeDir(path)
 	if err != nil {
 		return "", err
@@ -135,8 +134,6 @@ func ImageToBase64(path string) (string, error) {
 
 // LoadSchemaFromFile loads a json schema string file and
 // transforms it into a json object representation.
-// ollama also allows for a simple "json" string for
-// arbitrary output in json format.
 //
 // Parameters:
 //
@@ -144,10 +141,9 @@ func ImageToBase64(path string) (string, error) {
 //
 // Returns:
 //
-//	any   - the json object or a "json" string
-//	error - error if any
-func LoadSchemaFromFile(path string) (any, error) {
-	// Expand homedir if applicable
+//	map[string]any - the json object
+//	error          - error if any
+func LoadSchemaFromFile(path string) (map[string]any, error) {
 	fullPath, err := paths.ExpandHomeDir(path)
 	if err != nil {
 		return nil, err
@@ -158,14 +154,6 @@ func LoadSchemaFromFile(path string) (any, error) {
 		return nil, err
 	}
 
-	// Special case: file only contains "json"
-	// This is the arbitrary and random structured json output
-	trimmed := strings.TrimSpace(string(data))
-	if trimmed == "json" || trimmed == `"json"` {
-		return "json", nil
-	}
-
-	// Default: parse file content as json object
 	var schema map[string]any
 	if err := json.Unmarshal(data, &schema); err != nil {
 		return nil, fmt.Errorf("invalid json schema: %w", err)

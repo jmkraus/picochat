@@ -18,11 +18,12 @@ type openAIClient struct {
 }
 
 type openAIChatCompletionsRequest struct {
-	Model       string              `json:"model"`
-	Messages    []openAIChatMessage `json:"messages"`
-	Stream      bool                `json:"stream"`
-	Temperature float64             `json:"temperature,omitempty"`
-	TopP        float64             `json:"top_p,omitempty"`
+	Model          string              `json:"model"`
+	Messages       []openAIChatMessage `json:"messages"`
+	Stream         bool                `json:"stream"`
+	Temperature    float64             `json:"temperature,omitempty"`
+	TopP           float64             `json:"top_p,omitempty"`
+	ResponseFormat map[string]any      `json:"response_format,omitempty"`
 }
 
 type openAIChatMessage struct {
@@ -56,11 +57,12 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 	}
 
 	payload := openAIChatCompletionsRequest{
-		Model:       input.Model,
-		Messages:    mapMessagesToOpenAIChatMessages(input.Messages),
-		Stream:      true,
-		Temperature: input.Temperature,
-		TopP:        input.TopP,
+		Model:          input.Model,
+		Messages:       mapMessagesToOpenAIChatMessages(input.Messages),
+		Stream:         true,
+		Temperature:    input.Temperature,
+		TopP:           input.TopP,
+		ResponseFormat: extractSchemaFormat(input.Format),
 	}
 
 	body, err := json.Marshal(payload)
@@ -240,4 +242,15 @@ func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage 
 		out = append(out, openAIChatMessage{Role: msg.Role, Content: parts})
 	}
 	return out
+}
+
+func extractSchemaFormat(v any) map[string]any {
+	if v == nil {
+		return nil
+	}
+	m, ok := v.(map[string]any)
+	if !ok {
+		return nil
+	}
+	return m
 }

@@ -12,7 +12,7 @@ type ChatInput struct {
 	Temperature float64
 	TopP        float64
 	Reasoning   bool
-	Format      any
+	Format      map[string]any
 }
 
 type ChatChunk struct {

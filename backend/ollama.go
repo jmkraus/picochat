@@ -21,7 +21,7 @@ type ollamaChatRequest struct {
 	Options   *ollamaOptions     `json:"options,omitempty"`
 	Stream    bool               `json:"stream"`
 	Think     bool               `json:"think,omitempty"`
-	Format    any                `json:"format,omitempty"`
+	Format    map[string]any     `json:"format,omitempty"`
 }
 
 type ollamaReasoning struct {
@@ -69,7 +69,7 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		},
 		Stream: true,
 		Think:  input.Reasoning,
-		Format: input.Format,
+		Format: extractSchemaFormat(input.Format),
 	}
 
 	jsonData, err := json.Marshal(reqBody)

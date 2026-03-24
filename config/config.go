@@ -23,10 +23,10 @@ type Config struct {
 	Reasoning   bool    `json:"reasoning"`
 	Quiet       bool    `json:"quiet"`
 
-	ConfigPath string `toml:"-"`
-	ImagePath  string `toml:"-"` ////IMAGES
-	OutputFmt  string `toml:"-"`
-	SchemaFmt  any    `toml:"-"`
+	ConfigPath string         `toml:"-"`
+	ImagePath  string         `toml:"-"` ////IMAGES
+	OutputFmt  string         `toml:"-"`
+	SchemaFmt  map[string]any `toml:"-"`
 }
 
 const (

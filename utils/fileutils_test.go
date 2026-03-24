@@ -75,24 +75,6 @@ func TestImageToBase64(t *testing.T) {
 	}
 }
 
-func TestLoadSchemaFromFile_JSONLiteral(t *testing.T) {
-	tmpDir := t.TempDir()
-	file := filepath.Join(tmpDir, "schema.txt")
-	if err := os.WriteFile(file, []byte("json\n"), 0644); err != nil {
-		t.Fatalf("write schema.txt: %v", err)
-	}
-
-	got, err := LoadSchemaFromFile(file)
-	if err != nil {
-		t.Fatalf("LoadSchemaFromFile returned error: %v", err)
-	}
-
-	s, ok := got.(string)
-	if !ok || s != "json" {
-		t.Fatalf("unexpected value: %#v", got)
-	}
-}
-
 func TestLoadSchemaFromFile_Object(t *testing.T) {
 	tmpDir := t.TempDir()
 	file := filepath.Join(tmpDir, "schema.json")
@@ -105,12 +87,8 @@ func TestLoadSchemaFromFile_Object(t *testing.T) {
 		t.Fatalf("LoadSchemaFromFile returned error: %v", err)
 	}
 
-	obj, ok := got.(map[string]any)
-	if !ok {
-		t.Fatalf("expected map[string]any, got %T", got)
-	}
-	if obj["type"] != "object" {
-		t.Fatalf("type = %v, want object", obj["type"])
+	if got["type"] != "object" {
+		t.Fatalf("type = %v, want object", got["type"])
 	}
 }
 
