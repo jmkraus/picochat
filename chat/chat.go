@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+type ChatResult struct {
+	Output   string  `json:"output" yaml:"output"`
+	Elapsed  string  `json:"elapsed" yaml:"elapsed"`
+	TokensPS float64 `json:"tokens_per_sec" yaml:"tokens_per_sec"`
+}
+
 // HandleChat sends a chat request to the configured model, streams the response,
 // updates the chat history, and returns a summary message with elapsed time
 // and token speed.
