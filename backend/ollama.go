@@ -69,7 +69,7 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		},
 		Stream: true,
 		Think:  input.Reasoning,
-		Format: extractSchemaFormat(input.Format),
+		Format: input.Format,
 	}
 
 	jsonData, err := json.Marshal(reqBody)

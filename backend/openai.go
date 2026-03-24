@@ -62,7 +62,7 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		Stream:         true,
 		Temperature:    input.Temperature,
 		TopP:           input.TopP,
-		ResponseFormat: extractSchemaFormat(input.Format),
+		ResponseFormat: input.Format,
 	}
 
 	body, err := json.Marshal(payload)
@@ -242,15 +242,4 @@ func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage 
 		out = append(out, openAIChatMessage{Role: msg.Role, Content: parts})
 	}
 	return out
-}
-
-func extractSchemaFormat(v any) map[string]any {
-	if v == nil {
-		return nil
-	}
-	m, ok := v.(map[string]any)
-	if !ok {
-		return nil
-	}
-	return m
 }
