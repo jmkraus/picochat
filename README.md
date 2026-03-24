@@ -209,8 +209,6 @@ In this case, generating the resulting JSON structure is an integral part of the
 }
 ```
 
-If the exact structure doesn't matter (as long as the result is valid JSON), then it's also possible to create a dummy file that contains only the word `JSON`. This will be accepted as well. All other schema files are validated. In most cases this works, but the output quality depends on the model chosen and may not be satisfactory.
-
 
 ### Reasoning
 
