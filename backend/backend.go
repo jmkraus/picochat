@@ -34,6 +34,8 @@ type Client interface {
 
 func New(cfg *config.Config) Client {
 	switch strings.ToLower(strings.TrimSpace(cfg.Backend)) {
+	case "responses":
+		return newOpenAIResponsesClient(cfg.URL, cfg.APIKey)
 	case "openai":
 		return newOpenAIClient(cfg.URL, cfg.APIKey)
 	case "", "ollama":

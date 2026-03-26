@@ -2,12 +2,12 @@ package backend
 
 import "strings"
 
-// OpenAI Chat Completions API
-func newOpenAIClient(baseURL, apiKey string) Client {
+// OpenAI Responses API
+func newOpenAIResponsesClient(baseURL, apiKey string) Client {
 	if strings.TrimSpace(baseURL) == "" {
 		baseURL = "https://api.openai.com"
 	}
-	return &openAIClient{
+	return &openAIResponsesClient{
 		baseURL: strings.TrimRight(baseURL, "/"),
 		apiKey:  apiKey,
 	}

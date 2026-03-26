@@ -7,3 +7,4 @@ testdata/
 *.jpg
 *.png
 openai.toml
+responses.toml
