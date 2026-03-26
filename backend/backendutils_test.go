@@ -81,3 +81,43 @@ func TestBuildOpenAIURL(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildOpenAIURL_ResponsesEndpoint(t *testing.T) {
+	tests := []struct {
+		name     string
+		baseURL  string
+		endpoint string
+		want     string
+	}{
+		{
+			name:     "no path adds v1 for responses",
+			baseURL:  "https://api.openai.com",
+			endpoint: "responses",
+			want:     "https://api.openai.com/v1/responses",
+		},
+		{
+			name:     "existing v1 path keeps responses endpoint",
+			baseURL:  "https://api.openai.com/v1",
+			endpoint: "responses",
+			want:     "https://api.openai.com/v1/responses",
+		},
+		{
+			name:     "custom proxy path is trusted for responses",
+			baseURL:  "http://localhost:8080/openai",
+			endpoint: "responses",
+			want:     "http://localhost:8080/openai/responses",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := buildOpenAIURL(tt.baseURL, tt.endpoint)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Fatalf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
