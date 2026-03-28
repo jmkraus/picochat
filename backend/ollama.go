@@ -59,9 +59,11 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		reasoning = &ollamaReasoning{Effort: "medium"}
 	}
 
+	ollamaMessages := normalizeOllamaImages(input.Messages)
+
 	reqBody := ollamaChatRequest{
 		Model:     input.Model,
-		Messages:  input.Messages,
+		Messages:  ollamaMessages,
 		Reasoning: reasoning,
 		Options: &ollamaOptions{
 			Temperature: input.Temperature,
@@ -186,4 +188,35 @@ func (c *ollamaClient) GetServerVersion() (string, error) {
 	}
 
 	return v.Version, nil
+}
+
+func normalizeOllamaImages(in []messages.Message) []messages.Message {
+	out := make([]messages.Message, len(in))
+	copy(out, in)
+
+	for i := range out {
+		if len(out[i].Images) == 0 {
+			continue
+		}
+
+		imgs := make([]string, len(out[i].Images))
+		for j, img := range out[i].Images {
+			imgs[j] = stripDataURLPrefix(img)
+		}
+		out[i].Images = imgs
+	}
+
+	return out
+}
+
+func stripDataURLPrefix(s string) string {
+	if !strings.HasPrefix(s, "data:") {
+		return s
+	}
+
+	const marker = ";base64,"
+	if idx := strings.Index(s, marker); idx >= 0 {
+		return s[idx+len(marker):]
+	}
+	return s
 }

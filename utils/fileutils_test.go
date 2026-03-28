@@ -104,3 +104,32 @@ func TestLoadSchemaFromFile_InvalidJSON(t *testing.T) {
 		t.Fatalf("expected error, got nil")
 	}
 }
+
+func TestGetMimeType_Image(t *testing.T) {
+	tmpDir := t.TempDir()
+	file := filepath.Join(tmpDir, "image.jpg")
+	if err := os.WriteFile(file, []byte("dummy"), 0644); err != nil {
+		t.Fatalf("write image.jpg: %v", err)
+	}
+
+	mt, err := GetMimeType(file)
+	if err != nil {
+		t.Fatalf("GetMimeType returned error: %v", err)
+	}
+	if mt != "image/jpeg" {
+		t.Fatalf("mime = %q, want %q", mt, "image/jpeg")
+	}
+}
+
+func TestGetMimeType_NonImageReturnsError(t *testing.T) {
+	tmpDir := t.TempDir()
+	file := filepath.Join(tmpDir, "note.txt")
+	if err := os.WriteFile(file, []byte("hello"), 0644); err != nil {
+		t.Fatalf("write note.txt: %v", err)
+	}
+
+	_, err := GetMimeType(file)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}

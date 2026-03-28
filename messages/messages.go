@@ -15,7 +15,6 @@ const (
 
 type Message struct {
 	Role      string   `json:"role"`
-	Thinking  string   `json:"thinking,omitempty"`
 	Content   string   `json:"content"`
 	Images    []string `json:"images,omitempty"` ////IMAGES
 	Reasoning string   `json:"-"`
@@ -66,11 +65,18 @@ func (h *ChatHistory) add(role, reasoning, content, image string) error {
 		////IMAGES
 		var img []string
 		if image != "" {
+			mime, err := utils.GetMimeType(image)
+			if err != nil {
+				return err
+			}
 			b64, err := utils.ImageToBase64(image)
 			if err != nil {
 				return fmt.Errorf("convert image to base64 failed: %w", err)
 			}
-			img = append(img, b64)
+			// "data:<mime>;base64,<data>"
+			// img = append(img, b64)
+			imageData := fmt.Sprintf("data:%s;base64,%s", mime, b64)
+			img = append(img, imageData)
 		}
 
 		h.Messages = append(h.Messages, Message{Role: role, Reasoning: reasoning, Content: content, Images: img})

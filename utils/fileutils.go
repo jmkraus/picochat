@@ -3,8 +3,13 @@ package utils
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"mime"
+	"net/http"
 	"os"
+	"path/filepath"
 	"picochat/paths"
 	"picochat/requests"
 	"runtime"
@@ -160,4 +165,46 @@ func LoadSchemaFromFile(path string) (map[string]any, error) {
 	}
 
 	return schema, nil
+}
+
+// GetMimeType resolves the MIME type of a file.
+// It first checks by file extension and then falls
+// back to content sniffing.
+//
+// Parameters:
+//
+//	path (string) - path to the file
+//
+// Returns:
+//
+//	string - detected MIME type (must be image/*)
+//	error  - error if file cannot be read or MIME is not image/*
+func GetMimeType(path string) (string, error) {
+	ext := filepath.Ext(path)
+
+	if mt := mime.TypeByExtension(ext); mt != "" {
+		if strings.HasPrefix(mt, "image/") {
+			return mt, nil
+		}
+		return "", fmt.Errorf("unsupported file type %q (only image/* allowed)", mt)
+	}
+
+	// Fallback: sniff content bytes
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	buf := make([]byte, 512)
+	n, err := f.Read(buf)
+	if err != nil && !errors.Is(err, io.EOF) {
+		return "", err
+	}
+
+	mt := http.DetectContentType(buf[:n])
+	if strings.HasPrefix(mt, "image/") {
+		return mt, nil
+	}
+	return "", fmt.Errorf("unsupported file type %q (only image/* allowed)", mt)
 }

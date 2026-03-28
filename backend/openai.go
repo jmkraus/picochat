@@ -18,12 +18,11 @@ type openAIClient struct {
 }
 
 type openAIChatCompletionsRequest struct {
-	Model          string              `json:"model"`
-	Messages       []openAIChatMessage `json:"messages"`
-	Stream         bool                `json:"stream"`
-	Temperature    float64             `json:"temperature,omitempty"`
-	TopP           float64             `json:"top_p,omitempty"`
-	ResponseFormat map[string]any      `json:"response_format,omitempty"`
+	Model       string              `json:"model"`
+	Messages    []openAIChatMessage `json:"messages"`
+	Stream      bool                `json:"stream"`
+	Temperature float64             `json:"temperature,omitempty"`
+	TopP        float64             `json:"top_p,omitempty"`
 }
 
 type openAIChatMessage struct {
@@ -57,12 +56,11 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 	}
 
 	payload := openAIChatCompletionsRequest{
-		Model:          input.Model,
-		Messages:       mapMessagesToOpenAIChatMessages(input.Messages),
-		Stream:         true,
-		Temperature:    input.Temperature,
-		TopP:           input.TopP,
-		ResponseFormat: input.Format,
+		Model:       input.Model,
+		Messages:    mapMessagesToOpenAIChatMessages(input.Messages),
+		Stream:      true,
+		Temperature: input.Temperature,
+		TopP:        input.TopP,
 	}
 
 	body, err := json.Marshal(payload)
@@ -234,7 +232,7 @@ func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage 
 			parts = append(parts, map[string]any{
 				"type": "image_url",
 				"image_url": map[string]any{
-					"url": "data:image/png;base64," + img,
+					"url": img,
 				},
 			})
 		}

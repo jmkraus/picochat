@@ -28,7 +28,14 @@ type responsesRequest struct {
 }
 
 type responsesText struct {
-	Format map[string]any `json:"format,omitempty"`
+	Format responsesTextFormat `json:"format"`
+}
+
+type responsesTextFormat struct {
+	Type   string         `json:"type"`
+	Name   string         `json:"name,omitempty"`
+	Schema map[string]any `json:"schema,omitempty"`
+	Strict bool           `json:"strict,omitempty"`
 }
 
 type responsesInputItem struct {
@@ -40,6 +47,7 @@ type responsesInputPart struct {
 	Type     string `json:"type"`
 	Text     string `json:"text,omitempty"`
 	ImageURL string `json:"image_url,omitempty"`
+	Detail   string `json:"detail,omitempty"`
 }
 
 type responsesModelsResponse struct {
@@ -62,9 +70,7 @@ func (c *openAIResponsesClient) ChatStream(input ChatInput, onChunk func(ChatChu
 		Stream:      true,
 		Temperature: input.Temperature,
 		TopP:        input.TopP,
-	}
-	if len(input.Format) != 0 {
-		reqPayload.Text = &responsesText{Format: input.Format}
+		Text:        buildResponsesText(input.Format),
 	}
 
 	body, err := json.Marshal(reqPayload)
@@ -149,6 +155,25 @@ func (c *openAIResponsesClient) ChatStream(input ChatInput, onChunk func(ChatChu
 	return ChatFinal{Reasoning: fullThinking.String(), Content: fullContent.String()}, nil
 }
 
+func buildResponsesText(schema map[string]any) *responsesText {
+	if len(schema) == 0 {
+		return &responsesText{
+			Format: responsesTextFormat{
+				Type: "text",
+			},
+		}
+	}
+
+	return &responsesText{
+		Format: responsesTextFormat{
+			Type:   "json_schema",
+			Name:   "user",
+			Schema: schema,
+			Strict: true,
+		},
+	}
+}
+
 func (c *openAIResponsesClient) GetAvailableModels() ([]string, error) {
 	if strings.TrimSpace(c.apiKey) == "" {
 		return nil, fmt.Errorf("missing OpenAI API key")
@@ -214,7 +239,8 @@ func mapMessagesToResponsesInput(in []messages.Message) []responsesInputItem {
 			}
 			parts = append(parts, responsesInputPart{
 				Type:     "input_image",
-				ImageURL: "data:image/png;base64," + img,
+				ImageURL: img,
+				Detail:   "auto",
 			})
 		}
 
