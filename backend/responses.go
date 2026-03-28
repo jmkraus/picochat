@@ -56,6 +56,17 @@ type responsesModelsResponse struct {
 	} `json:"data"`
 }
 
+// ChatStream sends a streaming request to the OpenAI Responses endpoint.
+//
+// Parameters:
+//
+//	input (ChatInput)               - normalized chat payload
+//	onChunk (func(ChatChunk) error) - callback for streamed chunks
+//
+// Returns:
+//
+//	ChatFinal - accumulated reasoning and content
+//	error     - error if request/stream handling fails
 func (c *openAIResponsesClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
 	if strings.TrimSpace(c.apiKey) == "" {
 		return ChatFinal{}, fmt.Errorf("missing OpenAI API key")
@@ -155,6 +166,16 @@ func (c *openAIResponsesClient) ChatStream(input ChatInput, onChunk func(ChatChu
 	return ChatFinal{Reasoning: fullThinking.String(), Content: fullContent.String()}, nil
 }
 
+// buildResponsesText builds the Responses API text.format payload for either
+// plain text or strict json_schema output.
+//
+// Parameters:
+//
+//	schema (map[string]any) - optional schema definition
+//
+// Returns:
+//
+//	*responsesText - formatted text block for request payload
 func buildResponsesText(schema map[string]any) *responsesText {
 	if len(schema) == 0 {
 		return &responsesText{
@@ -174,6 +195,16 @@ func buildResponsesText(schema map[string]any) *responsesText {
 	}
 }
 
+// GetAvailableModels fetches models from the OpenAI-compatible models endpoint.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	[]string - list of model IDs
+//	error    - error if request or decoding fails
 func (c *openAIResponsesClient) GetAvailableModels() ([]string, error) {
 	if strings.TrimSpace(c.apiKey) == "" {
 		return nil, fmt.Errorf("missing OpenAI API key")
@@ -216,10 +247,29 @@ func (c *openAIResponsesClient) GetAvailableModels() ([]string, error) {
 	return models, nil
 }
 
+// GetServerVersion returns a static descriptor for this backend protocol.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	string - protocol descriptor
+//	error  - always nil
 func (c *openAIResponsesClient) GetServerVersion() (string, error) {
 	return "OpenAI Responses API", nil
 }
 
+// mapMessagesToResponsesInput maps internal messages to Responses API input items.
+//
+// Parameters:
+//
+//	in ([]messages.Message) - internal chat history messages
+//
+// Returns:
+//
+//	[]responsesInputItem - mapped request input items
 func mapMessagesToResponsesInput(in []messages.Message) []responsesInputItem {
 	out := make([]responsesInputItem, 0, len(in))
 
@@ -253,6 +303,19 @@ func mapMessagesToResponsesInput(in []messages.Message) []responsesInputItem {
 	return out
 }
 
+// parseResponsesEvent parses one SSE event payload and extracts incremental
+// reasoning/content plus completion state.
+//
+// Parameters:
+//
+//	data (string) - SSE event payload (JSON)
+//
+// Returns:
+//
+//	string - reasoning delta
+//	string - content delta
+//	bool   - done flag
+//	error  - error if decoding fails
 func parseResponsesEvent(data string) (thinking, content string, done bool, err error) {
 	var evt map[string]any
 	if err := json.Unmarshal([]byte(data), &evt); err != nil {

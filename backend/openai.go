@@ -47,6 +47,17 @@ type openAIStreamEvent struct {
 	} `json:"choices"`
 }
 
+// ChatStream sends a streaming chat completion request to an OpenAI-compatible endpoint.
+//
+// Parameters:
+//
+//	input (ChatInput)               - normalized chat payload
+//	onChunk (func(ChatChunk) error) - callback for streamed chunks
+//
+// Returns:
+//
+//	ChatFinal - accumulated reasoning and content
+//	error     - error if request/stream handling fails
 func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
 	if strings.TrimSpace(c.apiKey) == "" {
 		return ChatFinal{}, fmt.Errorf("missing OpenAI API key")
@@ -141,6 +152,16 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 	return ChatFinal{Reasoning: fullThinking.String(), Content: fullContent.String()}, nil
 }
 
+// GetAvailableModels fetches models from the OpenAI-compatible models endpoint.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	[]string - list of model IDs
+//	error    - error if request or decoding fails
 func (c *openAIClient) GetAvailableModels() ([]string, error) {
 	if strings.TrimSpace(c.apiKey) == "" {
 		return nil, fmt.Errorf("missing OpenAI API key")
@@ -183,10 +204,33 @@ func (c *openAIClient) GetAvailableModels() ([]string, error) {
 	return models, nil
 }
 
+// GetServerVersion returns a static descriptor for this backend protocol.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	string - protocol descriptor
+//	error  - always nil
 func (c *openAIClient) GetServerVersion() (string, error) {
 	return "OpenAI-compatible Chat Completions API", nil
 }
 
+// parseOpenAIChatCompletionEvent parses one SSE event payload and extracts
+// incremental reasoning/content plus completion state.
+//
+// Parameters:
+//
+//	data (string) - SSE event payload (JSON)
+//
+// Returns:
+//
+//	string - reasoning delta
+//	string - content delta
+//	bool   - done flag
+//	error  - error if decoding fails
 func parseOpenAIChatCompletionEvent(data string) (thinking, content string, done bool, err error) {
 	var evt openAIStreamEvent
 	if err := json.Unmarshal([]byte(data), &evt); err != nil {
@@ -210,6 +254,15 @@ func parseOpenAIChatCompletionEvent(data string) (thinking, content string, done
 	return thinking, content, done, nil
 }
 
+// mapMessagesToOpenAIChatMessages maps internal messages to chat-completions format.
+//
+// Parameters:
+//
+//	in ([]messages.Message) - internal chat history messages
+//
+// Returns:
+//
+//	[]openAIChatMessage - mapped request messages
 func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage {
 	out := make([]openAIChatMessage, 0, len(in))
 	for _, msg := range in {
