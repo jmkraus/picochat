@@ -190,7 +190,7 @@ func buildResponsesText(schema map[string]any) *responsesText {
 			Type:   "json_schema",
 			Name:   "user",
 			Schema: schema,
-			Strict: true,
+			Strict: false,
 		},
 	}
 }
