@@ -63,7 +63,7 @@ func (h *ChatHistory) add(role, reasoning, content, image string) error {
 		}
 
 		////IMAGES
-		var img []string
+		var images []string
 		if image != "" {
 			mime, err := utils.GetMimeType(image)
 			if err != nil {
@@ -73,13 +73,11 @@ func (h *ChatHistory) add(role, reasoning, content, image string) error {
 			if err != nil {
 				return fmt.Errorf("convert image to base64 failed: %w", err)
 			}
-			// "data:<mime>;base64,<data>"
-			// img = append(img, b64)
 			imageData := fmt.Sprintf("data:%s;base64,%s", mime, b64)
-			img = append(img, imageData)
+			images = append(images, imageData)
 		}
 
-		h.Messages = append(h.Messages, Message{Role: role, Reasoning: reasoning, Content: content, Images: img})
+		h.Messages = append(h.Messages, Message{Role: role, Reasoning: reasoning, Content: content, Images: images})
 		h.compress()
 
 		return nil
