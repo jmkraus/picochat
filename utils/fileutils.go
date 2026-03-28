@@ -168,8 +168,8 @@ func LoadSchemaFromFile(path string) (map[string]any, error) {
 }
 
 // GetMimeType resolves the MIME type of a file.
-// It first checks by file extension and then falls
-// back to content sniffing.
+// It first checks by content sniffing and then
+// falls back to file extension.
 //
 // Parameters:
 //
@@ -180,16 +180,7 @@ func LoadSchemaFromFile(path string) (map[string]any, error) {
 //	string - detected MIME type (must be image/*)
 //	error  - error if file cannot be read or MIME is not image/*
 func GetMimeType(path string) (string, error) {
-	ext := filepath.Ext(path)
-
-	if mt := mime.TypeByExtension(ext); mt != "" {
-		if strings.HasPrefix(mt, "image/") {
-			return mt, nil
-		}
-		return "", fmt.Errorf("unsupported file type %q (only image/* allowed)", mt)
-	}
-
-	// Fallback: sniff content bytes
+	// Prefer content-based detection for safety.
 	f, err := os.Open(path)
 	if err != nil {
 		return "", err
@@ -206,5 +197,12 @@ func GetMimeType(path string) (string, error) {
 	if strings.HasPrefix(mt, "image/") {
 		return mt, nil
 	}
+
+	// Minimal fallback: trust extension only if it maps to an image MIME.
+	ext := filepath.Ext(path)
+	if byExt := mime.TypeByExtension(ext); strings.HasPrefix(byExt, "image/") {
+		return byExt, nil
+	}
+
 	return "", fmt.Errorf("unsupported file type %q (only image/* allowed)", mt)
 }
