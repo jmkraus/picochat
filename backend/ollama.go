@@ -53,6 +53,17 @@ type ollamaServerVersion struct {
 	Version string `json:"version"`
 }
 
+// ChatStream sends a streaming chat request to an Ollama-compatible endpoint.
+//
+// Parameters:
+//
+//	input (ChatInput)                  - normalized chat payload
+//	onChunk (func(ChatChunk) error)    - callback for streamed chunks
+//
+// Returns:
+//
+//	ChatFinal - accumulated reasoning and content
+//	error     - error if request/stream handling fails
 func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
 	var reasoning *ollamaReasoning
 	if input.Reasoning {
@@ -132,6 +143,16 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 	}, nil
 }
 
+// GetAvailableModels fetches available models from the Ollama tags endpoint.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	[]string - list of model IDs/names
+//	error    - error if request or decoding fails
 func (c *ollamaClient) GetAvailableModels() ([]string, error) {
 	tagsURL, err := buildOllamaURL(c.baseURL, "tags")
 	if err != nil {
@@ -161,6 +182,16 @@ func (c *ollamaClient) GetAvailableModels() ([]string, error) {
 	return names, nil
 }
 
+// GetServerVersion fetches server version from the Ollama version endpoint.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	string - server version
+//	error  - error if request or decoding fails
 func (c *ollamaClient) GetServerVersion() (string, error) {
 	versionURL, err := buildOllamaURL(c.baseURL, "version")
 	if err != nil {
@@ -190,6 +221,17 @@ func (c *ollamaClient) GetServerVersion() (string, error) {
 	return v.Version, nil
 }
 
+// normalizeOllamaImages normalizes image payloads for Ollama requests.
+// If an image is a data URL, the prefix is removed and only plain base64
+// data is kept.
+//
+// Parameters:
+//
+//	in ([]messages.Message) - input messages
+//
+// Returns:
+//
+//	[]messages.Message - copied slice with normalized image payloads
 func normalizeOllamaImages(in []messages.Message) []messages.Message {
 	out := make([]messages.Message, len(in))
 	copy(out, in)
@@ -209,14 +251,24 @@ func normalizeOllamaImages(in []messages.Message) []messages.Message {
 	return out
 }
 
+// stripDataURLPrefix removes a data URL prefix and returns only base64 data.
+//
+// Parameters:
+//
+//	s (string) - image payload
+//
+// Returns:
+//
+//	string - plain base64 data (or original string if no prefix exists)
 func stripDataURLPrefix(s string) string {
 	if !strings.HasPrefix(s, "data:") {
 		return s
 	}
 
 	const marker = ";base64,"
-	if idx := strings.Index(s, marker); idx >= 0 {
-		return s[idx+len(marker):]
+	_, after, found := strings.Cut(s, marker)
+	if found {
+		return after
 	}
 	return s
 }
