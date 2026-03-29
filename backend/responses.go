@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -105,58 +104,7 @@ func (c *openAIResponsesClient) ChatStream(input ChatInput, onChunk func(ChatChu
 		return ChatFinal{}, fmt.Errorf("non-200 response: %d - %s", resp.StatusCode, string(msg))
 	}
 
-	var fullThinking strings.Builder
-	var fullContent strings.Builder
-
-	reader := bufio.NewReader(resp.Body)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return ChatFinal{}, fmt.Errorf("read stream failed: %w", err)
-		}
-
-		line = strings.TrimSpace(line)
-		if line == "" || !strings.HasPrefix(line, "data:") {
-			continue
-		}
-
-		data := strings.TrimSpace(strings.TrimPrefix(line, "data:"))
-		if data == "[DONE]" {
-			if onChunk != nil {
-				if err := onChunk(ChatChunk{Done: true}); err != nil {
-					return ChatFinal{}, err
-				}
-			}
-			break
-		}
-
-		thinking, content, done, err := parseResponsesEvent(data)
-		if err != nil {
-			return ChatFinal{}, err
-		}
-
-		if thinking != "" {
-			fullThinking.WriteString(thinking)
-		}
-		if content != "" {
-			fullContent.WriteString(content)
-		}
-
-		if onChunk != nil {
-			if err := onChunk(ChatChunk{
-				Thinking: thinking,
-				Content:  content,
-				Done:     done,
-			}); err != nil {
-				return ChatFinal{}, err
-			}
-		}
-	}
-
-	return ChatFinal{Reasoning: fullThinking.String(), Content: fullContent.String()}, nil
+	return consumeSSEStream(resp.Body, parseResponsesEvent, onChunk)
 }
 
 // buildResponsesText builds the Responses API text.format payload for either
