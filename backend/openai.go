@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"picochat/messages"
 	"strings"
-	"time"
 )
 
 type openAIClient struct {
@@ -28,12 +27,6 @@ type openAIChatCompletionsRequest struct {
 type openAIChatMessage struct {
 	Role    string `json:"role"`
 	Content any    `json:"content"`
-}
-
-type openAIModelsResponse struct {
-	Data []struct {
-		ID string `json:"id"`
-	} `json:"data"`
 }
 
 type openAIStreamEvent struct {
@@ -163,45 +156,7 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 //	[]string - list of model IDs
 //	error    - error if request or decoding fails
 func (c *openAIClient) GetAvailableModels() ([]string, error) {
-	if strings.TrimSpace(c.apiKey) == "" {
-		return nil, fmt.Errorf("missing OpenAI API key")
-	}
-
-	endpoint, err := buildOpenAIURL(c.baseURL, "models")
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("create request failed: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
-
-	client := http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("fetch models failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		msg, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("non-200 response: %d - %s", resp.StatusCode, string(msg))
-	}
-
-	var result openAIModelsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("decode response failed: %w", err)
-	}
-
-	models := make([]string, 0, len(result.Data))
-	for _, v := range result.Data {
-		if v.ID != "" {
-			models = append(models, v.ID)
-		}
-	}
-	return models, nil
+	return fetchOpenAIModels(c.baseURL, c.apiKey)
 }
 
 // GetServerVersion returns a static descriptor for this backend protocol.
