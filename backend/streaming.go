@@ -14,6 +14,19 @@ type streamAccum struct {
 	Content   strings.Builder
 }
 
+// consumeSSEStream consumes an SSE stream body, parses each data event
+// with the provided parser callback, and accumulates reasoning/content.
+//
+// Parameters:
+//
+//	body (io.Reader)                 - response stream body
+//	parse (parseEventFn)             - event parser callback
+//	onChunk (func(ChatChunk) error)  - optional chunk callback
+//
+// Returns:
+//
+//	ChatFinal - accumulated reasoning and content
+//	error     - error if stream read/parsing/callback fails
 func consumeSSEStream(
 	body io.Reader,
 	parse parseEventFn,

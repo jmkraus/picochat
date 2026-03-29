@@ -11,6 +11,20 @@ import (
 	"time"
 )
 
+// buildProviderURL constructs a full endpoint URL for a provider.
+// If the base URL already contains a path, it is trusted as-is and
+// the endpoint is appended. Otherwise, the provider root path is added.
+//
+// Parameters:
+//
+//	baseURL (string) - server base URL
+//	apiRoot (string) - default API root path (e.g. "api", "v1")
+//	endPoint (string) - endpoint path without leading slash
+//
+// Returns:
+//
+//	string - full endpoint URL
+//	error  - error if URL is invalid or endpoint is empty
 func buildProviderURL(baseURL, apiRoot, endPoint string) (string, error) {
 	u, err := url.Parse(strings.TrimSpace(baseURL))
 	if err != nil {
@@ -36,10 +50,32 @@ func buildProviderURL(baseURL, apiRoot, endPoint string) (string, error) {
 	return u.String(), nil
 }
 
+// buildOllamaURL builds a full Ollama endpoint URL.
+//
+// Parameters:
+//
+//	baseURL (string) - Ollama server base URL
+//	endPoint (string) - endpoint path without leading slash
+//
+// Returns:
+//
+//	string - full endpoint URL
+//	error  - error if URL or endpoint is invalid
 func buildOllamaURL(baseURL, endPoint string) (string, error) {
 	return buildProviderURL(baseURL, "api", endPoint)
 }
 
+// buildOpenAIURL builds a full OpenAI-compatible endpoint URL.
+//
+// Parameters:
+//
+//	baseURL (string) - OpenAI-compatible server base URL
+//	endPoint (string) - endpoint path without leading slash
+//
+// Returns:
+//
+//	string - full endpoint URL
+//	error  - error if URL or endpoint is invalid
 func buildOpenAIURL(baseURL, endPoint string) (string, error) {
 	return buildProviderURL(baseURL, "v1", endPoint)
 }
@@ -50,6 +86,17 @@ type openAIModelsResponse struct {
 	} `json:"data"`
 }
 
+// fetchOpenAIModels fetches model IDs from an OpenAI-compatible /models endpoint.
+//
+// Parameters:
+//
+//	baseURL (string) - OpenAI-compatible server base URL
+//	apiKey (string)  - bearer token for authorization
+//
+// Returns:
+//
+//	[]string - list of model IDs
+//	error    - error if request/decoding fails or API key is missing
 func fetchOpenAIModels(baseURL, apiKey string) ([]string, error) {
 	if strings.TrimSpace(apiKey) == "" {
 		return nil, fmt.Errorf("missing OpenAI API key")
