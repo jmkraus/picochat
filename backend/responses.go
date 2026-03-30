@@ -161,7 +161,7 @@ func (c *openAIResponsesClient) GetAvailableModels() ([]string, error) {
 //	string - protocol descriptor
 //	error  - always nil
 func (c *openAIResponsesClient) GetServerVersion() (string, error) {
-	return "OpenAI Responses API", nil
+	return "unknown (using OpenAI Responses API)", nil
 }
 
 // mapMessagesToResponsesInput maps internal messages to Responses API input items.

@@ -122,7 +122,7 @@ func (c *openAIClient) GetAvailableModels() ([]string, error) {
 //	string - protocol descriptor
 //	error  - always nil
 func (c *openAIClient) GetServerVersion() (string, error) {
-	return "OpenAI-compatible Chat Completions API", nil
+	return "unknown (using OpenAI Chat Completions API)", nil
 }
 
 // parseOpenAIChatCompletionEvent parses one SSE event payload and extracts
