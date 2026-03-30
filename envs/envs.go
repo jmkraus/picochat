@@ -19,7 +19,7 @@ type EnvSpec struct {
 }
 
 var ConfigEnvVars = []EnvSpec{
-	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "backend", Runtime: true},
+	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "backend"},
 	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "url"},
 	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "api_key", Sensitive: true},
 	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model", Runtime: true},
