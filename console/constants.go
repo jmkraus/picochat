@@ -1,19 +1,5 @@
 package console
 
-// struct types
-type InputResult struct {
-	Text      string
-	IsCommand bool
-	Aborted   bool
-	EOF       bool
-	Error     error
-}
-
-type commandHistory struct {
-	entries []string
-	index   int
-}
-
 // Constants
 const (
 	Prompt = ">>> "

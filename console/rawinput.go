@@ -11,6 +11,14 @@ import (
 	"golang.org/x/term"
 )
 
+type InputResult struct {
+	Text      string
+	IsCommand bool
+	Aborted   bool
+	EOF       bool
+	Error     error
+}
+
 // PromptWidth returns the width of the predefined prompt symbols
 // as correct runewidth calculation.
 //

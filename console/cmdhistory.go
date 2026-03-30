@@ -1,5 +1,10 @@
 package console
 
+type commandHistory struct {
+	entries []string
+	index   int
+}
+
 var cmdHistory = &commandHistory{}
 
 // AddCommand adds a command to the history.
