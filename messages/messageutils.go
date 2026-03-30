@@ -108,7 +108,7 @@ func CalculateTokens(s string) float64 {
 	return float64(len(words)) * 1.3
 }
 
-// CalculateBase64Tokens estimates the number of tokenks for a base64 encoded image.
+// CalculateBase64Tokens estimates the number of tokens for a base64 encoded image.
 //
 // Parameters:
 //
@@ -117,6 +117,28 @@ func CalculateTokens(s string) float64 {
 // Returns:
 //
 //	float64 - the estimated token count
-func CalculateBase64Tokens(base64 string) int {
-	return int(float64(len(base64)) / 3.3)
+func CalculateBase64Tokens(base64 string) float64 {
+	return (float64(len(base64)) / 3.3 * 1.1)
+}
+
+// StripDataURLPrefix removes a data URL prefix and returns only base64 data.
+//
+// Parameters:
+//
+//	s (string) - image payload
+//
+// Returns:
+//
+//	string - plain base64 data (or original string if no prefix exists)
+func StripDataURLPrefix(s string) string {
+	if !strings.HasPrefix(s, "data:") {
+		return s
+	}
+
+	const marker = ";base64,"
+	_, after, found := strings.Cut(s, marker)
+	if found {
+		return after
+	}
+	return s
 }
