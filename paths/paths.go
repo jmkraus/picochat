@@ -87,7 +87,7 @@ func getConfigDir() (string, error) {
 	}
 
 	// Fallback 2: $CONFIG_PATH
-	if env, _ := os.LookupEnv("CONFIG_PATH"); env != "" {
+	if env := os.Getenv("CONFIG_PATH"); env != "" {
 		return env, nil
 	}
 
@@ -160,7 +160,7 @@ func GetHistoryPath() (string, error) {
 //	string - the config directory path
 //	error - error if any
 func fallbackToXDGOrHome() (string, error) {
-	if env, _ := os.LookupEnv("XDG_CONFIG_HOME"); env != "" {
+	if env := os.Getenv("XDG_CONFIG_HOME"); env != "" {
 		return filepath.Join(env, "picochat"), nil
 	}
 

@@ -19,7 +19,7 @@ import (
 //
 //	bool - app is running in a tmux session (true / false)
 func isTmuxSession() bool {
-	tmux, _ := os.LookupEnv("TMUX")
+	tmux := os.Getenv("TMUX")
 	return tmux != ""
 }
 
