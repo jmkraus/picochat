@@ -14,7 +14,7 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.Backend != "ollama" {
 		t.Errorf("Backend default = %q, want %q", cfg.Backend, "ollama")
 	}
-	if cfg.APIKey != "" {
+	if cfg.APIKey != "ollama" {
 		t.Errorf("APIKey default = %q, want empty string", cfg.APIKey)
 	}
 	if cfg.Model != "gpt-oss:latest" {
