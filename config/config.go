@@ -110,9 +110,9 @@ func load(configPathArg string) {
 //	Config - a filled Config struct
 func defaultConfig() Config {
 	return Config{
-		Backend:     "ollama",
 		URL:         "http://localhost:11434/api",
-		APIKey:      "",
+		Backend:     "ollama",
+		APIKey:      "ollama",
 		Model:       "gpt-oss:latest",
 		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
 		Context:     20,

@@ -113,6 +113,31 @@ func TestApplyEnvValues_InvalidValueReturnsError(t *testing.T) {
 	}
 }
 
+func TestApplyEnvValues_InvalidFloat64ValueReturnsError(t *testing.T) {
+	tests := []struct {
+		name   string
+		envKey string
+	}{
+		{name: "temperature", envKey: "PICOCHAT_TEMPERATURE"},
+		{name: "top_p", envKey: "PICOCHAT_TOP_P"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			t.Setenv(tt.envKey, "not-a-float")
+
+			err := applyEnvValues(&cfg)
+			if err == nil {
+				t.Fatal("applyEnvValues returned nil error, want error")
+			}
+			if !strings.Contains(err.Error(), tt.envKey) {
+				t.Errorf("error = %q, want to contain %q", err.Error(), tt.envKey)
+			}
+		})
+	}
+}
+
 func TestApplyEnvValues_EmptyValueIsIgnored(t *testing.T) {
 	cfg := defaultConfig()
 
