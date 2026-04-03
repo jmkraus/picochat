@@ -24,7 +24,7 @@ If an invalid format is provided, PicoChat falls back to `plain` and prints a wa
 ## Structured content (`-format`)
 
 Structured content is generated during inference from a JSON schema:
-This feature is not available on all backends and works best with Ollama via the Ollama API, but it can also be used with the OpenAI-compatible completions API.
+This feature is not available on all backends and mainly works with Ollama via the Ollama API.
 
 ```bash
 echo "Tell me about Canada" | picochat -format ./schema.json
