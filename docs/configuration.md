@@ -47,6 +47,8 @@ Supported variables:
 - `PICOCHAT_REASONING`
 - `PICOCHAT_QUIET`
 
+`APIKey` can be set in `config.toml`, but this is not recommended for regular use because the key is then stored in plain text. A better approach is to fetch the key from your password manager in a shell script and export it as `PICOCHAT_API_KEY` before starting PicoChat.
+
 ## Personas
 
 You can maintain multiple config files (for example `generic.toml`, `developer.toml`) and load them with:
