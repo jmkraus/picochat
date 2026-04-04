@@ -154,7 +154,7 @@ func Get() (*Config, error) {
 func Set(key string, value any) error {
 	cfg, err := Get()
 	if err != nil {
-		return fmt.Errorf("cannot apply config change: %w", err)
+		return fmt.Errorf("get config data failed: %w", err)
 	}
 
 	if !envs.AllowedRuntimeField(key) {
