@@ -19,10 +19,10 @@ History files are stored in the PicoChat config directory (for example `.config/
 | Key           | Type    | Description                                                         |
 | ------------- | ------- | ------------------------------------------------------------------- |
 | `Backend`     | string  | Backend flavor (`ollama`, `openai`, `responses`)                    |
-| `URL`         | string  | Core API endpoint (default: `http://localhost:11434/api`)          |
+| `URL`         | string  | Core API endpoint (default: `http://localhost:11434`)               |
 | `APIKey`      | string  | API key for OpenAI-compatible backends (recommended via env var)    |
-| `Model`       | string  | Model name (must be available on backend)                          |
-| `Context`     | integer | Max messages in context (`3..100`)                                 |
+| `Model`       | string  | Model name (must be available on backend)                           |
+| `Context`     | integer | Max messages in context (`3..100`)                                  |
 | `Temperature` | float   | Model temperature                                                   |
 | `Top_p`       | float   | Top-p sampling value                                                |
 | `Prompt`      | string  | System prompt/persona                                               |
