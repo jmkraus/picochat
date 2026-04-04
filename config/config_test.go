@@ -8,8 +8,8 @@ import (
 func TestDefaultConfig(t *testing.T) {
 	cfg := defaultConfig()
 
-	if cfg.URL != "http://localhost:11434/api" {
-		t.Errorf("URL default = %q, want %q", cfg.URL, "http://localhost:11434/api")
+	if cfg.URL != "http://localhost:11434" {
+		t.Errorf("URL default = %q, want %q", cfg.URL, "http://localhost:11434")
 	}
 	if cfg.Backend != "ollama" {
 		t.Errorf("Backend default = %q, want %q", cfg.Backend, "ollama")

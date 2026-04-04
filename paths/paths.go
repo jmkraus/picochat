@@ -100,7 +100,7 @@ func getConfigDir() (string, error) {
 		return xdg, nil
 	}
 
-	return "", fmt.Errorf("no valid config path found.")
+	return "", fmt.Errorf("no valid config path found")
 }
 
 var overrideHistoryPath string // for Unit Tests

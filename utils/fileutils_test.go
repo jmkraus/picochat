@@ -51,7 +51,7 @@ func TestListHistoryFiles_NoHistoryFiles(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error, got nil")
 	}
-	if err.Error() != "no history files found." {
+	if err.Error() != "no history files found" {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }

@@ -45,7 +45,7 @@ func ListHistoryFiles() (string, error) {
 	}
 
 	if len(history) == 0 {
-		return "", fmt.Errorf("no history files found.")
+		return "", fmt.Errorf("no history files found")
 	}
 
 	setHistoryList(history)

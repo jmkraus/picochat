@@ -18,7 +18,7 @@ import (
 //	error
 func ShowAvailableModels(models []string) (string, error) {
 	if len(models) == 0 {
-		return "", fmt.Errorf("no models available.")
+		return "", fmt.Errorf("no models available")
 	}
 
 	setModelsList(models)
@@ -38,7 +38,7 @@ func ShowAvailableModels(models []string) (string, error) {
 //	string - formatted list
 func FormatList(content []string, heading string, numbered bool) string {
 	if len(content) == 0 {
-		return fmt.Sprintf("no %s found.", strings.ToLower(heading))
+		return fmt.Sprintf("No %s found.", strings.ToLower(heading))
 	}
 
 	var lines []string

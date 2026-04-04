@@ -28,7 +28,7 @@ func TestFormatList_WithNumbers(t *testing.T) {
 
 func TestFormatList_Empty(t *testing.T) {
 	items := []string{}
-	expected := "no items found."
+	expected := "No items found."
 
 	result := FormatList(items, "items", false)
 
