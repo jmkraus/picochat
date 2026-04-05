@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	MinContext     = 3
+	MaxContext     = 100
 	MinTemperature = 0.0
 	MaxTemperature = 2.0
 	MinTopP        = 0.0
@@ -85,7 +87,7 @@ func NormalizeConfig(cfg *Config) []string {
 	var warnings []string
 
 	origCtx := cfg.Context
-	if v, changed := ClampInt("context", cfg.Context, MinCtx, MaxCtx); changed {
+	if v, changed := ClampInt("context", cfg.Context, MinContext, MaxContext); changed {
 		cfg.Context = v
 		warnings = append(warnings, fmt.Sprintf("config value 'context' (%d) out of range [%d..%d], clamped to %d", origCtx, MinCtx, MaxCtx, v))
 	}
