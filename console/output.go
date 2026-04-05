@@ -3,6 +3,7 @@ package console
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 const info_prefix string = BrightGreen + Bold + "✓" + ColorReset
@@ -37,6 +38,24 @@ func Error(msg string) {
 func Warn(msg string) {
 	fmt.Print(ClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", warn_prefix, msg)
+}
+
+// Warns calls the Warn func multiple times for a number of similar warnings.
+//
+// Parameters:
+//
+//	msgs ([]string) - slice of warning messages to be printed
+//
+// Returns:
+//
+//	none
+func Warns(msgs []string) {
+	for _, m := range msgs {
+		if strings.TrimSpace(m) == "" {
+			continue
+		}
+		Warn(m)
+	}
 }
 
 // Info prints a message to stdout (normal output)
