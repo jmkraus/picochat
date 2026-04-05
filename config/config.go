@@ -29,15 +29,11 @@ type Config struct {
 	SchemaFmt  map[string]any `toml:"-"`
 }
 
-const (
-	MinCtx = 3
-	MaxCtx = 100
-)
-
 var (
 	instance       *Config
 	once           sync.Once
-	loadErr        error
+	loadWarn       []string
+	loadError      error
 	initConfigPath string
 )
 
@@ -66,7 +62,7 @@ func Init(configPath string) {
 func load(configPathArg string) {
 	path, err := paths.GetConfigPath(configPathArg)
 	if err != nil {
-		loadErr = err
+		loadError = err
 		return
 	}
 
@@ -76,7 +72,7 @@ func load(configPathArg string) {
 	// 2. Config file
 	if paths.FileExists(path) {
 		if _, err := toml.DecodeFile(path, &cfg); err != nil {
-			loadErr = fmt.Errorf("decode toml file %q failed: %w", path, err)
+			loadError = fmt.Errorf("decode toml file %q failed: %w", path, err)
 			return
 		}
 	} else {
@@ -86,14 +82,12 @@ func load(configPathArg string) {
 	// 3. Environment variables
 	err = applyEnvValues(&cfg)
 	if err != nil {
-		loadErr = fmt.Errorf("apply env var values failed: %w", err)
+		loadError = fmt.Errorf("apply env var values failed: %w", err)
 		return
 	}
 
-	if cfg.Context < MinCtx || cfg.Context > MaxCtx {
-		loadErr = fmt.Errorf("context size must be between %d and %d", MinCtx, MaxCtx)
-		return
-	}
+	// TODO 4. Check value contraints
+	// NormalizeConfig()
 
 	cfg.ConfigPath = path
 	instance = &cfg
@@ -138,7 +132,7 @@ func Get() (*Config, error) {
 	once.Do(func() {
 		load(initConfigPath) // load takes string arg
 	})
-	return instance, loadErr
+	return instance, loadError
 }
 
 // Set allows changing a specific parameter after loading.
@@ -166,9 +160,8 @@ func Set(key string, value any) error {
 		return fmt.Errorf("apply config value failed: %w", err)
 	}
 
-	if key == "context" && (next.Context < MinCtx || next.Context > MaxCtx) {
-		return fmt.Errorf("context size must be between %d and %d", MinCtx, MaxCtx)
-	}
+	// TODO
+	// NormalizeConfig()
 
 	*cfg = next
 	return nil

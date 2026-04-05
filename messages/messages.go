@@ -218,8 +218,8 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 //
 //	error
 func (h *ChatHistory) SetContextSize(max int) error {
-	if max < config.MinCtx || max > config.MaxCtx {
-		return fmt.Errorf("context size must be between %d and %d", config.MinCtx, config.MaxCtx)
+	if max < config.MinContext || max > config.MaxContext {
+		return fmt.Errorf("context size must be between %d and %d", config.MinContext, config.MaxContext)
 	}
 	if h.MaxContext == max {
 		return nil

@@ -15,14 +15,14 @@ func TestClampInt(t *testing.T) {
 		wantValue int
 		wantChg   bool
 	}{
-		{name: "within range", in: 20, min: MinCtx, max: MaxCtx, wantValue: 20, wantChg: false},
-		{name: "below min", in: 1, min: MinCtx, max: MaxCtx, wantValue: MinCtx, wantChg: true},
-		{name: "above max", in: 999, min: MinCtx, max: MaxCtx, wantValue: MaxCtx, wantChg: true},
+		{name: "within range", in: 20, min: MinContext, max: MaxContext, wantValue: 20, wantChg: false},
+		{name: "below min", in: 1, min: MinContext, max: MaxContext, wantValue: MinContext, wantChg: true},
+		{name: "above max", in: 999, min: MinContext, max: MaxContext, wantValue: MaxContext, wantChg: true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, changed := ClampInt("context", tt.in, tt.min, tt.max)
+			got, changed := clampInt("context", tt.in, tt.min, tt.max)
 			if got != tt.wantValue {
 				t.Fatalf("value = %d, want %d", got, tt.wantValue)
 			}
@@ -52,7 +52,7 @@ func TestClampFloat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, changed := ClampFloat("float", tt.in, tt.min, tt.max)
+			got, changed := clampFloat("float", tt.in, tt.min, tt.max)
 			if got != tt.wantValue {
 				t.Fatalf("value = %v, want %v", got, tt.wantValue)
 			}
@@ -95,8 +95,8 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 
 	warnings := NormalizeConfig(&cfg)
 
-	if cfg.Context != MinCtx {
-		t.Fatalf("context = %d, want %d", cfg.Context, MinCtx)
+	if cfg.Context != MinContext {
+		t.Fatalf("context = %d, want %d", cfg.Context, MinContext)
 	}
 	if cfg.Temperature != MaxTemperature {
 		t.Fatalf("temperature = %v, want %v", cfg.Temperature, MaxTemperature)
@@ -116,4 +116,3 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 		}
 	}
 }
-

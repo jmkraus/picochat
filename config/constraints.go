@@ -14,7 +14,7 @@ const (
 	MaxTopP        = 1.0
 )
 
-// ClampInt clamps an integer value to the given inclusive range.
+// clampInt clamps an integer value to the given inclusive range.
 //
 // Parameters:
 //
@@ -27,7 +27,7 @@ const (
 //
 //	int  - clamped or original value
 //	bool - true if value was changed
-func ClampInt(name string, v, min, max int) (int, bool) {
+func clampInt(name string, v, min, max int) (int, bool) {
 	_ = name
 	if v < min {
 		return min, true
@@ -38,7 +38,7 @@ func ClampInt(name string, v, min, max int) (int, bool) {
 	return v, false
 }
 
-// ClampFloat clamps a float64 value to the given inclusive range.
+// clampFloat clamps a float64 value to the given inclusive range.
 // NaN and Inf values are treated as invalid and clamped to boundaries.
 //
 // Parameters:
@@ -52,7 +52,7 @@ func ClampInt(name string, v, min, max int) (int, bool) {
 //
 //	float64 - clamped or original value
 //	bool    - true if value was changed
-func ClampFloat(name string, v, min, max float64) (float64, bool) {
+func clampFloat(name string, v, min, max float64) (float64, bool) {
 	_ = name
 	if math.IsNaN(v) || math.IsInf(v, -1) {
 		return min, true
@@ -87,19 +87,19 @@ func NormalizeConfig(cfg *Config) []string {
 	var warnings []string
 
 	origCtx := cfg.Context
-	if v, changed := ClampInt("context", cfg.Context, MinContext, MaxContext); changed {
+	if v, changed := clampInt("context", cfg.Context, MinContext, MaxContext); changed {
 		cfg.Context = v
-		warnings = append(warnings, fmt.Sprintf("config value 'context' (%d) out of range [%d..%d], clamped to %d", origCtx, MinCtx, MaxCtx, v))
+		warnings = append(warnings, fmt.Sprintf("config value 'context' (%d) out of range [%d..%d], clamped to %d", origCtx, MinContext, MaxContext, v))
 	}
 
 	origTemp := cfg.Temperature
-	if v, changed := ClampFloat("temperature", cfg.Temperature, MinTemperature, MaxTemperature); changed {
+	if v, changed := clampFloat("temperature", cfg.Temperature, MinTemperature, MaxTemperature); changed {
 		cfg.Temperature = v
 		warnings = append(warnings, fmt.Sprintf("config value 'temperature' (%g) out of range [%g..%g], clamped to %g", origTemp, MinTemperature, MaxTemperature, v))
 	}
 
 	origTopP := cfg.Top_p
-	if v, changed := ClampFloat("top_p", cfg.Top_p, MinTopP, MaxTopP); changed {
+	if v, changed := clampFloat("top_p", cfg.Top_p, MinTopP, MaxTopP); changed {
 		cfg.Top_p = v
 		warnings = append(warnings, fmt.Sprintf("config value 'top_p' (%g) out of range [%g..%g], clamped to %g", origTopP, MinTopP, MaxTopP, v))
 	}
