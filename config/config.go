@@ -126,9 +126,9 @@ func defaultConfig() Config {
 //
 // Returns:
 //
-//	*Config   - pointer to the loaded configuration
-//	[]strings - one or more warnings
-//	error     - error if any
+//	*Config  - pointer to the loaded configuration
+//	[]string - one or more warnings
+//	error    - error if any
 func Get() (*Config, []string, error) {
 	once.Do(func() {
 		load(initConfigPath) // load takes string arg
@@ -145,24 +145,27 @@ func Get() (*Config, []string, error) {
 //
 // Returns:
 //
-//	error - error if any
-func Set(key string, value any) error {
+//	[]strings - one or more warnings
+//	error     - error if any
+func Set(key string, value any) ([]string, error) {
 	cfg, _, err := Get()
 	if err != nil {
-		return fmt.Errorf("get config data failed: %w", err)
+		return nil, fmt.Errorf("get config data failed: %w", err)
 	}
 
 	if !envs.AllowedRuntimeField(key) {
-		return fmt.Errorf("unsupported config key '%s'", key)
+		return nil, fmt.Errorf("unsupported config key '%s'", key)
 	}
 
 	next := *cfg // work on copy to avoid compromised config
 	if err := applyConfigValue(&next, key, value); err != nil {
-		return fmt.Errorf("apply config value failed: %w", err)
+		return nil, fmt.Errorf("apply config value failed: %w", err)
 	}
 
+	warnings := NormalizeConfig(&next)
+
 	*cfg = next
-	return nil
+	return warnings, nil
 }
 
 // applyConfig updates a specific config element.
