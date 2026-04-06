@@ -86,8 +86,8 @@ func load(configPathArg string) {
 		return
 	}
 
-	// TODO 4. Check value contraints
-	// NormalizeConfig()
+	// 4. Check value contraints
+	loadWarn = NormalizeConfig(&cfg)
 
 	cfg.ConfigPath = path
 	instance = &cfg
@@ -160,9 +160,6 @@ func Set(key string, value any) error {
 	if err := applyConfigValue(&next, key, value); err != nil {
 		return fmt.Errorf("apply config value failed: %w", err)
 	}
-
-	// TODO
-	// NormalizeConfig()
 
 	*cfg = next
 	return nil
