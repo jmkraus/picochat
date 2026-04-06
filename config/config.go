@@ -126,13 +126,14 @@ func defaultConfig() Config {
 //
 // Returns:
 //
-//	*Config - pointer to the loaded configuration
-//	error   - error if any
-func Get() (*Config, error) {
+//	*Config   - pointer to the loaded configuration
+//	[]strings - one or more warnings
+//	error     - error if any
+func Get() (*Config, []string, error) {
 	once.Do(func() {
 		load(initConfigPath) // load takes string arg
 	})
-	return instance, loadError
+	return instance, loadWarn, loadError
 }
 
 // Set allows changing a specific parameter after loading.
@@ -146,7 +147,7 @@ func Get() (*Config, error) {
 //
 //	error - error if any
 func Set(key string, value any) error {
-	cfg, err := Get()
+	cfg, _, err := Get()
 	if err != nil {
 		return fmt.Errorf("get config data failed: %w", err)
 	}

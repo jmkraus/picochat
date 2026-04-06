@@ -154,5 +154,6 @@ func getConfig(cfg *config.Config) (*config.Config, error) {
 	if cfg != nil {
 		return cfg, nil
 	}
-	return config.Get()
+	conf, _, err := config.Get()
+	return conf, err
 }

@@ -77,10 +77,13 @@ func main() {
 	}
 
 	config.Init(*args.ConfigPath)
-	cfg, err := config.Get()
+	cfg, warn, err := config.Get()
 	if err != nil {
 		console.Error(fmt.Sprintf("load configuration failed: %v", err))
 		os.Exit(1)
+	}
+	if len(warn) > 0 {
+		console.Warns(warn)
 	}
 
 	if *args.Quiet {
