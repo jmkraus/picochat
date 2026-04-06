@@ -23,8 +23,8 @@ History files are stored in the PicoChat config directory (for example `.config/
 | `APIKey`      | string  | API key for OpenAI-compatible backends (recommended via env var)    |
 | `Model`       | string  | Model name (must be available on backend)                           |
 | `Context`     | integer | Max messages in context (`3..100`)                                  |
-| `Temperature` | float   | Model temperature                                                   |
-| `Top_p`       | float   | Top-p sampling value                                                |
+| `Temperature` | float   | Model temperature (`0..2`)                                          |
+| `Top_p`       | float   | Top-p sampling value (`0..1`)                                       |
 | `Prompt`      | string  | System prompt/persona                                               |
 | `Quiet`       | bool    | Suppress info/warn output                                           |
 | `Reasoning`   | bool    | Enable or disable reasoning behavior                                |
