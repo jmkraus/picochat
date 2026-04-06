@@ -127,7 +127,7 @@ func defaultConfig() Config {
 // Returns:
 //
 //	*Config  - pointer to the loaded configuration
-//	[]string - one or more warnings
+//	[]string - one or more warnings if any
 //	error    - error if any
 func Get() (*Config, []string, error) {
 	once.Do(func() {
@@ -145,7 +145,7 @@ func Get() (*Config, []string, error) {
 //
 // Returns:
 //
-//	[]strings - one or more warnings
+//	[]strings - one or more warnings if any
 //	error     - error if any
 func Set(key string, value any) ([]string, error) {
 	cfg, _, err := Get()
