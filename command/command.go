@@ -39,7 +39,7 @@ type CommandResult struct {
 //	CommandResult - a struct containing output, error, quit flag, prompt,
 //	and repeat flag for the command.
 func HandleCommand(commandLine string, history *messages.ChatHistory, input io.Reader) CommandResult {
-	cfg, err := config.Get()
+	cfg, _, err := config.Get()
 	if err != nil {
 		return CommandResult{Error: fmt.Errorf("read config failed: %w", err)}
 	}
@@ -211,6 +211,17 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("apply to config failed: %w", err)}
 		}
+
+		var warn string
+		warnings := config.NormalizeConfig(cfg)
+		if len(warnings) > 0 {
+			if len(warnings) == 1 {
+				warn = warnings[0]
+			} else {
+				warn = fmt.Sprintf("%s (+%d more)", warnings[0], len(warnings)-1)
+			}
+		}
+
 		if key == "context" {
 			intVal, _ := value.(int)
 			err := history.SetContextSize(intVal)
@@ -218,7 +229,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("set context size failed: %w", err)}
 			}
 		}
-		return CommandResult{Info: fmt.Sprintf("Config updated: %s = %v.", key, value)}
+		return CommandResult{Info: fmt.Sprintf("Config updated for %s.", key), Warn: warn}
 	case "clear":
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Info: "History cleared (system prompt retained)."}
