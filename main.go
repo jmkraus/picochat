@@ -143,7 +143,7 @@ func main() {
 
 	if !session.Quiet {
 		if *args.Model != "" {
-			console.Info(fmt.Sprintf("Configuration overridden by model=%s", cfg.Model))
+			console.Info(fmt.Sprintf("Using model from CLI override: %s.", cfg.Model))
 		}
 		console.Info("PicoChat started.")
 	}
