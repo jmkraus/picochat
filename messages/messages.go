@@ -178,6 +178,20 @@ func (h *ChatHistory) GetByIndex(index int) (Message, error) {
 	return h.Messages[index], nil
 }
 
+// CheckIfLastEntryIsRole probes if the last history entry is  of
+// the given role type.
+//
+// Parameters:
+//
+//	role (string) - Role of the message (System, User, Assistant)
+//
+// Returns:
+//
+//	bool - Status if the role does match
+func (h *ChatHistory) CheckIfLastEntryIsRole(role string) bool {
+	return h.GetLast().Role == role
+}
+
 // Replace replaces the entire message slice with newMessages.
 //
 // Parameters:
