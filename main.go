@@ -32,17 +32,6 @@ func sendPrompt(session *Session, prompt string) {
 }
 
 func repeatPrompt(session *Session) {
-	if session.History.Len() < 2 {
-		console.Warn("chat history is empty")
-		return
-	}
-
-	lastEntry := session.History.GetLast()
-	if lastEntry.Role != messages.RoleUser {
-		console.Warn("last entry in history is not a user prompt")
-		return
-	}
-
 	runChat(session)
 }
 
@@ -184,6 +173,7 @@ func main() {
 			result := command.HandleCommand(input.Text, session.History, os.Stdin)
 			if result.Error != nil {
 				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
+				continue
 			}
 			if result.Warn != "" {
 				console.Warn(result.Warn)
@@ -195,7 +185,6 @@ func main() {
 			if result.Output != "" {
 				fmt.Println(result.Output)
 			}
-
 			if result.Quit {
 				break
 			}
@@ -219,6 +208,5 @@ func main() {
 		if input.EOF {
 			break
 		}
-
 	}
 }

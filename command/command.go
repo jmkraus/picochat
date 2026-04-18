@@ -161,6 +161,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 	case "retry":
 		history.Discard()
+		if history.IsEmpty() {
+			return CommandResult{Error: fmt.Errorf("chat history is empty")}
+		}
+		lastEntry := history.GetLast()
+		if lastEntry.Role != messages.RoleUser {
+			return CommandResult{Error: fmt.Errorf("last entry in chat history is not a user prompt")}
+		}
 		return CommandResult{Info: "Repeating last chat history user prompt.", Repeat: true}
 	case "models":
 		if args == "" {
