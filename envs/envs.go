@@ -102,9 +102,9 @@ func ConfigEnvVarsTable() string {
 
 	for _, spec := range ConfigEnvVars {
 		val, lookup := GetEnv(spec.Env)
-		set := "true"
-		if !lookup {
-			set = "false"
+		set := "false"
+		if lookup {
+			set = "true"
 		}
 		if lookup && val == "" {
 			val = "[empty]"
