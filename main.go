@@ -176,7 +176,6 @@ func main() {
 		console.Error(err.Error())
 		os.Exit(1)
 	}
-
 	if len(warn) > 0 {
 		console.Warns(warn)
 	}
@@ -222,14 +221,14 @@ func main() {
 		if input.IsCommand {
 			console.NewLine(session.Quiet)
 			result := command.HandleCommand(input.Text, session.History, os.Stdin)
+			console.AddCommand(input.Text)
 			if result.Error != nil {
-				console.Error(fmt.Sprintf("command handler failed: %v", result.Error))
+				console.Error(fmt.Sprintf("command handler error: %v", result.Error))
 				continue
 			}
 			if result.Warn != "" {
 				console.Warn(result.Warn)
 			}
-			console.AddCommand(input.Text)
 			if result.Info != "" && !session.Quiet {
 				console.Info(result.Info)
 			}
