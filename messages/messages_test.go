@@ -38,6 +38,51 @@ func TestAddAndClear(t *testing.T) {
 	}
 }
 
+func TestDiscard(t *testing.T) {
+	t.Run("only system prompt - no change", func(t *testing.T) {
+		h := NewHistory("sys", 5)
+
+		h.Discard()
+
+		if h.Len() != 1 {
+			t.Fatalf("expected length 1, got %d", h.Len())
+		}
+		if h.Get()[0].Role != RoleSystem {
+			t.Fatalf("expected first role %q, got %q", RoleSystem, h.Get()[0].Role)
+		}
+	})
+
+	t.Run("last message is assistant - remove last", func(t *testing.T) {
+		h := NewHistory("sys", 5)
+		_ = h.add(RoleUser, "", "hello", "")
+		_ = h.add(RoleAssistant, "", "hi", "")
+
+		h.Discard()
+
+		if h.Len() != 2 {
+			t.Fatalf("expected length 2 after discard, got %d", h.Len())
+		}
+		last := h.GetLast()
+		if last.Role != RoleUser {
+			t.Fatalf("expected last role %q, got %q", RoleUser, last.Role)
+		}
+	})
+
+	t.Run("last message is not assistant - no change", func(t *testing.T) {
+		h := NewHistory("sys", 5)
+		_ = h.add(RoleUser, "", "hello", "")
+
+		h.Discard()
+
+		if h.Len() != 2 {
+			t.Fatalf("expected length 2, got %d", h.Len())
+		}
+		if h.GetLast().Role != RoleUser {
+			t.Fatalf("expected last role %q, got %q", RoleUser, h.GetLast().Role)
+		}
+	})
+}
+
 func TestChatHistory_add_InvalidRole(t *testing.T) {
 	h := &ChatHistory{}
 

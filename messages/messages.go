@@ -104,13 +104,12 @@ func (h *ChatHistory) AddAssistant(reasoning, content string) error {
 //
 //	none
 func (h *ChatHistory) Discard() {
-	if h.Len() <= 1 {
-		return // only system prompt in history
+	if h.IsEmpty() {
+		return
 	}
 
-	lastIndex := h.Len() - 1
-	if h.Messages[lastIndex].Role == RoleAssistant {
-		h.Messages = h.Messages[:lastIndex]
+	if h.CheckIfLastEntryIsRole(RoleAssistant) {
+		h.Messages = h.Messages[:h.Len()-1]
 	}
 }
 
