@@ -239,6 +239,77 @@ func TestEstimateTokens(t *testing.T) {
 	}
 }
 
+func TestAddUser(t *testing.T) {
+	h := NewHistory("sys", 5)
+
+	if err := h.AddUser("hello", ""); err != nil {
+		t.Fatalf("AddUser failed: %v", err)
+	}
+
+	last := h.GetLast()
+	if last.Role != RoleUser {
+		t.Fatalf("last role = %q, want %q", last.Role, RoleUser)
+	}
+	if last.Content != "hello" {
+		t.Fatalf("last content = %q, want %q", last.Content, "hello")
+	}
+}
+
+func TestAddAssistant(t *testing.T) {
+	h := NewHistory("sys", 5)
+
+	if err := h.AddAssistant("internal reasoning", "visible answer"); err != nil {
+		t.Fatalf("AddAssistant failed: %v", err)
+	}
+
+	last := h.GetLast()
+	if last.Role != RoleAssistant {
+		t.Fatalf("last role = %q, want %q", last.Role, RoleAssistant)
+	}
+	if last.Reasoning != "internal reasoning" {
+		t.Fatalf("last reasoning = %q, want %q", last.Reasoning, "internal reasoning")
+	}
+	if last.Content != "visible answer" {
+		t.Fatalf("last content = %q, want %q", last.Content, "visible answer")
+	}
+}
+
+func TestGetByIndex(t *testing.T) {
+	h := NewHistory("sys", 5)
+	_ = h.add(RoleUser, "", "hello", "")
+
+	t.Run("valid index", func(t *testing.T) {
+		msg, err := h.GetByIndex(1)
+		if err != nil {
+			t.Fatalf("GetByIndex returned error: %v", err)
+		}
+		if msg.Role != RoleUser || msg.Content != "hello" {
+			t.Fatalf("unexpected message: %+v", msg)
+		}
+	})
+
+	t.Run("negative index", func(t *testing.T) {
+		_, err := h.GetByIndex(-1)
+		if err == nil {
+			t.Fatal("expected error for negative index, got nil")
+		}
+	})
+
+	t.Run("out of bounds index", func(t *testing.T) {
+		_, err := h.GetByIndex(99)
+		if err == nil {
+			t.Fatal("expected error for out-of-bounds index, got nil")
+		}
+	})
+}
+
+func TestMaxCtx(t *testing.T) {
+	h := NewHistory("sys", 42)
+	if h.MaxCtx() != 42 {
+		t.Fatalf("MaxCtx = %d, want %d", h.MaxCtx(), 42)
+	}
+}
+
 func TestGetLastMessage(t *testing.T) {
 	h := NewHistory("sys", 5)
 	last := h.GetLast()
