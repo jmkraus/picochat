@@ -50,7 +50,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		hello := "Hello, are you there?"
 		return CommandResult{Output: hello, Pasted: hello}
 	case "test":
-		err := utils.CreateTestFile(cfg.URL)
+		models, err := backend.New(cfg).GetAvailableModels()
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("get models list failed: %w", err)}
+		}
+
+		err = utils.CreateTestFile(models)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save test file failed: %w", err)}
 		}
@@ -105,6 +110,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		list := []string{
 			fmt.Sprintf("Configuration file: %s", cfg.ConfigPath),
+			fmt.Sprintf("Backend API used: %s", cfg.Backend),
 			fmt.Sprintf("Response output format: %s", cfg.OutputFmt),
 			fmt.Sprintf("Current model is '%s'", cfg.Model),
 			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),

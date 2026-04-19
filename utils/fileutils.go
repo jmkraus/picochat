@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"picochat/paths"
-	"picochat/requests"
 	"runtime"
 	"strings"
 )
@@ -58,12 +57,12 @@ func ListHistoryFiles() (string, error) {
 //
 // Parameters:
 //
-//	baseUrl (string) - Base URL for the API
+//	models ([]string) - list of available model names
 //
 // Returns:
 //
 //	none
-func CreateTestFile(baseUrl string) error {
+func CreateTestFile(models []string) error {
 	var (
 		def   string
 		cmd   string
@@ -86,11 +85,6 @@ func CreateTestFile(baseUrl string) error {
 		cmd = "echo \"$TEXT\" | picochat -model %s"
 		ext = "sh"
 		first = "#!/bin/sh"
-	}
-
-	models, err := requests.GetAvailableModels(baseUrl)
-	if err != nil {
-		return err
 	}
 
 	if len(models) == 0 {
