@@ -77,8 +77,9 @@ func TestDiscard(t *testing.T) {
 		if h.Len() != 2 {
 			t.Fatalf("expected length 2, got %d", h.Len())
 		}
-		if h.GetLast().Role != RoleUser {
-			t.Fatalf("expected last role %q, got %q", RoleUser, h.GetLast().Role)
+		last := h.GetLast()
+		if last.Role != RoleUser {
+			t.Fatalf("expected last role %q, got %q", RoleUser, last.Role)
 		}
 	})
 }
