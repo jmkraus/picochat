@@ -67,7 +67,7 @@ func parseKeyVal(args string) (string, any, error) {
 // Returns:
 //
 //	int   - parsed index
-//	error - error if input is not an integer
+//	error - error if any
 func parseIndex(indexStr string) (int, error) {
 	indexAny, err := vartypes.Convert(vartypes.VarInt, indexStr)
 	if err != nil {
@@ -88,7 +88,7 @@ func parseIndex(indexStr string) (int, error) {
 // Returns:
 //
 //	string - selected filename of the history session
-//	error  - Error msg if anything went wrong
+//	error  - error if any
 func getHistoryFilename(f string, input io.Reader) (string, error) {
 	if f == "" {
 		var err error
@@ -157,7 +157,7 @@ func promptForFilename(input io.Reader) (string, error) {
 // Returns:
 //
 //	string - the extracted code block content.
-//	bool - true if a code block was found, false otherwise.
+//	bool   - true if a code block was found, false otherwise.
 func extractCodeBlock(s string) (string, bool) {
 	re := regexp.MustCompile("(?s)```\\w*\\n(.*?)```")
 	match := re.FindStringSubmatch(s)

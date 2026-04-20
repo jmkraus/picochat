@@ -61,9 +61,9 @@ func trimEmptyLines(s string) string {
 	return strings.Join(lines[start:end], "\n")
 }
 
-// elapsedTime returns the elapsed time in seconds and a formatted
-// "MM:SS" string.  All calculations are performed in whole seconds
-// to avoid floating-point rounding differences.
+// elapsedTime returns the elapsed time in seconds and a formatted string.
+// All calculations are performed in whole seconds to avoid floating-point
+// rounding differences.
 //
 // Parameters:
 //
