@@ -93,21 +93,21 @@ func runChat(session *Session) {
 //
 // Returns:
 //
-//	*Session - prepared runtime session
-//	[]string - startup warnings (if any)
 //	bool     - true if caller should print version and exit
+//	*Session - prepared runtime session
+//	[]string - startup warnings if any
 //	error    - error if startup initialization fails
-func initSessionFromArgs() (*Session, []string, bool, error) {
+func initSessionFromArgs() (bool, *Session, []string, error) {
 	args.Parse()
 
 	if *args.ShowVersion {
-		return nil, nil, true, nil
+		return true, nil, nil, nil
 	}
 
 	config.Init(*args.ConfigPath)
 	cfg, warn, err := config.Get()
 	if err != nil {
-		return nil, nil, false, fmt.Errorf("load configuration failed: %w", err)
+		return false, nil, nil, fmt.Errorf("load configuration failed: %w", err)
 	}
 
 	if *args.Quiet {
@@ -122,7 +122,7 @@ func initSessionFromArgs() (*Session, []string, bool, error) {
 		cfg.OutputFmt = f
 		if !ok {
 			cfg.OutputFmt = "plain"
-			console.Warn("unknown output format - fallback to plain")
+			warn = append(warn, "unknown output format - fallback to plain")
 		}
 	}
 
@@ -130,7 +130,7 @@ func initSessionFromArgs() (*Session, []string, bool, error) {
 		cfg.OutputFmt = "plain" // There can be only one
 		schema, err := utils.LoadSchemaFromFile(*args.Format)
 		if err != nil {
-			return nil, nil, false, fmt.Errorf("load json schema file failed: %w", err)
+			return false, nil, nil, fmt.Errorf("load json schema file failed: %w", err)
 		}
 		cfg.SchemaFmt = schema
 	}
@@ -142,7 +142,7 @@ func initSessionFromArgs() (*Session, []string, bool, error) {
 	if *args.Image != "" {
 		cfg.ImagePath = *args.Image
 		if !paths.FileExists(cfg.ImagePath) {
-			return nil, nil, false, fmt.Errorf("image file not found")
+			return false, nil, nil, fmt.Errorf("image file not found")
 		}
 	}
 
@@ -150,7 +150,7 @@ func initSessionFromArgs() (*Session, []string, bool, error) {
 	if *args.HistoryFile != "" {
 		history, err = messages.LoadHistoryFromFile(*args.HistoryFile)
 		if err != nil {
-			return nil, nil, false, fmt.Errorf("load history failed: %w", err)
+			return false, nil, nil, fmt.Errorf("load history failed: %w", err)
 		}
 	} else {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
@@ -162,11 +162,11 @@ func initSessionFromArgs() (*Session, []string, bool, error) {
 		Quiet:   cfg.Quiet,
 	}
 
-	return session, warn, false, nil
+	return false, session, warn, nil
 }
 
 func main() {
-	session, warn, showVersion, err := initSessionFromArgs()
+	showVersion, session, warn, err := initSessionFromArgs()
 	if showVersion {
 		fmt.Printf("picochat version is %s", version.Version)
 		fmt.Println()
