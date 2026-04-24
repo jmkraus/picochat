@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const info_prefix string = BrightGreen + Bold + "✓" + ColorReset
+const info_prefix string = Green + Bold + "✓" + ColorReset
 const warn_prefix string = BrightYellow + Bold + "!" + ColorReset
 const err_prefix string = BrightRed + Bold + "×" + ColorReset
 
