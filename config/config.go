@@ -21,6 +21,7 @@ type Config struct {
 	Temperature float64 `json:"temperature"`
 	Top_p       float64 `json:"top_p"`
 	Reasoning   bool    `json:"reasoning"`
+	Effort      string  `json:"effort"`
 	Quiet       bool    `json:"quiet"`
 
 	ConfigPath string         `toml:"-"`
@@ -113,6 +114,7 @@ func defaultConfig() Config {
 		Temperature: 0.7,
 		Top_p:       0.9,
 		Reasoning:   false,
+		Effort:      "medium",
 		Quiet:       false,
 	}
 }

@@ -35,6 +35,9 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.Reasoning {
 		t.Errorf("Reasoning default = %v, want %v", cfg.Reasoning, false)
 	}
+	if cfg.Effort != "medium" {
+		t.Errorf("Effort default = %v, want %v", cfg.Effort, "medium")
+	}
 	if cfg.Quiet {
 		t.Errorf("Quiet default = %v, want %v", cfg.Quiet, false)
 	}
@@ -64,6 +67,7 @@ func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
 	t.Setenv("PICOCHAT_TEMPERATURE", "0.2")
 	t.Setenv("PICOCHAT_TOP_P", "0.6")
 	t.Setenv("PICOCHAT_REASONING", "true")
+	t.Setenv("PICOCHAT_EFFORT", "low")
 	t.Setenv("PICOCHAT_QUIET", "true")
 
 	if err := applyEnvValues(&cfg); err != nil {

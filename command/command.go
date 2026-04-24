@@ -211,6 +211,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
 				fmt.Sprintf("top_p = %.2f", cfg.Top_p),
 				fmt.Sprintf("reasoning = %t", cfg.Reasoning),
+				fmt.Sprintf("effort = %s", cfg.Effort),
 			}
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}

@@ -28,6 +28,7 @@ History files are stored in the PicoChat config directory (for example `.config/
 | `Prompt`      | string  | System prompt/persona                                               |
 | `Quiet`       | bool    | Suppress info/warn output                                           |
 | `Reasoning`   | bool    | Enable or disable reasoning behavior                                |
+| `Effort`      | string  | Tune the trace length of reasoning output                           |
 
 ## Environment variables
 
@@ -45,6 +46,7 @@ Supported variables:
 - `PICOCHAT_TEMPERATURE`
 - `PICOCHAT_TOP_P`
 - `PICOCHAT_REASONING`
+- `PICOCHAT_EFFORT`
 - `PICOCHAT_QUIET`
 
 `APIKey` can be set in `config.toml`, but this is not recommended for regular use because the key is then stored in plain text. A better approach is to fetch the key from your password manager in a shell script and export it as `PICOCHAT_API_KEY` before starting PicoChat.

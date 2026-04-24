@@ -54,6 +54,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		Temperature: cfg.Temperature,
 		TopP:        cfg.Top_p,
 		Reasoning:   cfg.Reasoning,
+		Effort:      cfg.Effort,
 		Format:      cfg.SchemaFmt,
 	}, func(chunk backend.ChatChunk) error {
 		if (chunk.Content != "" ||

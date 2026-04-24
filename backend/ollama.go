@@ -67,7 +67,7 @@ type ollamaServerVersion struct {
 func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
 	var reasoning *ollamaReasoning
 	if input.Reasoning {
-		reasoning = &ollamaReasoning{Effort: "medium"}
+		reasoning = &ollamaReasoning{Effort: input.Effort}
 	}
 
 	ollamaMessages := normalizeOllamaImages(input.Messages)
