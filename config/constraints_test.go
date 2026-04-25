@@ -75,13 +75,14 @@ func TestNormalizeConfig_NoChanges(t *testing.T) {
 		Context:     20,
 		Temperature: 0.7,
 		Top_p:       0.9,
+		Effort:      "medium",
 	}
 
 	warnings := NormalizeConfig(&cfg)
 	if len(warnings) != 0 {
 		t.Fatalf("warnings = %v, want empty", warnings)
 	}
-	if cfg.Context != 20 || cfg.Temperature != 0.7 || cfg.Top_p != 0.9 {
+	if cfg.Context != 20 || cfg.Temperature != 0.7 || cfg.Top_p != 0.9 || cfg.Effort != "medium" {
 		t.Fatalf("config unexpectedly changed: %+v", cfg)
 	}
 }
@@ -91,6 +92,7 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 		Context:     0,
 		Temperature: 3.2,
 		Top_p:       -0.5,
+		Effort:      "invalid",
 	}
 
 	warnings := NormalizeConfig(&cfg)
@@ -104,13 +106,16 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 	if cfg.Top_p != MinTopP {
 		t.Fatalf("top_p = %v, want %v", cfg.Top_p, MinTopP)
 	}
+	if cfg.Effort != "medium" {
+		t.Fatalf("effort = %q, want %q", cfg.Effort, "medium")
+	}
 
-	if len(warnings) != 3 {
-		t.Fatalf("warnings count = %d, want 3", len(warnings))
+	if len(warnings) != 4 {
+		t.Fatalf("warnings count = %d, want 4", len(warnings))
 	}
 
 	joined := strings.Join(warnings, " | ")
-	for _, field := range []string{"context", "temperature", "top_p"} {
+	for _, field := range []string{"context", "temperature", "top_p", "effort"} {
 		if !strings.Contains(joined, field) {
 			t.Fatalf("warnings %q do not contain field %q", joined, field)
 		}

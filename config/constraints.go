@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 const (
@@ -69,7 +70,33 @@ func clampFloat(name string, v, min, max float64) (float64, bool) {
 	return v, false
 }
 
-// NormalizeConfig clamps numeric config values to their valid ranges.
+// normalizeEffort validates and normalizes the effort value.
+//
+// Parameters:
+//
+//	raw (string) - input effort value
+//
+// Returns:
+//
+//	string - normalized effort value
+//	bool   - true if fallback/alias handling was applied
+func normalizeEffort(raw string) (string, bool) {
+	value := strings.ToLower(strings.TrimSpace(raw))
+
+	switch value {
+	case "none", "low", "medium", "high":
+		return value, false
+	case "mid":
+		return "medium", true
+	case "":
+		return "medium", true
+	default:
+		return "medium", true
+	}
+}
+
+// NormalizeConfig clamps numeric config values to their valid ranges and
+// normalizes effort values to a supported set.
 // It mutates cfg and returns warning messages for changed values.
 //
 // Parameters:
@@ -102,6 +129,14 @@ func NormalizeConfig(cfg *Config) []string {
 	if v, changed := clampFloat("top_p", cfg.Top_p, MinTopP, MaxTopP); changed {
 		cfg.Top_p = v
 		warnings = append(warnings, fmt.Sprintf("config value 'top_p' (%g) out of range [%g..%g], clamped to %g", origTopP, MinTopP, MaxTopP, v))
+	}
+
+	origEffort := cfg.Effort
+	if v, warn := normalizeEffort(cfg.Effort); v != cfg.Effort {
+		cfg.Effort = v
+		if warn {
+			warnings = append(warnings, fmt.Sprintf("config value 'effort' (%q) invalid, normalized to %q", origEffort, v))
+		}
 	}
 
 	return warnings

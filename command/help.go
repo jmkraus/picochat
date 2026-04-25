@@ -59,6 +59,12 @@ var helpTopics = map[string][]string{
 		"  /set               Show available parameters and current settings",
 		"  /set <key=value>   Set the parameter <key> to new setting <value>",
 		"  Example: /set temperature=0.7",
+		"",
+		"  Value ranges:",
+		"  context            3..100",
+		"  temperature        0..2",
+		"  top_p              0..1",
+		"  effort             none, low, medium, high",
 	},
 }
 
