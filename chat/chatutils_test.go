@@ -146,7 +146,7 @@ func TestTokenSpeed(t *testing.T) {
 			name: "Zero time",
 			t:    0,
 			s:    "example text",
-			want: 0,
+			want: 2.6,
 		},
 		{
 			name: "Zero tokens",

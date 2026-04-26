@@ -89,8 +89,8 @@ func elapsedTime(t time.Time) (int, string) {
 }
 
 // tokenSpeed calculates the average number of tokens processed per
-// unit of time (t).  It returns 0 when t is zero to avoid division by
-// zero.  The result is rounded to one decimal place.
+// unit of time (t).  If t is zero, then t=1 is assumed to ensure proper calculation.
+// The result is rounded to one decimal place.
 //
 // Parameters:
 //
@@ -101,8 +101,13 @@ func elapsedTime(t time.Time) (int, string) {
 //
 //	float64 - tokens per second
 func tokenSpeed(t int, s string) float64 {
-	if (t == 0) || (s == "") {
-		return 0
+	if s == "" {
+		return 0.0
+	}
+
+	if t == 0 {
+		// we are too fast...
+		t = 1
 	}
 
 	tokens := messages.CalculateTokens(s)
