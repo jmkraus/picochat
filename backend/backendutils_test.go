@@ -8,6 +8,7 @@ func TestBuildOllamaURL(t *testing.T) {
 		baseURL  string
 		endpoint string
 		want     string
+		wantErr  bool
 	}{
 		{
 			name:     "no path adds api",
@@ -22,16 +23,28 @@ func TestBuildOllamaURL(t *testing.T) {
 			want:     "http://localhost:11434/api/tags",
 		},
 		{
-			name:     "custom path is trusted",
+			name:     "legacy v1 path is rewritten to api",
+			baseURL:  "http://localhost:11434/v1",
+			endpoint: "version",
+			want:     "http://localhost:11434/api/version",
+		},
+		{
+			name:     "custom path is rejected",
 			baseURL:  "http://localhost:11434/ollama",
 			endpoint: "version",
-			want:     "http://localhost:11434/ollama/version",
+			wantErr:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := buildOllamaURL(tt.baseURL, tt.endpoint)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				return
+			}
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -48,6 +61,7 @@ func TestBuildOpenAIURL(t *testing.T) {
 		baseURL  string
 		endpoint string
 		want     string
+		wantErr  bool
 	}{
 		{
 			name:     "no path adds v1",
@@ -62,16 +76,28 @@ func TestBuildOpenAIURL(t *testing.T) {
 			want:     "https://api.openai.com/v1/chat/completions",
 		},
 		{
-			name:     "custom path is trusted",
+			name:     "legacy api path is rewritten to v1",
+			baseURL:  "http://localhost:8080/api",
+			endpoint: "chat/completions",
+			want:     "http://localhost:8080/v1/chat/completions",
+		},
+		{
+			name:     "custom path is rejected",
 			baseURL:  "http://localhost:8080/openai",
 			endpoint: "chat/completions",
-			want:     "http://localhost:8080/openai/chat/completions",
+			wantErr:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := buildOpenAIURL(tt.baseURL, tt.endpoint)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				return
+			}
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -88,6 +114,7 @@ func TestBuildOpenAIURL_ResponsesEndpoint(t *testing.T) {
 		baseURL  string
 		endpoint string
 		want     string
+		wantErr  bool
 	}{
 		{
 			name:     "no path adds v1 for responses",
@@ -102,16 +129,28 @@ func TestBuildOpenAIURL_ResponsesEndpoint(t *testing.T) {
 			want:     "https://api.openai.com/v1/responses",
 		},
 		{
-			name:     "custom proxy path is trusted for responses",
+			name:     "legacy api path rewritten for responses",
+			baseURL:  "http://localhost:8080/api",
+			endpoint: "responses",
+			want:     "http://localhost:8080/v1/responses",
+		},
+		{
+			name:     "custom proxy path rejected for responses",
 			baseURL:  "http://localhost:8080/openai",
 			endpoint: "responses",
-			want:     "http://localhost:8080/openai/responses",
+			wantErr:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := buildOpenAIURL(tt.baseURL, tt.endpoint)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				return
+			}
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}

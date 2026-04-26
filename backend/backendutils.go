@@ -12,8 +12,9 @@ import (
 )
 
 // buildProviderURL constructs a full endpoint URL for a provider.
-// If the base URL already contains a path, it is trusted as-is and
-// the endpoint is appended. Otherwise, the provider root path is added.
+// The base URL is expected to be host[:port] only. For backward
+// compatibility, legacy roots "/api" and "/v1" are accepted and replaced
+// by the provider root.
 //
 // Parameters:
 //
@@ -38,15 +39,18 @@ func buildProviderURL(baseURL, apiRoot, endPoint string) (string, error) {
 
 	basePath := strings.Trim(strings.TrimSpace(u.Path), "/")
 	root := strings.Trim(strings.TrimSpace(apiRoot), "/")
-
-	// If no base path is provided, add provider root (api/v1).
-	// If a path already exists, trust it and only append endpoint.
-	finalBase := basePath
-	if finalBase == "" {
-		finalBase = root
+	if root == "" {
+		return "", fmt.Errorf("api root is empty")
 	}
 
-	u.Path = "/" + path.Join(finalBase, cleanEndpoint)
+	switch basePath {
+	case "", "api", "v1":
+		// empty path is preferred; /api and /v1 are accepted as legacy roots
+	default:
+		return "", fmt.Errorf("invalid base url path %q: only empty, /api or /v1 are allowed", u.Path)
+	}
+
+	u.Path = "/" + path.Join(root, cleanEndpoint)
 	return u.String(), nil
 }
 
