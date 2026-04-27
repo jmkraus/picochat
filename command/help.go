@@ -13,7 +13,7 @@ var helpTopics = map[string][]string{
 		"  /copy, /c          Copy the last answer to clipboard",
 		"  /paste, /v         Paste clipboard contents as user input and send",
 		"  /info              Show system information",
-		"  /message           Show the last message again (e.g., after load)",
+		"  /message           Show message(s) from chat history (e.g., after load)",
 		"  /load              Load chat history from a file",
 		"  /save              Save current chat history to a file",
 		"  /models            List downloaded models (and switch models)",
