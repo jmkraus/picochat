@@ -95,8 +95,29 @@ func normalizeEffort(raw string) (string, bool) {
 	}
 }
 
+// normalizeBackend validates and normalizes the backend value.
+//
+// Parameters:
+//
+//	raw (string) - input backend value
+//
+// Returns:
+//
+//	string - normalized backend value
+//	bool   - true if fallback/alias handling was applied
+func normalizeBackend(raw string) (string, bool) {
+	value := strings.ToLower(strings.TrimSpace(raw))
+
+	switch value {
+	case "ollama", "openai", "responses":
+		return value, false
+	default:
+		return "ollama", true
+	}
+}
+
 // NormalizeConfig clamps numeric config values to their valid ranges and
-// normalizes effort values to a supported set.
+// normalizes effort/backend values to supported sets.
 // It mutates cfg and returns warning messages for changed values.
 //
 // Parameters:
@@ -136,6 +157,14 @@ func NormalizeConfig(cfg *Config) []string {
 		cfg.Effort = v
 		if warn {
 			warnings = append(warnings, fmt.Sprintf("config value 'effort' (%q) invalid, normalized to %q", origEffort, v))
+		}
+	}
+
+	origBackend := cfg.Backend
+	if v, warn := normalizeBackend(cfg.Backend); v != cfg.Backend {
+		cfg.Backend = v
+		if warn {
+			warnings = append(warnings, fmt.Sprintf("config value 'backend' (%q) invalid, normalized to %q", origBackend, v))
 		}
 	}
 

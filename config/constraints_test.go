@@ -72,6 +72,7 @@ func TestNormalizeConfig_Nil(t *testing.T) {
 
 func TestNormalizeConfig_NoChanges(t *testing.T) {
 	cfg := Config{
+		Backend:     "ollama",
 		Context:     20,
 		Temperature: 0.7,
 		Top_p:       0.9,
@@ -82,13 +83,14 @@ func TestNormalizeConfig_NoChanges(t *testing.T) {
 	if len(warnings) != 0 {
 		t.Fatalf("warnings = %v, want empty", warnings)
 	}
-	if cfg.Context != 20 || cfg.Temperature != 0.7 || cfg.Top_p != 0.9 || cfg.Effort != "medium" {
+	if cfg.Backend != "ollama" || cfg.Context != 20 || cfg.Temperature != 0.7 || cfg.Top_p != 0.9 || cfg.Effort != "medium" {
 		t.Fatalf("config unexpectedly changed: %+v", cfg)
 	}
 }
 
 func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 	cfg := Config{
+		Backend:     "invalid",
 		Context:     0,
 		Temperature: 3.2,
 		Top_p:       -0.5,
@@ -109,15 +111,46 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 	if cfg.Effort != "medium" {
 		t.Fatalf("effort = %q, want %q", cfg.Effort, "medium")
 	}
+	if cfg.Backend != "ollama" {
+		t.Fatalf("backend = %q, want %q", cfg.Backend, "ollama")
+	}
 
-	if len(warnings) != 4 {
-		t.Fatalf("warnings count = %d, want 4", len(warnings))
+	if len(warnings) != 5 {
+		t.Fatalf("warnings count = %d, want 5", len(warnings))
 	}
 
 	joined := strings.Join(warnings, " | ")
-	for _, field := range []string{"context", "temperature", "top_p", "effort"} {
+	for _, field := range []string{"context", "temperature", "top_p", "effort", "backend"} {
 		if !strings.Contains(joined, field) {
 			t.Fatalf("warnings %q do not contain field %q", joined, field)
 		}
+	}
+}
+
+func TestNormalizeBackend(t *testing.T) {
+	tests := []struct {
+		name      string
+		in        string
+		wantValue string
+		wantWarn  bool
+	}{
+		{name: "ollama", in: "ollama", wantValue: "ollama", wantWarn: false},
+		{name: "openai", in: "openai", wantValue: "openai", wantWarn: false},
+		{name: "responses", in: "responses", wantValue: "responses", wantWarn: false},
+		{name: "case-insensitive", in: "OpenAI", wantValue: "openai", wantWarn: false},
+		{name: "empty fallback", in: "", wantValue: "ollama", wantWarn: true},
+		{name: "invalid fallback", in: "foo", wantValue: "ollama", wantWarn: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, warn := normalizeBackend(tt.in)
+			if got != tt.wantValue {
+				t.Fatalf("value = %q, want %q", got, tt.wantValue)
+			}
+			if warn != tt.wantWarn {
+				t.Fatalf("warn = %v, want %v", warn, tt.wantWarn)
+			}
+		})
 	}
 }
