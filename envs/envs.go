@@ -1,7 +1,6 @@
 package envs
 
 import (
-	"fmt"
 	"os"
 	"picochat/vartypes"
 	"strings"
@@ -130,47 +129,61 @@ func ConfigEnvVarsTable() string {
 //
 //	string - markdown string with all line breaks
 func markdownTable(tableData [][]string) string {
-	numColumns := len(tableData[0])
-	border := "|" + strings.Repeat(" %s |", numColumns)
+	if len(tableData) == 0 || len(tableData[0]) == 0 {
+		return ""
+	}
 
-	maxWidths := make([]int, numColumns)
+	numColumns := len(tableData[0])
 	separator := make([]string, numColumns)
 	for i := range separator {
 		separator[i] = "---"
 	}
 
-	tableData = append(tableData, []string{})
-	copy(tableData[1:], tableData)
-	tableData[1] = separator
+	rows := make([][]string, 0, len(tableData)+1)
+	rows = append(rows, tableData[0], separator)
+	rows = append(rows, tableData[1:]...)
 
-	for _, row := range tableData {
-		for cIdx, col := range row {
-			if len(col) > maxWidths[cIdx] {
-				maxWidths[cIdx] = len(col)
+	maxWidths := make([]int, numColumns)
+	for _, row := range rows {
+		for colIdx := range numColumns {
+			col := ""
+			if colIdx < len(row) {
+				col = row[colIdx]
+			}
+			if len(col) > maxWidths[colIdx] {
+				maxWidths[colIdx] = len(col)
 			}
 		}
 	}
 
-	for rIdx, row := range tableData {
-		fill := " "
-		if rIdx == 1 {
-			fill = "-"
+	pad := func(s string, width int, fill byte) string {
+		if len(s) >= width {
+			return s
 		}
-		for cIdx, col := range row {
-			tableData[rIdx][cIdx] = fmt.Sprintf("%-"+fmt.Sprint(maxWidths[cIdx])+"s", col)
-			tableData[rIdx][cIdx] = strings.ReplaceAll(tableData[rIdx][cIdx], " ", fill)
+		return s + strings.Repeat(string(fill), width-len(s))
+	}
+
+	var builder strings.Builder
+	for rowIdx, row := range rows {
+		fill := byte(' ')
+		if rowIdx == 1 {
+			fill = '-'
+		}
+
+		builder.WriteByte('|')
+		for colIdx := range numColumns {
+			col := ""
+			if colIdx < len(row) {
+				col = row[colIdx]
+			}
+			builder.WriteByte(' ')
+			builder.WriteString(pad(col, maxWidths[colIdx], fill))
+			builder.WriteString(" |")
+		}
+		if rowIdx < len(rows)-1 {
+			builder.WriteByte('\n')
 		}
 	}
 
-	rows := make([]string, len(tableData))
-	for i, row := range tableData {
-		rowValues := make([]any, len(row))
-		for j, v := range row {
-			rowValues[j] = v
-		}
-		rows[i] = fmt.Sprintf(border, rowValues...)
-	}
-
-	table := strings.Join(rows, "\n")
-	return table
+	return builder.String()
 }
