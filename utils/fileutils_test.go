@@ -133,3 +133,36 @@ func TestGetMimeType_NonImageReturnsError(t *testing.T) {
 		t.Fatalf("expected error, got nil")
 	}
 }
+
+func TestStripDataURLPrefix(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{
+			name: "data url with base64 marker",
+			in:   "data:image/png;base64,QUJDRA==",
+			want: "QUJDRA==",
+		},
+		{
+			name: "plain base64 unchanged",
+			in:   "QUJDRA==",
+			want: "QUJDRA==",
+		},
+		{
+			name: "data url without base64 marker unchanged",
+			in:   "data:image/png,QUJDRA==",
+			want: "data:image/png,QUJDRA==",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := StripDataURLPrefix(tt.in)
+			if got != tt.want {
+				t.Fatalf("StripDataURLPrefix(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
+}
