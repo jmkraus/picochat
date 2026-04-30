@@ -334,7 +334,7 @@ func (h *ChatHistory) EstimateTokens() float64 {
 		total += CalculateTokens(text)
 
 		if len(msg.Images) > 0 && msg.Images[0] != "" {
-			b64 := StripDataURLPrefix(msg.Images[0])
+			b64 := utils.StripDataURLPrefix(msg.Images[0])
 			total += CalculateBase64Tokens(b64)
 		}
 	}

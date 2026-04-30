@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"picochat/messages"
+	"picochat/utils"
 	"strings"
 )
 
@@ -243,7 +244,7 @@ func normalizeOllamaImages(in []messages.Message) []messages.Message {
 
 		imgs := make([]string, len(out[i].Images))
 		for j, img := range out[i].Images {
-			imgs[j] = messages.StripDataURLPrefix(img)
+			imgs[j] = utils.StripDataURLPrefix(img)
 		}
 		out[i].Images = imgs
 	}

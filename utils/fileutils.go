@@ -131,6 +131,28 @@ func ImageToBase64(path string) (string, error) {
 	return encoded, nil
 }
 
+// StripDataURLPrefix removes a data URL prefix and returns only base64 data.
+//
+// Parameters:
+//
+//	s (string) - image payload
+//
+// Returns:
+//
+//	string - plain base64 data (or original string if no prefix exists)
+func StripDataURLPrefix(s string) string {
+	if !strings.HasPrefix(s, "data:") {
+		return s
+	}
+
+	const marker = ";base64,"
+	_, after, found := strings.Cut(s, marker)
+	if found {
+		return after
+	}
+	return s
+}
+
 // LoadSchemaFromFile loads a json schema string file and
 // transforms it into a json object representation.
 //
