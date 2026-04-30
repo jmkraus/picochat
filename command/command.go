@@ -290,27 +290,3 @@ func parseCommandArgs(input string) (string, string) {
 	}
 	return cmd, arg
 }
-
-// getMessageByIndex retrieves a history message by index and formats it with
-// a bold header line in the form "(index:role)".
-//
-// Parameters:
-//
-//	args (string) - the message index as string
-//	history (*messages.ChatHistory) - chat history used for index lookup
-//
-// Returns:
-//
-//	string - formatted message including header and content
-//	error  - error if index parsing or lookup fails
-func getMessageByIndex(args string, history *messages.ChatHistory) (string, error) {
-	index, err := parseIndex(args)
-	if err != nil {
-		return "", fmt.Errorf("get message failed: %w", err)
-	}
-	msg, err := history.GetByIndex(index)
-	if err != nil {
-		return "", fmt.Errorf("get message failed: %w", err)
-	}
-	return output.FormatMessage(msg, index, true, false), nil
-}
