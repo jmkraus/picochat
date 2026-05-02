@@ -176,8 +176,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: "Repeating last chat history user prompt.", Repeat: true}
 	case "models":
 		if args == "" {
-			client := backend.New(cfg)
-			list, err := client.GetAvailableModels()
+			list, err := backend.New(cfg).GetAvailableModels()
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
 			}
