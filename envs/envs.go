@@ -21,7 +21,7 @@ var ConfigEnvVars = []EnvSpec{
 	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "backend"},
 	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "url"},
 	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "api_key", Sensitive: true},
-	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model", Runtime: true},
+	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model"},
 	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "context", Runtime: true},
 	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "temperature", Runtime: true},
 	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "top_p", Runtime: true},

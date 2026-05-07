@@ -40,7 +40,6 @@ func TestParseArgs_Valid(t *testing.T) {
 		{"temperature=0.7", "temperature", "float64"},
 		{"top_p=0.9", "top_p", "float64"},
 		{"context=42", "context", "int"},
-		{"model=gpt-4", "model", "string"},
 	}
 
 	for _, tt := range tests {
