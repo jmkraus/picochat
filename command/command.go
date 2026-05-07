@@ -278,6 +278,8 @@ func parseCommandArgs(input string) (string, string) {
 		cmd = "/paste"
 	case "/?":
 		cmd = "/help"
+	case "/hallo":
+		cmd = "/hello" // just in case...
 	}
 
 	// normalize
