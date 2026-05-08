@@ -112,7 +112,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			fmt.Sprintf("Configuration file: %s", cfg.ConfigPath),
 			fmt.Sprintf("Backend API used: %s", cfg.Backend),
 			fmt.Sprintf("Response output format: %s", cfg.OutputFmt),
-			fmt.Sprintf("Current model is '%s'", cfg.Model),
+			fmt.Sprintf("Current model is %q", cfg.Model),
 			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),
 			fmt.Sprintf("Context token estimation: %.0f", math.Ceil(history.EstimateTokens())),
 			fmt.Sprintf("Server version is %s", serverVersion),
@@ -138,7 +138,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			if found {
 				return CommandResult{Output: msg.Content}
 			}
-			return CommandResult{Warn: fmt.Sprintf("No element for role '%s' found.", args)}
+			return CommandResult{Warn: fmt.Sprintf("No element for role %q found.", args)}
 		default:
 			msg := history.GetLast().Content
 			return CommandResult{Output: msg}
@@ -198,7 +198,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("no value for given index found")}
 		}
 		cfg.Model = model
-		return CommandResult{Info: fmt.Sprintf("Switched model to '%s'.", model)}
+		return CommandResult{Info: fmt.Sprintf("Switched model to %q.", model)}
 	case "envs":
 		envSetup := envs.ConfigEnvVarsTable()
 		return CommandResult{Output: envSetup}

@@ -156,7 +156,7 @@ func Set(key string, value any) ([]string, error) {
 	}
 
 	if !envs.AllowedRuntimeField(key) {
-		return nil, fmt.Errorf("unsupported config key '%s'", key)
+		return nil, fmt.Errorf("unsupported config key %q", key)
 	}
 
 	next := *cfg // work on copy to avoid compromised config

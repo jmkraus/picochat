@@ -82,7 +82,7 @@ func (h *ChatHistory) add(role, reasoning, content, image string) error {
 
 		return nil
 	default:
-		return fmt.Errorf("invalid role '%s'", role)
+		return fmt.Errorf("invalid role %q", role)
 	}
 }
 

@@ -99,7 +99,7 @@ func TestChatHistory_add_InvalidRole(t *testing.T) {
 		t.Errorf("expected message length to remain %d, got %d", initialLen, h.Len())
 	}
 
-	expectedErr := "invalid role 'alien'"
+	expectedErr := "invalid role \"alien\""
 	if err.Error() != expectedErr {
 		t.Errorf("unexpected error message:\nwant: %q\ngot:  %q", expectedErr, err.Error())
 	}

@@ -48,7 +48,7 @@ func parseKeyVal(args string) (string, any, error) {
 
 	fieldCfg, ok := envs.ConfigByField(key)
 	if !ok || !fieldCfg.Runtime {
-		return "", nil, fmt.Errorf("unsupported config key '%s'", key)
+		return "", nil, fmt.Errorf("unsupported config key %q'", key)
 	}
 
 	convertedValue, err := vartypes.Convert(fieldCfg.Type, value)

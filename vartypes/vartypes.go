@@ -57,13 +57,13 @@ func Convert(varType VarType, value string) (any, error) {
 	case VarFloat:
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid float value '%s'", value)
+			return nil, fmt.Errorf("invalid float value %q", value)
 		}
 		return v, nil
 	case VarInt:
 		v, err := strconv.Atoi(value)
 		if err != nil {
-			return nil, fmt.Errorf("invalid integer value '%s'", value)
+			return nil, fmt.Errorf("invalid integer value %q", value)
 		}
 		return v, nil
 	case VarString:
@@ -75,7 +75,7 @@ func Convert(varType VarType, value string) (any, error) {
 		}
 		return v, nil
 	default:
-		return nil, fmt.Errorf("unsupported var type '%s'", varType)
+		return nil, fmt.Errorf("unsupported var type %q", varType)
 	}
 }
 
@@ -96,6 +96,6 @@ func stringToBool(s string) (bool, error) {
 	case "false", "0", "f", "n", "no":
 		return false, nil
 	default:
-		return false, fmt.Errorf("invalid boolean value '%s'", s)
+		return false, fmt.Errorf("invalid boolean value %q", s)
 	}
 }
