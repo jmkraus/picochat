@@ -9,7 +9,7 @@ import (
 
 func TestSaveAndLoad(t *testing.T) {
 	h := NewHistory("persist me", 5)
-	if err := h.add("user", "", "data", ""); err != nil {
+	if err := h.add(RoleUser, "", "data", ""); err != nil {
 		t.Fatalf("add failed: %v", err)
 	}
 
@@ -37,7 +37,7 @@ func TestSaveAndLoad(t *testing.T) {
 
 func TestSaveAndLoad_DropsReasoning(t *testing.T) {
 	h := NewHistory("persist me", 5)
-	if err := h.add("assistant", "internal reasoning that must not be persisted", "visible content", ""); err != nil {
+	if err := h.add(RoleAssistant, "internal reasoning that must not be persisted", "visible content", ""); err != nil {
 		t.Fatalf("add failed: %v", err)
 	}
 

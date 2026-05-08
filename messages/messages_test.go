@@ -12,7 +12,7 @@ func TestNewHistory(t *testing.T) {
 		t.Fatalf("expected 1 message, got %d", len(h.Get()))
 	}
 
-	if h.Get()[0].Role != "system" {
+	if h.Get()[0].Role != RoleSystem {
 		t.Errorf("expected first message role to be 'system', got %s", h.Get()[0].Role)
 	}
 
@@ -24,8 +24,8 @@ func TestNewHistory(t *testing.T) {
 func TestAddAndClear(t *testing.T) {
 	h := NewHistory("init", 5)
 
-	h.add("user", "", "Hello!", "")
-	h.add("assistant", "", "Hi there!", "")
+	h.add(RoleUser, "", "Hello!", "")
+	h.add(RoleAssistant, "", "Hi there!", "")
 
 	if h.Len() != 3 {
 		t.Errorf("expected 3 messages, got %d", h.Len())
@@ -33,7 +33,7 @@ func TestAddAndClear(t *testing.T) {
 
 	h.ClearExceptSystemPrompt()
 
-	if h.Len() != 1 || h.Get()[0].Role != "system" {
+	if h.Len() != 1 || h.Get()[0].Role != RoleSystem {
 		t.Errorf("clear should leave only system prompt")
 	}
 }
@@ -109,14 +109,14 @@ func TestCompressKeepsLimitAndPrompt(t *testing.T) {
 	h := NewHistory("system prompt", 5)
 
 	for i := 1; i <= 10; i++ {
-		h.add("user", "", fmt.Sprintf("msg %d", i), "")
+		h.add(RoleUser, "", fmt.Sprintf("msg %d", i), "")
 	}
 
 	if h.Len() != 5 {
 		t.Errorf("expected 5 messages, got %d", h.Len())
 	}
 
-	if h.Get()[0].Role != "system" {
+	if h.Get()[0].Role != RoleSystem {
 		t.Error("expected first message to be system prompt")
 	}
 
@@ -136,7 +136,7 @@ func TestSetContextSize(t *testing.T) {
 
 	// add 9 messages to fill context
 	for i := 1; i < 10; i++ {
-		h.add("user", "", fmt.Sprintf("msg %d", i), "")
+		h.add(RoleUser, "", fmt.Sprintf("msg %d", i), "")
 	}
 
 	// Invalid values
@@ -162,7 +162,7 @@ func TestSetContextSize(t *testing.T) {
 	if len(h.Messages) != 3 {
 		t.Errorf("Expected 3 messages after trimming, got %d", len(h.Messages))
 	}
-	if h.Messages[0].Role != "system" {
+	if h.Messages[0].Role != RoleSystem {
 		t.Errorf("First message should be system prompt")
 	}
 	if h.Messages[1].Content != "msg 8" {
@@ -184,8 +184,8 @@ func TestAddAndCompress(t *testing.T) {
 
 	// add 4 User/Assistant messages → +1 System = 5
 	for i := 1; i <= 4; i++ {
-		h.add("user", "", "Hello", "")
-		h.add("assistant", "", "Hi there", "")
+		h.add(RoleUser, "", "Hello", "")
+		h.add(RoleAssistant, "", "Hi there", "")
 	}
 
 	if h.Len() != 5 {
@@ -197,7 +197,7 @@ func TestAddAndCompress(t *testing.T) {
 	}
 
 	// Now add another message - this should trigger Compress()
-	h.add("user", "", "Overflow message", "")
+	h.add(RoleUser, "", "Overflow message", "")
 
 	if h.Len() != 5 {
 		t.Errorf("After compress, expected length 5, got %d", h.Len())
@@ -205,18 +205,18 @@ func TestAddAndCompress(t *testing.T) {
 
 	// Ensure that System prompt is kept
 	first := h.Get()[0]
-	if first.Role != "system" {
+	if first.Role != RoleSystem {
 		t.Errorf("Expected first message to be system prompt, got %s", first.Role)
 	}
 }
 
 func TestReplaceMessages(t *testing.T) {
 	h := NewHistory("init", 5)
-	h.add("user", "", "first", "")
+	h.add(RoleUser, "", "first", "")
 
 	newMessages := []Message{
-		{Role: "system", Content: "replaced system"},
-		{Role: "user", Content: "replaced message"},
+		{Role: RoleSystem, Content: "replaced system"},
+		{Role: RoleUser, Content: "replaced message"},
 	}
 	h.Replace(newMessages)
 
@@ -231,8 +231,8 @@ func TestReplaceMessages(t *testing.T) {
 
 func TestEstimateTokens(t *testing.T) {
 	h := NewHistory("short prompt", 5)
-	h.add("user", "", "This is a short message", "")
-	h.add("assistant", "", "This is a slightly longer reply that includes a few more words.", "")
+	h.add(RoleUser, "", "This is a short message", "")
+	h.add(RoleAssistant, "", "This is a slightly longer reply that includes a few more words.", "")
 
 	tokens := h.EstimateTokens()
 	if tokens <= 0 {
@@ -314,25 +314,25 @@ func TestMaxCtx(t *testing.T) {
 func TestGetLastMessage(t *testing.T) {
 	h := NewHistory("sys", 5)
 	last := h.GetLast()
-	if last.Role != "system" {
+	if last.Role != RoleSystem {
 		t.Errorf("expected last message to be system at init, got %s", last.Role)
 	}
 
-	h.add("user", "", "msg", "")
+	h.add(RoleUser, "", "msg", "")
 	last = h.GetLast()
-	if last.Role != "user" || last.Content != "msg" {
+	if last.Role != RoleUser || last.Content != "msg" {
 		t.Errorf("unexpected last message: %+v", last)
 	}
 }
 
 func TestGetLastRole(t *testing.T) {
 	h := NewHistory("init", 5)
-	h.add("user", "", "hello", "")
-	h.add("assistant", "", "hi", "")
-	h.add("user", "", "bye", "")
+	h.add(RoleUser, "", "hello", "")
+	h.add(RoleAssistant, "", "hi", "")
+	h.add(RoleUser, "", "bye", "")
 
 	t.Run("find last user", func(t *testing.T) {
-		msg, ok := h.GetLastRole("user")
+		msg, ok := h.GetLastRole(RoleUser)
 		if !ok {
 			t.Fatalf("expected to find user message, got none")
 		}
@@ -342,7 +342,7 @@ func TestGetLastRole(t *testing.T) {
 	})
 
 	t.Run("find last assistant", func(t *testing.T) {
-		msg, ok := h.GetLastRole("assistant")
+		msg, ok := h.GetLastRole(RoleAssistant)
 		if !ok {
 			t.Fatalf("expected to find assistant message, got none")
 		}
@@ -360,7 +360,7 @@ func TestGetLastRole(t *testing.T) {
 
 	t.Run("empty history", func(t *testing.T) {
 		empty := NewHistory("empty", 5)
-		_, ok := empty.GetLastRole("user")
+		_, ok := empty.GetLastRole(RoleUser)
 		if ok {
 			t.Errorf("expected no match in empty history, but got one")
 		}
@@ -372,7 +372,7 @@ func TestIsEmpty(t *testing.T) {
 	if !h.IsEmpty() {
 		t.Errorf("expected history to be empty (only system prompt)")
 	}
-	h.add("user", "", "hi", "")
+	h.add(RoleUser, "", "hi", "")
 	if h.IsEmpty() {
 		t.Errorf("expected history to be non-empty after user message")
 	}
@@ -386,7 +386,7 @@ func TestEstimateTokens_IncludesReasoning(t *testing.T) {
 
 	// Reasoning-only message (empty content) should raise number of tokens
 	// because EstimateTokens counts Reasoning + Content.
-	if err := h.add("assistant", "This is hidden reasoning text", "", ""); err != nil {
+	if err := h.add(RoleAssistant, "This is hidden reasoning text", "", ""); err != nil {
 		t.Fatalf("add failed: %v", err)
 	}
 

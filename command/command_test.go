@@ -73,13 +73,13 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 		t.Fatalf("expected 3 messages, got %d", len(loaded))
 	}
 
-	if loaded[0].Role != "system" || loaded[0].Content != "You are a LLM" {
+	if loaded[0].Role != messages.RoleSystem || loaded[0].Content != "You are a LLM" {
 		t.Fatalf("unexpected message[0]: %#v", loaded[0])
 	}
-	if loaded[1].Role != "user" || loaded[1].Content != "Hello, are you there?" {
+	if loaded[1].Role != messages.RoleUser || loaded[1].Content != "Hello, are you there?" {
 		t.Fatalf("unexpected message[1]: %#v", loaded[1])
 	}
-	if loaded[2].Role != "assistant" || loaded[2].Content != "How can I assist you today?" {
+	if loaded[2].Role != messages.RoleAssistant || loaded[2].Content != "How can I assist you today?" {
 		t.Fatalf("unexpected message[2]: %#v", loaded[2])
 	}
 }

@@ -31,11 +31,11 @@ func FormatMessage(msg messages.Message, index int, header, color bool) string {
 
 	if color {
 		switch msg.Role {
-		case "system":
+		case messages.RoleSystem:
 			output = console.Colorize(console.Magenta, output)
-		case "user":
+		case messages.RoleUser:
 			output = console.Colorize(console.Cyan, output)
-		case "assistant":
+		case messages.RoleAssistant:
 			// nothing to do here
 		}
 	}
