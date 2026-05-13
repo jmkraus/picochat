@@ -10,7 +10,7 @@ var (
 	ShowVersion = flag.Bool("version", false, "Shows the version and exits")
 	Image       = flag.String("image", "", "Sets a path to an image file")
 	Output      = flag.String("output", "", "Sets the response output format (plain, json, json-pretty, yaml)")
-	Format      = flag.String("format", "", "Sets the path to a JSON schema file")
+	Schema      = flag.String("schema", "", "Sets the path to a JSON schema file")
 )
 
 func Parse() {

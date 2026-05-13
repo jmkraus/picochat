@@ -126,9 +126,9 @@ func initSessionFromArgs() (bool, *Session, []string, error) {
 		}
 	}
 
-	if *args.Format != "" {
+	if *args.Schema != "" {
 		cfg.OutputFmt = "plain" // There can be only one
-		schema, err := utils.LoadSchemaFromFile(*args.Format)
+		schema, err := utils.LoadSchemaFromFile(*args.Schema)
 		if err != nil {
 			return false, nil, nil, fmt.Errorf("load json schema file failed: %w", err)
 		}

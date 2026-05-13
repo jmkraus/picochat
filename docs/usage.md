@@ -48,7 +48,7 @@ echo "/models" | picochat -quiet
 | Argument   | Description                   |
 | ---------- | ----------------------------- |
 | `-config`  | Load a configuration file     |
-| `-format`  | Path to JSON schema file      |
+| `-schema`  | Path to JSON schema file      |
 | `-history` | Load a specific session       |
 | `-image`   | Path to image file            |
 | `-model`   | Override configured model     |
