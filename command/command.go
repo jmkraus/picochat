@@ -63,11 +63,11 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "bye":
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
-		name, err := messages.SaveHistoryToFile(args, history.Get())
+		filename, err := messages.SaveHistoryToFile(args, history.Get())
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
-		return CommandResult{Info: fmt.Sprintf("History saved as %s.", name)}
+		return CommandResult{Info: fmt.Sprintf("History saved as file %q.", filename)}
 	case "load":
 		if args == "" {
 			files, err := utils.ListHistoryFiles()
@@ -89,7 +89,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}
 			}
 			history.Replace(loaded.Get())
-			return CommandResult{Info: fmt.Sprintf("History file %s loaded.", filename)}
+			return CommandResult{Info: fmt.Sprintf("History file %q loaded.", filename)}
 		} else {
 			return CommandResult{Warn: "Load canceled."}
 		}
