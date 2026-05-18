@@ -13,6 +13,7 @@ import (
 	"picochat/paths"
 	"picochat/utils"
 	"strings"
+	"unicode/utf8"
 )
 
 type CommandResult struct {
@@ -24,6 +25,8 @@ type CommandResult struct {
 	Pasted string
 	Repeat bool
 }
+
+var readClipboard = clipb.ReadClipboard
 
 // HandleCommand processes a command line input, performs the requested action,
 // and returns a CommandResult containing the outcome of the command.
@@ -157,12 +160,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Info: payload.Info}
 	case "paste":
-		text, err := clipb.ReadClipboard()
+		text, err := readClipboard()
 		if err != nil {
 			return CommandResult{Error: err}
 		}
+		count := utf8.RuneCountInString(text)
 		return CommandResult{
-			Info:   fmt.Sprintf("Pasted %d characters from clipboard.", len(text)),
+			Info:   fmt.Sprintf("Pasted %d characters from clipboard.", count),
 			Pasted: text,
 		}
 	case "retry":

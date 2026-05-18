@@ -1,9 +1,10 @@
-package command_test
+package command
 
 import (
 	"os"
 	"path/filepath"
-	"picochat/command"
+	// "picochat/command"
+	"fmt"
 	"picochat/messages"
 	"picochat/paths"
 	"strings"
@@ -14,7 +15,7 @@ func TestHandleClear(t *testing.T) {
 	h := messages.NewHistory("initial system prompt", 50)
 	h.AddUser("hello", "")
 
-	result := command.HandleCommand("/clear", h, strings.NewReader(""))
+	result := HandleCommand("/clear", h, strings.NewReader(""))
 	if !h.IsEmpty() {
 		t.Error("expected history to be cleared except system prompt")
 	}
@@ -25,7 +26,7 @@ func TestHandleClear(t *testing.T) {
 
 func TestHandleHelp(t *testing.T) {
 	h := messages.NewHistory("prompt", 50)
-	result := command.HandleCommand("/help", h, strings.NewReader(""))
+	result := HandleCommand("/help", h, strings.NewReader(""))
 	if !strings.Contains(result.Output, "/save") {
 		t.Errorf("expected help to contain /save, got: %s", result.Info)
 	}
@@ -59,7 +60,7 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 	h := messages.NewHistory("system prompt", 50)
 	input := strings.NewReader("dummy.chat\n")
 
-	result := command.HandleCommand("/load", h, input)
+	result := HandleCommand("/load", h, input)
 
 	if result.Error != nil {
 		t.Fatalf("expected no error, got: %v", result.Error)
@@ -81,5 +82,51 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 	}
 	if loaded[2].Role != messages.RoleAssistant || loaded[2].Content != "How can I assist you today?" {
 		t.Fatalf("unexpected message[2]: %#v", loaded[2])
+	}
+}
+
+func TestHandleCommand_Paste_UsesRuneCount(t *testing.T) {
+	prevReadClipboard := readClipboard
+	t.Cleanup(func() {
+		readClipboard = prevReadClipboard
+	})
+
+	readClipboard = func() (string, error) {
+		return "Hello, 世界", nil
+	}
+
+	history := messages.NewHistory("sys", 10)
+	result := HandleCommand("/paste", history, strings.NewReader(""))
+
+	if result.Error != nil {
+		t.Fatalf("expected no error, got %v", result.Error)
+	}
+	if result.Pasted != "Hello, 世界" {
+		t.Fatalf("unexpected pasted payload: %q", result.Pasted)
+	}
+	wantInfo := "Pasted 9 characters from clipboard."
+	if result.Info != wantInfo {
+		t.Fatalf("info = %q, want %q", result.Info, wantInfo)
+	}
+}
+
+func TestHandleCommand_Paste_ReadClipboardError(t *testing.T) {
+	prevReadClipboard := readClipboard
+	t.Cleanup(func() {
+		readClipboard = prevReadClipboard
+	})
+
+	readClipboard = func() (string, error) {
+		return "", fmt.Errorf("clipboard read failed")
+	}
+
+	history := messages.NewHistory("sys", 10)
+	result := HandleCommand("/paste", history, strings.NewReader(""))
+
+	if result.Error == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if !strings.Contains(result.Error.Error(), "clipboard read failed") {
+		t.Fatalf("unexpected error: %v", result.Error)
 	}
 }
