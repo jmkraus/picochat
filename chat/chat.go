@@ -101,7 +101,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	if fullContent.Len() == 0 {
 		console.StopSpinner(cfg.Quiet, stop)
-		return nil, fmt.Errorf("no content received from model %s", cfg.Model)
+		return nil, fmt.Errorf("no content received from model %q", cfg.Model)
 	}
 
 	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), fullContent.String())
