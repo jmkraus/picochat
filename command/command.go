@@ -7,6 +7,7 @@ import (
 	"picochat/backend"
 	"picochat/clipb"
 	"picochat/config"
+	"picochat/console"
 	"picochat/envs"
 	"picochat/messages"
 	"picochat/output"
@@ -108,7 +109,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "info":
 		serverVersion, err := backend.New(cfg).GetServerVersion()
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("fetch server version failed: %w", err)}
+			serverVersion = fmt.Sprintf("%s connection error", console.Err_prefix)
 		}
 
 		list := []string{
@@ -118,7 +119,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			fmt.Sprintf("Current model is %q", cfg.Model),
 			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),
 			fmt.Sprintf("Context token estimation: %.0f", math.Ceil(history.EstimateTokens())),
-			fmt.Sprintf("Server version is %s", serverVersion),
+			fmt.Sprintf("Server version: %s", serverVersion),
 		}
 
 		return CommandResult{Output: utils.FormatList(list, "Server info", false)}
