@@ -38,6 +38,25 @@ func copyToTmuxBufferStdin(text string) error {
 	return cmd.Run()
 }
 
+// copyFromTmuxBufferStdout reads the current tmux buffer via stdout.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	string - text read from the tmux buffer
+//	error  - any error encountered while reading the tmux buffer
+func copyFromTmuxBufferStdout() (string, error) {
+	cmd := exec.Command("tmux", "save-buffer", "-")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
+}
+
 // ReadClipboard reads the current contents of the system clipboard.
 //
 // Parameters:
@@ -50,10 +69,20 @@ func copyToTmuxBufferStdin(text string) error {
 //	error  - any error encountered while reading the clipboard
 func ReadClipboard() (string, error) {
 	text, err := clipboard.ReadAll()
-	if err != nil {
+	if err == nil {
+		text = strings.TrimSpace(text)
+	}
+
+	if isTmuxSession() && (err != nil || text == "") {
+		text, err = copyFromTmuxBufferStdout()
+		if err != nil {
+			return "", fmt.Errorf("tmux clipboard read failed: %w", err)
+		}
+		text = strings.TrimSpace(text)
+	} else if err != nil {
 		return "", fmt.Errorf("clipboard read failed: %w", err)
 	}
-	text = strings.TrimSpace(text)
+
 	if text == "" {
 		return "", fmt.Errorf("clipboard is empty")
 	}
