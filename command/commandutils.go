@@ -172,6 +172,38 @@ func promptForFilename(input io.Reader) (string, error) {
 	return filename, nil
 }
 
+// askConfirmation asks a yes/no question and parses the input as boolean.
+//
+// Parameters:
+//
+//	question (string) - prompt text shown before the fixed "(y/n)" suffix
+//	input (io.Reader) - input stream used for reading user input
+//
+// Returns:
+//
+//	bool  - parsed confirmation result
+//	error - error if input cannot be read or parsed as boolean
+func askConfirmation(question string, input io.Reader) (bool, error) {
+	fmt.Printf("%s (y/N): ", question)
+
+	reader := bufio.NewReader(input)
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return false, fmt.Errorf("input read failed: %w", err)
+	}
+
+	value := strings.TrimSpace(line)
+	if value == "" {
+		return false, nil
+	}
+	converted, err := vartypes.Convert(vartypes.VarBool, value)
+	if err != nil {
+		return false, fmt.Errorf("invalid confirmation value: %w", err)
+	}
+
+	return converted.(bool), nil
+}
+
 // extractCodeBlock extracts the first code block from a string
 // formatted with triple backticks.
 //

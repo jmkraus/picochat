@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"path/filepath"
 	"picochat/backend"
 	"picochat/clipb"
 	"picochat/config"
@@ -67,7 +68,26 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "bye":
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
-		filename, err := messages.SaveHistoryToFile(args, history.Get())
+		overwrite := false
+		if args != "" {
+			historyPath, err := paths.GetHistoryPath()
+			if err != nil {
+				return CommandResult{Error: fmt.Errorf("history path not found: %w", err)}
+			}
+			targetName := paths.EnsureSuffix(filepath.Base(args), paths.HistorySuffix)
+			targetPath := filepath.Join(historyPath, targetName)
+			if paths.FileExists(targetPath) {
+				overwrite, err = askConfirmation(fmt.Sprintf("File %q already exists. Overwrite?", targetName), input)
+				if err != nil {
+					return CommandResult{Error: fmt.Errorf("overwrite confirmation failed: %w", err)}
+				}
+				if !overwrite {
+					return CommandResult{Warn: "Save canceled."}
+				}
+			}
+		}
+
+		filename, err := messages.SaveHistoryToFile(args, history.Get(), overwrite)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}

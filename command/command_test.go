@@ -130,3 +130,51 @@ func TestHandleCommand_Paste_ReadClipboardError(t *testing.T) {
 		t.Fatalf("unexpected error: %v", result.Error)
 	}
 }
+
+func TestHandleCommand_Save_ExistingFile_NoOverwrite(t *testing.T) {
+	tmpDir := t.TempDir()
+	restore := paths.OverrideHistoryPath(tmpDir)
+	t.Cleanup(restore)
+
+	h := messages.NewHistory("system prompt", 50)
+	if err := h.AddUser("first", ""); err != nil {
+		t.Fatalf("add user failed: %v", err)
+	}
+
+	existingName := "existing"
+	if _, err := messages.SaveHistoryToFile(existingName, h.Get(), false); err != nil {
+		t.Fatalf("initial save failed: %v", err)
+	}
+
+	result := HandleCommand("/save "+existingName, h, strings.NewReader("n\n"))
+	if result.Error != nil {
+		t.Fatalf("expected no error, got: %v", result.Error)
+	}
+	if result.Warn != "Save canceled." {
+		t.Fatalf("unexpected warn: %q", result.Warn)
+	}
+}
+
+func TestHandleCommand_Save_ExistingFile_Overwrite(t *testing.T) {
+	tmpDir := t.TempDir()
+	restore := paths.OverrideHistoryPath(tmpDir)
+	t.Cleanup(restore)
+
+	h := messages.NewHistory("system prompt", 50)
+	if err := h.AddUser("first", ""); err != nil {
+		t.Fatalf("add user failed: %v", err)
+	}
+
+	existingName := "existing"
+	if _, err := messages.SaveHistoryToFile(existingName, h.Get(), false); err != nil {
+		t.Fatalf("initial save failed: %v", err)
+	}
+
+	result := HandleCommand("/save "+existingName, h, strings.NewReader("y\n"))
+	if result.Error != nil {
+		t.Fatalf("expected no error, got: %v", result.Error)
+	}
+	if !strings.Contains(result.Info, "History saved as file") {
+		t.Fatalf("unexpected info: %q", result.Info)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"picochat/messages"
 	"picochat/vartypes"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -171,5 +172,40 @@ func TestResolveCopyPayload_UnknownArg(t *testing.T) {
 	}
 	if got, want := err.Error(), "unknown copy argument"; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
+	}
+}
+
+func TestAskConfirmation(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    bool
+		wantErr bool
+	}{
+		{name: "enter only", input: "\n", want: false, wantErr: false},
+		{name: "empty input causes read error", input: "", want: false, wantErr: true},
+		{name: "yes via y", input: "y\n", want: true, wantErr: false},
+		{name: "no via n", input: "n\n", want: false, wantErr: false},
+		{name: "invalid value", input: "maybe\n", want: false, wantErr: true},
+		{name: "missing newline causes read error", input: "y", want: false, wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := askConfirmation("Proceed?", strings.NewReader(tt.input))
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Fatalf("got %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

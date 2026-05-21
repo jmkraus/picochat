@@ -53,14 +53,15 @@ func LoadHistoryFromFile(fileName string) (*ChatHistory, error) {
 //
 //	fileName (string)    - optional fileName (or timestamp if omitted)
 //	messages ([]Message) - the complete current chat history messages
+//	overwrite (bool)     - allow replacing an existing target file
 //
 // Returns:
 //
 //	string - the actual fileName
 //	error  - error if any
-func SaveHistoryToFile(fileName string, messages []Message) (string, error) {
+func SaveHistoryToFile(fileName string, messages []Message, overwrite bool) (string, error) {
 	if strings.HasPrefix(fileName, "#") {
-		return "", fmt.Errorf("fileName must not start with '#'")
+		return "", fmt.Errorf("filename must not start with '#'")
 	}
 
 	historyPath, err := paths.GetHistoryPath()
@@ -78,20 +79,20 @@ func SaveHistoryToFile(fileName string, messages []Message) (string, error) {
 	}
 	fullPath := filepath.Join(historyPath, fileName)
 
-	if !paths.FileExists(fullPath) {
-		data, err := json.MarshalIndent(messages, "", "  ")
-		if err != nil {
-			return "", fmt.Errorf("marshal messages failed: %w", err)
-		}
-
-		if err := os.WriteFile(fullPath, data, 0644); err != nil {
-			return "", fmt.Errorf("write file %s failed: %w", fileName, err)
-		}
-
-		return fileName, nil
-	} else {
-		return "", fmt.Errorf("fileName already exists")
+	if paths.FileExists(fullPath) && !overwrite {
+		return "", fmt.Errorf("filename already exists")
 	}
+
+	data, err := json.MarshalIndent(messages, "", "  ")
+	if err != nil {
+		return "", fmt.Errorf("marshal messages failed: %w", err)
+	}
+
+	if err := os.WriteFile(fullPath, data, 0644); err != nil {
+		return "", fmt.Errorf("write file %q failed: %w", fileName, err)
+	}
+
+	return fileName, nil
 }
 
 // CalculateTokens estimates the number of tokens in a string based on word count.

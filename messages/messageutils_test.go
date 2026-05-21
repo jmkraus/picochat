@@ -17,7 +17,7 @@ func TestSaveAndLoad(t *testing.T) {
 	restore := paths.OverrideHistoryPath(tmpDir)
 	t.Cleanup(restore)
 
-	filename, err := SaveHistoryToFile("", h.Get())
+	filename, err := SaveHistoryToFile("", h.Get(), false)
 	if err != nil {
 		t.Fatalf("save failed: %v", err)
 	}
@@ -45,7 +45,7 @@ func TestSaveAndLoad_DropsReasoning(t *testing.T) {
 	restore := paths.OverrideHistoryPath(tmpDir)
 	t.Cleanup(restore)
 
-	filename, err := SaveHistoryToFile("", h.Get())
+	filename, err := SaveHistoryToFile("", h.Get(), false)
 	if err != nil {
 		t.Fatalf("save failed: %v", err)
 	}
@@ -73,8 +73,32 @@ func TestSaveHistoryToFile_RejectsInvalidFilename(t *testing.T) {
 	restore := paths.OverrideHistoryPath(tmpDir)
 	t.Cleanup(restore)
 
-	if _, err := SaveHistoryToFile("#12", h.Get()); err == nil {
+	if _, err := SaveHistoryToFile("#12", h.Get(), false); err == nil {
 		t.Fatal("expected error for filename starting with '#', got nil")
+	}
+}
+
+func TestSaveHistoryToFile_OverwriteHandling(t *testing.T) {
+	h := NewHistory("persist me", 5)
+	if err := h.add(RoleUser, "", "first", ""); err != nil {
+		t.Fatalf("add failed: %v", err)
+	}
+
+	tmpDir := t.TempDir()
+	restore := paths.OverrideHistoryPath(tmpDir)
+	t.Cleanup(restore)
+
+	name := "overwrite-test"
+	if _, err := SaveHistoryToFile(name, h.Get(), false); err != nil {
+		t.Fatalf("initial save failed: %v", err)
+	}
+
+	if _, err := SaveHistoryToFile(name, h.Get(), false); err == nil {
+		t.Fatal("expected error when overwriting without permission, got nil")
+	}
+
+	if _, err := SaveHistoryToFile(name, h.Get(), true); err != nil {
+		t.Fatalf("overwrite save failed: %v", err)
 	}
 }
 
