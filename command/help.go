@@ -9,7 +9,7 @@ var helpTopics = map[string][]string{
 	"": {
 		"  [Ctrl]+D           Submit multiline input (EOF)",
 		"  [Esc], [Ctrl]+C    Cancel multiline input and return to prompt",
-		"  [Up] / [Down]      Browse prompt history",
+		"  [Up] / [Down]      Browse prompt history (commands only)",
 		"  /copy, /c          Copy the last answer to clipboard",
 		"  /paste, /v         Paste clipboard contents as user input and send",
 		"  /info              Show system information",
