@@ -113,6 +113,26 @@ func (h *ChatHistory) Discard() {
 	}
 }
 
+// Keep truncates the history above the given index and keeps entries
+// from 0 up to and including index.
+//
+// Parameters:
+//
+//	index (int) - last index to keep
+//
+// Returns:
+//
+//	bool - true if the history was truncated/kept successfully, false for invalid index
+func (h *ChatHistory) Keep(index int) bool {
+	if _, err := h.GetByIndex(index); err != nil {
+		return false
+	}
+
+	h.Messages = h.Messages[:index+1]
+	h.MaxContextReached = h.Len() >= h.MaxContext
+	return true
+}
+
 // Get returns the slice of messages in the history.
 //
 // Parameters:

@@ -67,6 +67,7 @@ echo "/models" | picochat -quiet
 | `/copy`, `/c`  | Copy last answer to clipboard                     |
 | `/paste`, `/v` | Paste clipboard content as user input and send    |
 | `/info`        | Show system information                           |
+| `/keep`        | Removes all elements after given index            |
 | `/message`     | Show message(s) from chat history                 |
 | `/load`        | Load chat history from file                       |
 | `/save`        | Save current chat history to file                 |

@@ -395,3 +395,62 @@ func TestEstimateTokens_IncludesReasoning(t *testing.T) {
 		t.Errorf("expected tokens to increase when reasoning is present; base=%.1f withReasoning=%.1f", base, withReasoning)
 	}
 }
+
+func TestKeep(t *testing.T) {
+	newHistory := func() *ChatHistory {
+		h := NewHistory("sys", 10)
+		_ = h.add(RoleUser, "", "u1", "")
+		_ = h.add(RoleAssistant, "", "a1", "")
+		_ = h.add(RoleUser, "", "u2", "")
+		return h
+	}
+
+	t.Run("negative index", func(t *testing.T) {
+		h := newHistory()
+		before := h.Len()
+		if ok := h.Keep(-1); ok {
+			t.Fatal("expected false for negative index, got true")
+		}
+		if h.Len() != before {
+			t.Fatalf("history length changed: got %d, want %d", h.Len(), before)
+		}
+	})
+
+	t.Run("out of bounds index", func(t *testing.T) {
+		h := newHistory()
+		before := h.Len()
+		if ok := h.Keep(h.Len()); ok {
+			t.Fatal("expected false for out-of-bounds index, got true")
+		}
+		if h.Len() != before {
+			t.Fatalf("history length changed: got %d, want %d", h.Len(), before)
+		}
+	})
+
+	t.Run("keep system only", func(t *testing.T) {
+		h := newHistory()
+		if ok := h.Keep(0); !ok {
+			t.Fatal("expected true for index 0, got false")
+		}
+		if h.Len() != 1 {
+			t.Fatalf("expected length 1, got %d", h.Len())
+		}
+		if h.GetLast().Role != RoleSystem {
+			t.Fatalf("expected last role %q, got %q", RoleSystem, h.GetLast().Role)
+		}
+	})
+
+	t.Run("keep up to middle index", func(t *testing.T) {
+		h := newHistory()
+		if ok := h.Keep(2); !ok {
+			t.Fatal("expected true for valid index, got false")
+		}
+		if h.Len() != 3 {
+			t.Fatalf("expected length 3, got %d", h.Len())
+		}
+		last := h.GetLast()
+		if last.Role != RoleAssistant || last.Content != "a1" {
+			t.Fatalf("unexpected last message after keep: %+v", last)
+		}
+	})
+}
