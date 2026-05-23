@@ -109,3 +109,10 @@ echo "/models" | picochat -quiet
 - Role: shows latest message for that role.
 - Index: shows specific history item.
 - `all`: shows full conversation with role formatting.
+
+`/keep <index>`:
+- Keeps all history entries from `0` up to and including `<index>`, and removes everything after it.
+- After `/keep`, check the last remaining entry before continuing:
+- If the last entry is an assistant reply, continue with your next normal prompt.
+- If the last entry is a user prompt, continue with `/retry` to avoid two user prompts in a row.
+- Use `/message all` to inspect the full numbered history before choosing the index.
