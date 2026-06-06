@@ -3,6 +3,7 @@ package envs
 import (
 	"os"
 	"picochat/vartypes"
+	"strconv"
 	"strings"
 )
 
@@ -98,10 +99,8 @@ func ConfigEnvVarsTable() string {
 
 	for _, spec := range ConfigEnvVars {
 		val, lookup := GetEnv(spec.Env)
-		set := "false"
-		if lookup {
-			set = "true"
-		}
+		set := strconv.FormatBool(lookup)
+
 		if lookup && val == "" {
 			val = "[empty]"
 		}
