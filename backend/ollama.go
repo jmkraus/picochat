@@ -81,7 +81,7 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 			Temperature: input.Temperature,
 			TopP:        input.TopP,
 		},
-		Stream: true,
+		Stream: input.Format == nil, // no stream for structured output
 		Think:  input.Reasoning,
 		Format: input.Format,
 	}
