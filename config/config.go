@@ -55,7 +55,7 @@ func Init(configPath string) {
 //
 // Parameters:
 //
-//	none
+//	configPathArg (string) - the path to the config file
 //
 // Returns:
 //
@@ -77,6 +77,10 @@ func load(configPathArg string) {
 			return
 		}
 	} else {
+		if len(initConfigPath) > 0 {
+			// Show a warning only if the configuration file is explicitly set via the -config argument.
+			loadWarn = append(loadWarn, "config file not found - fallback to default or env vars")
+		}
 		path = "none"
 	}
 
@@ -88,7 +92,7 @@ func load(configPathArg string) {
 	}
 
 	// 4. Check value contraints
-	loadWarn = NormalizeConfig(&cfg)
+	loadWarn = append(loadWarn, NormalizeConfig(&cfg)...)
 
 	cfg.ConfigPath = path
 	instance = &cfg
