@@ -57,7 +57,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "test":
 		models, err := backend.New(cfg).GetAvailableModels()
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("get models list failed: %w", err)}
+			return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
 		}
 
 		err = utils.CreateTestFile(models)
@@ -215,16 +215,16 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: "Repeating last chat history user prompt.", Repeat: true}
 	case "models":
 		if args == "" {
-			list, err := backend.New(cfg).GetAvailableModels()
+			models, err := backend.New(cfg).GetAvailableModels()
 			if err != nil {
-				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
+				return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
 			}
 
-			models, err := utils.ShowAvailableModels(list)
+			list, err := utils.ShowAvailableModels(models)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
 			}
-			return CommandResult{Output: models}
+			return CommandResult{Output: list}
 		}
 
 		args := strings.TrimPrefix(args, "#") // accept and ignore # prefix
