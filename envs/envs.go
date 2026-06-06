@@ -30,17 +30,12 @@ var ConfigEnvVars = []EnvSpec{
 	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "quiet"},
 }
 
-var allowedRuntimeFields map[string]bool
 var configByField map[string]EnvSpec
 
 func init() {
-	allowedRuntimeFields = make(map[string]bool, len(ConfigEnvVars))
 	configByField = make(map[string]EnvSpec, len(ConfigEnvVars))
 	for _, v := range ConfigEnvVars {
 		configByField[v.Field] = v
-		if v.Runtime {
-			allowedRuntimeFields[v.Field] = true
-		}
 	}
 }
 
@@ -53,13 +48,13 @@ func init() {
 //
 // Returns:
 //
-//		string - the value of the environment variable
-//	 bool   - environment variable is actually set (but can be empty)
+//	string - the value of the environment variable
+//	bool   - environment variable is actually set (but can be empty)
 func GetEnv(envvar EnvVar) (string, bool) {
 	return os.LookupEnv(string(envvar))
 }
 
-// AllowedRuntimeField checks if the given field name is valid.
+// AllowedRuntimeField checks if the given field can be set at runtime.
 //
 // Parameters:
 //
@@ -67,9 +62,10 @@ func GetEnv(envvar EnvVar) (string, bool) {
 //
 // Returns:
 //
-//	bool - field name is valid: true or false
+//	bool - field can be set at runtime: true or false
 func AllowedRuntimeField(field string) bool {
-	return allowedRuntimeFields[field]
+	cfg, ok := configByField[field]
+	return ok && cfg.Runtime
 }
 
 // ConfigByField returns the config metadata for a field.
