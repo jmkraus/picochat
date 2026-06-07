@@ -52,6 +52,7 @@ Supported variables:
 `APIKey` can be set in `config.toml`, but this is not recommended for regular use because the key is then stored in plain text. A better approach is to fetch the key from your password manager in a shell script and export it as `PICOCHAT_API_KEY` before starting PicoChat. Here's an example for macOS:
 
 ```bash
+# store api key (token) into Apple KeyChain
 security add-generic-password -a "$USER" -s openai-personal-token -w "<token>"
 ```
 
@@ -62,6 +63,7 @@ Then it can be wrapped into a small shell script:
 ```bash
 #!/bin/sh
 
+# read api key (token) from KeyChain and start PicoChat.
 export PICOCHAT_API_KEY="$(security find-generic-password -a "$USER" -s openai-personal-token -w)"
 picochat
 ```
