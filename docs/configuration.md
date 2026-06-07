@@ -45,11 +45,27 @@ Supported variables:
 - `PICOCHAT_CONTEXT`
 - `PICOCHAT_TEMPERATURE`
 - `PICOCHAT_TOP_P`
+- `PICOCHAT_QUIET`
 - `PICOCHAT_REASONING`
 - `PICOCHAT_EFFORT`
-- `PICOCHAT_QUIET`
 
-`APIKey` can be set in `config.toml`, but this is not recommended for regular use because the key is then stored in plain text. A better approach is to fetch the key from your password manager in a shell script and export it as `PICOCHAT_API_KEY` before starting PicoChat.
+`APIKey` can be set in `config.toml`, but this is not recommended for regular use because the key is then stored in plain text. A better approach is to fetch the key from your password manager in a shell script and export it as `PICOCHAT_API_KEY` before starting PicoChat. Here's an example for macOS:
+
+```bash
+security add-generic-password -a "$USER" -s openai-personal-token -w "<token>"
+```
+
+where `<token>` is the actual token, and `openai-personal-token` is an arbitrary name. Be aware that the token still can be exposed via shell history. For full safety consider creating the entry directly in the Apple KeyChain.
+
+Then it can be wrapped into a small shell script:
+
+```bash
+#!/bin/sh
+
+export PICOCHAT_API_KEY="$(security find-generic-password -a "$USER" -s openai-personal-token -w)"
+picochat
+```
+
 
 ## Personas
 
@@ -60,3 +76,9 @@ picochat -config @developer
 ```
 
 `@name` implies config directory plus `.toml` suffix.
+
+But it's also possible to enter a complete path:
+
+```bash
+picochat -config ./path/to/developer.toml
+```
