@@ -63,16 +63,16 @@ echo "/models" | picochat -quiet
 | `[Ctrl]+D`     | Submit multiline input                            |
 | `[Esc]`        | Cancel multiline input and return to prompt       |
 | `[Ctrl]+C`     | Cancel multiline input and return to prompt       |
-| `[Up]/[Down]`  | Browse prompt history                             |
-| `/copy`, `/c`  | Copy last answer to clipboard                     |
+| `[Up]/[Down]`  | Browse prompt history (commands only)             |
+| `/copy`, `/c`  | Copy selected answer to clipboard                 |
 | `/paste`, `/v` | Paste clipboard content as user input and send    |
 | `/info`        | Show system information                           |
-| `/keep`        | Removes all elements after given index            |
+| `/keep`        | Remove all elements after given index             |
 | `/message`     | Show message(s) from chat history                 |
 | `/load`        | Load chat history from file                       |
 | `/save`        | Save current chat history to file                 |
 | `/models`      | List downloaded models (and switch models)        |
-| `/clear`       | Clear chat history (retains system prompt)        |
+| `/clear`       | Clear chat history (retaining system prompt)      |
 | `/set`         | Set session variables (`key=value`)               |
 | `/envs`        | Show environment variable status table            |
 | `/image`       | Set image file path                               |
@@ -82,7 +82,7 @@ echo "/models" | picochat -quiet
 
 ### Command details
 
-`/load <filename>` or `/load #<index>`:
+`/load <filename|#<index>>`:
 - Without argument: lists history files and asks for selection.
 - Empty input cancels loading.
 - `.chat` suffix is optional.
@@ -90,11 +90,12 @@ echo "/models" | picochat -quiet
 `/save <filename>`:
 - Without argument: uses a timestamp filename (for example `2025-05-11_20-26-32.chat`).
 
-`/copy`:
-- Default: copies latest assistant content.
-- `/copy think`: includes reasoning section.
-- `/copy code`: copies first fenced code block.
-- `/copy user|system|assistant`: copies latest message by role.
+`/copy`, `/copy code`, `/copy think`, `/copy #<index>`, `/copy <role>`:
+- Without argument: copies latest assistant content.
+- `code`: copies first fenced code block.
+- `think`: includes reasoning section.
+- Index: copies message with specific index number.
+- Role: copies latest message by role.
 
 `/models <index>`:
 - Without argument: lists models.
@@ -105,14 +106,13 @@ echo "/models" | picochat -quiet
 - With argument: changes runtime setting for current session only.
 
 `/message <role>`, `/message #<index>`, `/message all`:
-- No argument: shows latest message.
+- Without argument: shows latest message.
 - Role: shows latest message for that role.
 - Index: shows specific history item.
 - `all`: shows full conversation with role formatting.
 
 `/keep <index>`:
 - Keeps all history entries from `0` up to and including `<index>`, and removes everything after it.
-- After `/keep`, check the last remaining entry before continuing:
 - If the last entry is an assistant reply, continue with your next normal prompt.
 - If the last entry is a user prompt, continue with `/retry` to avoid two user prompts in a row.
 - Use `/message all` to inspect the full numbered history before choosing the index.
