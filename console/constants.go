@@ -2,8 +2,11 @@ package console
 
 // Constants
 const (
-	Prompt = ">>> "
-	Shadow = Gray256 + "Send a message (/? for help)" + ColorReset
+	Prompt     string = ">>> "
+	ShadowText string = Gray256 + "Send a message (/? for help)" + ColorReset
+	InfoPrefix string = Green + Bold + "✓" + ColorReset
+	WarnPrefix string = BrightYellow + Bold + "!" + ColorReset
+	ErrPrefix  string = BrightRed + Bold + "×" + ColorReset
 )
 
 const (
@@ -11,7 +14,7 @@ const (
 	ClearLine       string = "\r\033[K"
 	CursorBack      string = "\033[D"
 	CursorForward   string = "\033[C"
-	CursorToColumn  string = "\033[%dG"
+	CursorToColumn  string = "\033[%dG" // requires a parameter
 	DisableLineWrap string = "\033[?7l"
 	EnableLineWrap  string = "\033[?7h"
 	DisableCursor   string = "\033[?25l"

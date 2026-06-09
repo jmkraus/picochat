@@ -6,12 +6,6 @@ import (
 	"strings"
 )
 
-const Info_prefix string = Green + Bold + "✓" + ColorReset
-const Warn_prefix string = BrightYellow + Bold + "!" + ColorReset
-const Err_prefix string = BrightRed + Bold + "×" + ColorReset
-
-// const warn_prefix string = BrightYellow + Bold + "!" + ColorReset
-
 // Error prints a custom error message to stderr
 //
 // Parameters:
@@ -23,7 +17,7 @@ const Err_prefix string = BrightRed + Bold + "×" + ColorReset
 //	none
 func Error(msg string) {
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", Err_prefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", ErrPrefix, msg)
 }
 
 // Warn prints a warning message to stderr, prefixed with "warning:"
@@ -37,7 +31,7 @@ func Error(msg string) {
 //	none
 func Warn(msg string) {
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", Warn_prefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", WarnPrefix, msg)
 }
 
 // Warns calls the Warn func multiple times for a number of similar warnings.
@@ -50,11 +44,11 @@ func Warn(msg string) {
 //
 //	none
 func Warns(msgs []string) {
-	for _, m := range msgs {
-		if strings.TrimSpace(m) == "" {
+	for _, msg := range msgs {
+		if strings.TrimSpace(msg) == "" {
 			continue
 		}
-		Warn(m)
+		Warn(msg)
 	}
 }
 
@@ -69,7 +63,7 @@ func Warns(msgs []string) {
 //	none
 func Info(msg string) {
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stdout, "%s %s\n", Info_prefix, msg)
+	fmt.Fprintf(os.Stdout, "%s %s\n", InfoPrefix, msg)
 }
 
 // NewLine writes a newline if the current mode isn't "quiet".

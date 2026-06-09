@@ -277,7 +277,7 @@ func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
 	visualPos := visualWidth(line, cursorPos)
 
 	if firstLine && len(line) == 0 {
-		fmt.Print(Prompt + Shadow)
+		fmt.Print(Prompt + ShadowText)
 	} else {
 		fmt.Print(prefix + string(line))
 	}

@@ -190,7 +190,7 @@ func main() {
 	for {
 		if !session.Quiet {
 			fmt.Println()
-			fmt.Print(console.Prompt + console.Shadow)
+			fmt.Print(console.Prompt + console.ShadowText)
 			console.SetCursorPos(console.PromptWidth() + 1)
 		}
 
