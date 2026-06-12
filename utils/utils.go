@@ -2,11 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"unicode"
 )
 
-// ShowAvailableModels lists all models via /tags API call
+// ListAvailableModels lists all models via /tags API call
 //
 // Parameters:
 //
@@ -16,11 +17,12 @@ import (
 //
 //	string - formatted list of available models
 //	error
-func ShowAvailableModels(models []string) (string, error) {
+func ListAvailableModels(models []string) (string, error) {
 	if len(models) == 0 {
 		return "", fmt.Errorf("no models available")
 	}
 
+	sort.Strings(models)
 	setModelsList(models)
 	return FormatList(models, "Language models", true), nil
 }

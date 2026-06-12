@@ -220,7 +220,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 				return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
 			}
 
-			list, err := utils.ShowAvailableModels(models)
+			list, err := utils.ListAvailableModels(models)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
 			}
