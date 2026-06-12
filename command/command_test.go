@@ -178,3 +178,82 @@ func TestHandleCommand_Save_ExistingFile_Overwrite(t *testing.T) {
 		t.Fatalf("unexpected info: %q", result.Info)
 	}
 }
+
+func TestParseCommandArgs(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantCmd string
+		wantArg string
+	}{
+		{
+			name:    "empty input",
+			input:   "",
+			wantCmd: "",
+			wantArg: "",
+		},
+		{
+			name:    "whitespace only",
+			input:   "   \t   ",
+			wantCmd: "",
+			wantArg: "",
+		},
+		{
+			name:    "copy alias",
+			input:   "/c",
+			wantCmd: "copy",
+			wantArg: "",
+		},
+		{
+			name:    "paste alias",
+			input:   "/v",
+			wantCmd: "paste",
+			wantArg: "",
+		},
+		{
+			name:    "help alias",
+			input:   "/?",
+			wantCmd: "help",
+			wantArg: "",
+		},
+		{
+			name:    "hallo alias",
+			input:   "/hallo",
+			wantCmd: "hello",
+			wantArg: "",
+		},
+		{
+			name:    "normalization lowercase and trim slash",
+			input:   "/MoDeLs  #2",
+			wantCmd: "models",
+			wantArg: "#2",
+		},
+		{
+			name:    "unknown command passthrough normalized",
+			input:   "/FoObAr keep This ARG",
+			wantCmd: "foobar",
+			wantArg: "keep This ARG",
+		},
+		{
+			name:    "without slash",
+			input:   "copy think",
+			wantCmd: "copy",
+			wantArg: "think",
+		},
+		{
+			name:    "args keep content but normalize spacing",
+			input:   "/set   temperature=0.7    now",
+			wantCmd: "set",
+			wantArg: "temperature=0.7 now",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd, arg := parseCommandArgs(tt.input)
+			if cmd != tt.wantCmd || arg != tt.wantArg {
+				t.Fatalf("parseCommandArgs(%q) = (%q, %q), want (%q, %q)", tt.input, cmd, arg, tt.wantCmd, tt.wantArg)
+			}
+		})
+	}
+}
