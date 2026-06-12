@@ -22,7 +22,11 @@ func ListAvailableModels(models []string) (string, error) {
 		return "", fmt.Errorf("no models available")
 	}
 
-	sort.Strings(models)
+	// Sort case-insensitively
+	sort.Slice(models, func(i, j int) bool {
+		return strings.ToLower(models[i]) < strings.ToLower(models[j])
+	})
+
 	setModelsList(models)
 	return FormatList(models, "Language models", true), nil
 }
