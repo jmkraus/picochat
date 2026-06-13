@@ -21,6 +21,10 @@ type Session struct {
 	Quiet   bool
 }
 
+const (
+	defaultOutputFormat = "plain"
+)
+
 // sendPrompt appends a user message to history and starts a chat run.
 //
 // Parameters:
@@ -116,18 +120,18 @@ func initSessionFromArgs() (bool, *Session, []string, error) {
 	}
 
 	if *args.Output == "" {
-		cfg.OutputFmt = "plain" // default
+		cfg.OutputFmt = defaultOutputFormat
 	} else {
 		f, ok := output.AllowedKeys(*args.Output)
 		cfg.OutputFmt = f
 		if !ok {
-			cfg.OutputFmt = "plain"
-			warn = append(warn, "unknown output format - fallback to plain")
+			cfg.OutputFmt = defaultOutputFormat
+			warn = append(warn, fmt.Sprintf("unknown output format - fallback to %s", defaultOutputFormat))
 		}
 	}
 
 	if *args.Schema != "" {
-		cfg.OutputFmt = "plain" // There can be only one
+		cfg.OutputFmt = defaultOutputFormat // Schema overrules output format
 		schema, err := utils.LoadSchemaFromFile(*args.Schema)
 		if err != nil {
 			return false, nil, nil, fmt.Errorf("load json schema file failed: %w", err)
