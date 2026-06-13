@@ -3,6 +3,7 @@ package clipb
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"testing"
 )
@@ -27,6 +28,9 @@ func TestCopyToTmuxBufferStdin(t *testing.T) {
 	if !isTmuxSession() {
 		t.Skip("Skipping test because not in tmux session")
 	}
+	if _, err := exec.LookPath("tmux"); err != nil {
+		t.Skip("Skipping test because tmux binary is not available")
+	}
 	err := copyToTmuxBufferStdin("Hello tmux")
 	if err != nil {
 		t.Errorf("Failed to copy to tmux buffer: %v", err)
@@ -36,6 +40,9 @@ func TestCopyToTmuxBufferStdin(t *testing.T) {
 func TestCopyFromTmuxBufferStdout(t *testing.T) {
 	if !isTmuxSession() {
 		t.Skip("Skipping test because not in tmux session")
+	}
+	if _, err := exec.LookPath("tmux"); err != nil {
+		t.Skip("Skipping test because tmux binary is not available")
 	}
 
 	expected := "Hello tmux stdout"
