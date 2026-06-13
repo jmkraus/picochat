@@ -308,7 +308,7 @@ func parseCommandArgs(input string) (string, string) {
 	}
 	cmd := strings.TrimSpace(parts[0])
 
-	// replace special abbreviations
+	// command replacements
 	switch cmd {
 	case "/c":
 		cmd = "/copy"
@@ -316,6 +316,8 @@ func parseCommandArgs(input string) (string, string) {
 		cmd = "/paste"
 	case "/?":
 		cmd = "/help"
+	case "/exit", "/quit":
+		cmd = "/bye"
 	case "/hallo":
 		cmd = "/hello" // just in case...
 	}
