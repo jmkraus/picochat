@@ -10,14 +10,14 @@ import (
 //
 // Parameters:
 //
-//	msg (string) - error message to be printed
+//	err (error) - error message to be printed
 //
 // Returns:
 //
 //	none
-func Error(msg string) {
+func Error(err error) {
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", ErrPrefix, msg)
+	fmt.Fprintf(os.Stderr, "%s %s\n", ErrPrefix, err.Error())
 }
 
 // Warn prints a warning message to stderr, prefixed with "warning:"

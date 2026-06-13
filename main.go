@@ -37,7 +37,7 @@ const (
 //	none
 func sendPrompt(session *Session, prompt string) {
 	if err := session.History.AddUser(prompt, session.Config.ImagePath); err != nil {
-		console.Error(err.Error())
+		console.Error(err)
 		return
 	}
 
@@ -74,7 +74,7 @@ func runChat(session *Session) {
 
 	result, err := chat.HandleChat(session.Config, session.History, stop)
 	if err != nil {
-		console.Error(err.Error())
+		console.Error(err)
 		return
 	}
 
@@ -84,7 +84,7 @@ func runChat(session *Session) {
 		session.Config.OutputFmt,
 		session.Quiet,
 	); err != nil {
-		console.Error(fmt.Sprintf("output failed: %v", err))
+		console.Error(fmt.Errorf("output failed: %w", err))
 	}
 }
 
@@ -177,7 +177,7 @@ func main() {
 		os.Exit(0)
 	}
 	if err != nil {
-		console.Error(err.Error())
+		console.Error(err)
 		os.Exit(1)
 	}
 	if len(warn) > 0 {
@@ -200,7 +200,7 @@ func main() {
 
 		input := console.ReadMultilineInput()
 		if input.Error != nil {
-			console.Error(input.Error.Error())
+			console.Error(input.Error)
 			continue
 		}
 
@@ -227,7 +227,7 @@ func main() {
 			result := command.HandleCommand(input.Text, session.History, os.Stdin)
 			console.AddCommand(input.Text)
 			if result.Error != nil {
-				console.Error(fmt.Sprintf("command handler error: %v", result.Error))
+				console.Error(fmt.Errorf("command handler error: %w", result.Error))
 				continue
 			}
 			if result.Warn != "" {
