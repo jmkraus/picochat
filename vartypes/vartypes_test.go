@@ -61,3 +61,61 @@ func TestConvertUnsupportedTypeAndInvalidBool(t *testing.T) {
 		t.Fatal("expected invalid bool error, got nil")
 	}
 }
+
+func TestConvertFloat(t *testing.T) {
+	t.Run("valid float", func(t *testing.T) {
+		got, err := Convert(VarFloat, "3.14")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		v, ok := got.(float64)
+		if !ok {
+			t.Fatalf("expected float64, got %T", got)
+		}
+		if v != 3.14 {
+			t.Fatalf("expected 3.14, got %v", v)
+		}
+	})
+
+	t.Run("invalid float", func(t *testing.T) {
+		if _, err := Convert(VarFloat, "abc"); err == nil {
+			t.Fatal("expected error for invalid float, got nil")
+		}
+	})
+}
+
+func TestConvertInt(t *testing.T) {
+	t.Run("valid int", func(t *testing.T) {
+		got, err := Convert(VarInt, "42")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		v, ok := got.(int)
+		if !ok {
+			t.Fatalf("expected int, got %T", got)
+		}
+		if v != 42 {
+			t.Fatalf("expected 42, got %v", v)
+		}
+	})
+
+	t.Run("invalid int", func(t *testing.T) {
+		if _, err := Convert(VarInt, "4.2"); err == nil {
+			t.Fatal("expected error for invalid int, got nil")
+		}
+	})
+}
+
+func TestConvertString(t *testing.T) {
+	got, err := Convert(VarString, "HeLLo")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	v, ok := got.(string)
+	if !ok {
+		t.Fatalf("expected string, got %T", got)
+	}
+	if v != "HeLLo" {
+		t.Fatalf("expected %q, got %q", "HeLLo", v)
+	}
+}

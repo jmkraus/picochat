@@ -9,6 +9,14 @@ import (
 	"github.com/atotto/clipboard"
 )
 
+// variables added for unit test accessibility
+var (
+	readClipboardAll  = clipboard.ReadAll
+	writeClipboardAll = clipboard.WriteAll
+	readTmuxBuffer    = copyFromTmuxBufferStdout
+	writeTmuxBuffer   = copyToTmuxBufferStdin
+)
+
 // isTmuxSession returns whether the current process is running inside a tmux session.
 //
 // Parameters:
@@ -68,13 +76,13 @@ func copyFromTmuxBufferStdout() (string, error) {
 //	string - the clipboard contents
 //	error  - any error encountered while reading the clipboard
 func ReadClipboard() (string, error) {
-	text, err := clipboard.ReadAll()
+	text, err := readClipboardAll()
 	if err == nil {
 		text = strings.TrimSpace(text)
 	}
 
 	if isTmuxSession() && (err != nil || text == "") {
-		text, err = copyFromTmuxBufferStdout()
+		text, err = readTmuxBuffer()
 		if err != nil {
 			return "", fmt.Errorf("tmux clipboard read failed: %w", err)
 		}
@@ -100,12 +108,12 @@ func ReadClipboard() (string, error) {
 //
 //	error - any error encountered while writing to the clipboard or tmux buffer
 func WriteClipboard(text string) error {
-	err := clipboard.WriteAll(text)
+	err := writeClipboardAll(text)
 	if err != nil {
 		return fmt.Errorf("clipboard write failed: %w", err)
 	}
 	if isTmuxSession() {
-		err := copyToTmuxBufferStdin(text)
+		err := writeTmuxBuffer(text)
 		if err != nil {
 			return fmt.Errorf("tmux clipboard write failed: %w", err)
 		}
