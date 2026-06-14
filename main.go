@@ -229,7 +229,8 @@ func main() {
 		}
 
 		if input.IsCommand {
-			printNewLine()
+			// printNewLine()
+			fmt.Println()
 			result := command.HandleCommand(input.Text, session.History, os.Stdin)
 			console.AddCommand(input.Text)
 			if result.Error != nil {
