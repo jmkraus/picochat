@@ -186,14 +186,11 @@ func main() {
 		}
 	}
 
-	if len(warn) > 0 && !session.Quiet {
-		console.Warns(warn)
-	}
-
-	if *args.Model != "" && !session.Quiet {
-		console.Info(fmt.Sprintf("Using model from CLI override: %q.", session.Config.Model))
-	}
 	if !session.Quiet {
+		console.Warns(warn)
+		if *args.Model != "" {
+			console.Info(fmt.Sprintf("Using model from CLI override: %q.", session.Config.Model))
+		}
 		console.Info("PicoChat started.")
 	}
 
@@ -229,18 +226,15 @@ func main() {
 		}
 
 		if input.IsCommand {
-			// printNewLine()
-			fmt.Println()
+			fmt.Println() // newline even in quiet mode
 			result := command.HandleCommand(input.Text, session.History, os.Stdin)
 			console.AddCommand(input.Text)
 			if result.Error != nil {
 				console.Error(fmt.Errorf("command handler error: %w", result.Error))
 				continue
 			}
-			if result.Warn != "" && !session.Quiet {
+			if !session.Quiet {
 				console.Warn(result.Warn)
-			}
-			if result.Info != "" && !session.Quiet {
 				console.Info(result.Info)
 			}
 			if result.Output != "" {

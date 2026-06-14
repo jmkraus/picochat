@@ -16,6 +16,10 @@ import (
 //
 //	none
 func Error(err error) {
+	if err == nil {
+		return
+	}
+
 	fmt.Print(ClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", ErrPrefix, err.Error())
 }
@@ -30,6 +34,10 @@ func Error(err error) {
 //
 //	none
 func Warn(msg string) {
+	if msg == "" {
+		return
+	}
+
 	fmt.Print(ClearLine)
 	fmt.Fprintf(os.Stderr, "%s %s\n", WarnPrefix, msg)
 }
@@ -44,6 +52,10 @@ func Warn(msg string) {
 //
 //	none
 func Warns(msgs []string) {
+	if len(msgs) == 0 {
+		return
+	}
+
 	for _, msg := range msgs {
 		if strings.TrimSpace(msg) == "" {
 			continue
@@ -62,6 +74,10 @@ func Warns(msgs []string) {
 //
 //	none
 func Info(msg string) {
+	if msg == "" {
+		return
+	}
+
 	fmt.Print(ClearLine)
 	fmt.Fprintf(os.Stdout, "%s %s\n", InfoPrefix, msg)
 }
