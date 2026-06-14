@@ -66,22 +66,6 @@ func Info(msg string) {
 	fmt.Fprintf(os.Stdout, "%s %s\n", InfoPrefix, msg)
 }
 
-// NewLine writes a newline if the current mode isn't "quiet".
-//
-// Parameters:
-//
-//	quiet (bool) - status of quiet mode
-//
-// Returns:
-//
-//	none
-func NewLine(quiet bool) {
-	if quiet {
-		return
-	}
-	fmt.Println()
-}
-
 // SetCursorPos places the cursor into the given column
 //
 // Parameters:

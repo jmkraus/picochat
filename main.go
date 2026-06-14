@@ -172,28 +172,34 @@ func initSessionFromArgs() (bool, *Session, []string, error) {
 func main() {
 	showVersion, session, warn, err := initSessionFromArgs()
 	if showVersion {
-		fmt.Printf("picochat version is %s", version.Version)
-		fmt.Println()
+		fmt.Printf("picochat version is %s\n", version.Version)
 		os.Exit(0)
 	}
 	if err != nil {
 		console.Error(err)
 		os.Exit(1)
 	}
-	if len(warn) > 0 {
+
+	printNewLine := func() {
+		if !session.Quiet {
+			fmt.Println()
+		}
+	}
+
+	if len(warn) > 0 && !session.Quiet {
 		console.Warns(warn)
 	}
 
+	if *args.Model != "" && !session.Quiet {
+		console.Info(fmt.Sprintf("Using model from CLI override: %q.", session.Config.Model))
+	}
 	if !session.Quiet {
-		if *args.Model != "" {
-			console.Info(fmt.Sprintf("Using model from CLI override: %q.", session.Config.Model))
-		}
 		console.Info("PicoChat started.")
 	}
 
 	for {
+		printNewLine()
 		if !session.Quiet {
-			fmt.Println()
 			fmt.Print(console.Prompt + console.ShadowText)
 			console.SetCursorPos(console.PromptWidth() + 1)
 		}
@@ -205,8 +211,8 @@ func main() {
 		}
 
 		if input.Aborted {
+			printNewLine()
 			if !session.Quiet {
-				console.NewLine(false)
 				console.Warn("Input canceled.")
 			}
 			continue
@@ -215,7 +221,7 @@ func main() {
 		if input.Text == "" && !input.IsCommand {
 			if input.EOF {
 				// we come from stdin pipe
-				console.NewLine(session.Quiet)
+				printNewLine()
 				break
 			} else {
 				continue
@@ -223,14 +229,14 @@ func main() {
 		}
 
 		if input.IsCommand {
-			console.NewLine(session.Quiet)
+			printNewLine()
 			result := command.HandleCommand(input.Text, session.History, os.Stdin)
 			console.AddCommand(input.Text)
 			if result.Error != nil {
 				console.Error(fmt.Errorf("command handler error: %w", result.Error))
 				continue
 			}
-			if result.Warn != "" {
+			if result.Warn != "" && !session.Quiet {
 				console.Warn(result.Warn)
 			}
 			if result.Info != "" && !session.Quiet {

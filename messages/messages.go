@@ -289,7 +289,7 @@ func (h *ChatHistory) compress() {
 	}
 
 	if !h.MaxContextReached {
-		console.NewLine(false)
+		fmt.Println()
 		console.Warn(fmt.Sprintf("Context size limit of %d reached.", max))
 		h.MaxContextReached = true
 	}
