@@ -155,6 +155,16 @@ func TestSetContextSize(t *testing.T) {
 		t.Errorf("Expected 10 messages, got %d", len(h.Messages))
 	}
 
+	// Unchanged size still recalculates MaxContextReached.
+	h.MaxContext = 12
+	h.MaxContextReached = true
+	if err := h.SetContextSize(12); err != nil {
+		t.Errorf("Expected no error for unchanged context, got %v", err)
+	}
+	if h.MaxContextReached {
+		t.Errorf("Expected MaxContextReached=false for len(10) with max(12), got true")
+	}
+
 	// Reduction to 3
 	if err := h.SetContextSize(3); err != nil {
 		t.Errorf("Unexpected error: %v", err)

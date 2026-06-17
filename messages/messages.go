@@ -48,8 +48,10 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 //
 // Parameters:
 //
-//	role (string)    - Role of the stored message (System, User, Assistant)
-//	content (string) - Message body
+//	role (string)      - Role of the stored message (System, User, Assistant)
+//	reasoning (string) - Reasoning body (if separate from message)
+//	content (string)   - Message body
+//	image (string)     - Image as base64 encoded string
 //
 // Returns:
 //
@@ -255,21 +257,38 @@ func (h *ChatHistory) SetContextSize(max int) error {
 		return fmt.Errorf("context size must be between %d and %d", config.MinContext, config.MaxContext)
 	}
 	if h.MaxContext == max {
+		h.MaxContextReached = h.Len() >= h.MaxContext
 		return nil
 	}
 
 	h.MaxContext = max
-
-	if h.Len() >= max {
-		start := h.Len() - (max - 1)
-		if start < 1 {
-			start = 1
-		}
-		h.Messages = append([]Message{h.Messages[0]}, h.Messages[start:]...)
-	}
+	h.trimToContextLimit()
 
 	h.MaxContextReached = h.Len() >= h.MaxContext
 	return nil
+}
+
+// trimToContextLimit trims the history to MaxContext while preserving
+// the first message (system prompt).
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	none
+func (h *ChatHistory) trimToContextLimit() {
+	max := h.MaxContext
+	if h.Len() <= max {
+		return
+	}
+
+	start := h.Len() - (max - 1)
+	if start < 1 {
+		start = 1
+	}
+	h.Messages = append([]Message{h.Messages[0]}, h.Messages[start:]...)
 }
 
 // Compress reduces the history to the specified maximum number of messages,
@@ -294,8 +313,7 @@ func (h *ChatHistory) compress() {
 		h.MaxContextReached = true
 	}
 
-	keep := h.Messages[h.Len()-(max-1):]
-	h.Messages = append(h.Messages[:1], keep...)
+	h.trimToContextLimit()
 }
 
 // Len returns the number of messages in the history.
