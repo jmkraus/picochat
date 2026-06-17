@@ -30,6 +30,9 @@ History files are stored in the PicoChat config directory (for example `.config/
 | `Reasoning`   | bool    | Enable or disable reasoning behavior                                |
 | `Effort`      | string  | Tune the trace length of reasoning output (`low`, `medium`, `high`) |
 
+NOTE: The `Quiet` option is intended for pipeline and scripting use and should not be set for interactive mode.
+
+
 ## Environment variables
 
 Load order: defaults -> config file -> environment variables.

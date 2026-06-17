@@ -56,6 +56,9 @@ echo "/models" | picochat -quiet
 | `-quiet`   | Suppress app messages         |
 | `-version` | Show version and exit         |
 
+NOTE: The `-quiet` flag is intended for pipeline and scripting use and should not be set for interactive mode.
+
+
 ## Commands
 
 | Command        | Description                                       |
