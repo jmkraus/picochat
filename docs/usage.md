@@ -70,7 +70,7 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 | `/copy`, `/c`  | Copy selected answer to clipboard                 |
 | `/paste`, `/v` | Paste clipboard content as user input and send    |
 | `/info`        | Show system information                           |
-| `/keep`        | Remove all elements after given index             |
+| `/trim`        | Remove all elements after given index             |
 | `/message`     | Show message(s) from chat history                 |
 | `/load`        | Load chat history from file                       |
 | `/save`        | Save current chat history to file                 |
@@ -114,8 +114,8 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 - Index: shows specific history item.
 - `all`: shows full conversation with role formatting.
 
-`/keep <index>`:
+`/trim <index>`:
 - Keeps all history entries from `0` up to and including `<index>`, and removes everything after it.
 - If the last entry is an assistant reply, continue with your next normal prompt.
 - If the last entry is a user prompt, continue with `/retry` to avoid two user prompts in a row.
-- Use `/message all` to inspect the full numbered history before choosing the index.
+- Use `/message all` to inspect the full numbered history before choosing the index and trimming.

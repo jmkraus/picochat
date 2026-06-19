@@ -115,7 +115,7 @@ func (h *ChatHistory) Discard() {
 	}
 }
 
-// Keep truncates the history above the given index and keeps entries
+// Trim truncates the history above the given index and keeps entries
 // from 0 up to and including index.
 //
 // Parameters:
@@ -125,7 +125,7 @@ func (h *ChatHistory) Discard() {
 // Returns:
 //
 //	bool - true if the history was truncated/kept successfully, false for invalid index
-func (h *ChatHistory) Keep(index int) bool {
+func (h *ChatHistory) Trim(index int) bool {
 	if _, err := h.GetByIndex(index); err != nil {
 		return false
 	}

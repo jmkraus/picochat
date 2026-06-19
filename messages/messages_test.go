@@ -406,7 +406,7 @@ func TestEstimateTokens_IncludesReasoning(t *testing.T) {
 	}
 }
 
-func TestKeep(t *testing.T) {
+func TestTrim(t *testing.T) {
 	newHistory := func() *ChatHistory {
 		h := NewHistory("sys", 10)
 		_ = h.add(RoleUser, "", "u1", "")
@@ -418,7 +418,7 @@ func TestKeep(t *testing.T) {
 	t.Run("negative index", func(t *testing.T) {
 		h := newHistory()
 		before := h.Len()
-		if ok := h.Keep(-1); ok {
+		if ok := h.Trim(-1); ok {
 			t.Fatal("expected false for negative index, got true")
 		}
 		if h.Len() != before {
@@ -429,7 +429,7 @@ func TestKeep(t *testing.T) {
 	t.Run("out of bounds index", func(t *testing.T) {
 		h := newHistory()
 		before := h.Len()
-		if ok := h.Keep(h.Len()); ok {
+		if ok := h.Trim(h.Len()); ok {
 			t.Fatal("expected false for out-of-bounds index, got true")
 		}
 		if h.Len() != before {
@@ -439,7 +439,7 @@ func TestKeep(t *testing.T) {
 
 	t.Run("keep system only", func(t *testing.T) {
 		h := newHistory()
-		if ok := h.Keep(0); !ok {
+		if ok := h.Trim(0); !ok {
 			t.Fatal("expected true for index 0, got false")
 		}
 		if h.Len() != 1 {
@@ -452,7 +452,7 @@ func TestKeep(t *testing.T) {
 
 	t.Run("keep up to middle index", func(t *testing.T) {
 		h := newHistory()
-		if ok := h.Keep(2); !ok {
+		if ok := h.Trim(2); !ok {
 			t.Fatal("expected true for valid index, got false")
 		}
 		if h.Len() != 3 {

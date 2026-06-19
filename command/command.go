@@ -143,7 +143,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		return CommandResult{Output: utils.FormatList(list, "Server info", false)}
-	case "keep":
+	case "trim":
 		args := strings.TrimPrefix(args, "#") // accept and ignore # prefix
 		if args == "" {
 			return CommandResult{Error: fmt.Errorf("missing index argument")}
@@ -152,7 +152,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: err}
 		}
-		ok := history.Keep(index)
+		ok := history.Trim(index)
 		if ok {
 			return CommandResult{Info: "Chat history has been truncated."}
 		}
