@@ -227,7 +227,6 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 }
 
 // ClearExceptSystemPrompt removes all messages except the system prompt
-// and resets context flag.
 //
 // Parameters:
 //
@@ -237,10 +236,8 @@ func (h *ChatHistory) Replace(newMessages []Message) {
 //
 //	none
 func (h *ChatHistory) ClearExceptSystemPrompt() {
-	if h.Len() > 1 {
-		h.Messages = h.Messages[:1]
-	}
-	h.MaxContextReached = false
+	// This is a special case of Trim
+	_ = h.Trim(0)
 }
 
 // SetContextSize sets the maximum context size and trims history if necessary.
