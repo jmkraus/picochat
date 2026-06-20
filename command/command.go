@@ -195,11 +195,16 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Info: payload.Info}
 	case "paste":
-		text, err := readClipboard()
+		tpl := config.GetTemplate(args)
+		clip, err := readClipboard()
 		if err != nil {
 			return CommandResult{Error: err}
 		}
-		count := utf8.RuneCountInString(text)
+		text := clip
+		if tpl != "" {
+			text = fmt.Sprintf("%s\n\n%s", tpl, clip)
+		}
+		count := utf8.RuneCountInString(clip)
 		return CommandResult{
 			Info:   fmt.Sprintf("Pasted %d characters from clipboard.", count),
 			Pasted: text,

@@ -24,10 +24,11 @@ type Config struct {
 	Effort      string  `json:"effort"`
 	Quiet       bool    `json:"quiet"`
 
-	ConfigPath string         `toml:"-"`
-	ImagePath  string         `toml:"-"` ////IMAGES
-	OutputFmt  string         `toml:"-"`
-	SchemaFmt  map[string]any `toml:"-"`
+	ConfigPath string            `toml:"-"`
+	ImagePath  string            `toml:"-"` ////IMAGES
+	OutputFmt  string            `toml:"-"`
+	SchemaFmt  map[string]any    `toml:"-"`
+	Templates  map[string]string `json:"-" toml:"Templates"`
 }
 
 var (
@@ -93,6 +94,9 @@ func load(configPathArg string) {
 
 	// 4. Check value contraints
 	loadWarn = append(loadWarn, NormalizeConfig(&cfg)...)
+
+	// 5. Load templates
+	setTemplates(cfg.Templates)
 
 	cfg.ConfigPath = path
 	instance = &cfg
