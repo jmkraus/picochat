@@ -247,8 +247,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		cfg.Model = model
 		return CommandResult{Info: fmt.Sprintf("Switched model to %q.", model)}
 	case "envs":
-		envSetup := envs.ConfigEnvVarsTable()
-		return CommandResult{Output: envSetup}
+		return CommandResult{Output: envs.ListEnvVars()}
 	case "set":
 		if args == "" {
 			list := []string{
@@ -292,7 +291,14 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Info: "History cleared (system prompt retained)."}
 	case "help":
-		return CommandResult{Output: HelpText(args)}
+		switch args {
+		case "env", "envs":
+			return CommandResult{Output: envs.ListEnvVars()}
+		case "tpl", "templates":
+			return CommandResult{Output: config.ListTemplates()}
+		default:
+			return CommandResult{Output: HelpText(args)}
+		}
 	default:
 		return CommandResult{Error: fmt.Errorf("unknown command")}
 	}
@@ -316,22 +322,22 @@ func parseCommandArgs(input string) (string, string) {
 	}
 	cmd := strings.TrimSpace(parts[0])
 
-	// command replacements
-	switch cmd {
-	case "/c":
-		cmd = "/copy"
-	case "/v":
-		cmd = "/paste"
-	case "/?":
-		cmd = "/help"
-	case "/exit", "/quit":
-		cmd = "/bye"
-	case "/hallo":
-		cmd = "/hello" // just in case...
-	}
-
 	// normalize
 	cmd = strings.ToLower(strings.TrimPrefix(cmd, "/"))
+
+	// command replacements
+	switch cmd {
+	case "c":
+		cmd = "copy"
+	case "v":
+		cmd = "paste"
+	case "?":
+		cmd = "help"
+	case "exit", "quit":
+		cmd = "bye"
+	case "hallo":
+		cmd = "hello" // just in case...
+	}
 
 	arg := ""
 	if len(parts) > 1 {

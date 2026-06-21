@@ -24,10 +24,10 @@ func TestAllowedRuntimeField_InvalidFieldsAreRejected(t *testing.T) {
 	}
 }
 
-func TestConfigEnvVarsTable_HidesSensitiveValues(t *testing.T) {
+func TestListEnvVars_HidesSensitiveValues(t *testing.T) {
 	t.Setenv("PICOCHAT_API_KEY", "sk-secret-value")
 
-	table := ConfigEnvVarsTable()
+	table := ListEnvVars()
 	if strings.Contains(table, "sk-secret-value") {
 		t.Fatalf("table leaked sensitive value")
 	}
@@ -39,10 +39,10 @@ func TestConfigEnvVarsTable_HidesSensitiveValues(t *testing.T) {
 	}
 }
 
-func TestConfigEnvVarsTable_ShowsNonSensitiveValues(t *testing.T) {
+func TestListEnvVars_ShowsNonSensitiveValues(t *testing.T) {
 	t.Setenv("PICOCHAT_MODEL", "test-model")
 
-	table := ConfigEnvVarsTable()
+	table := ListEnvVars()
 	if !strings.Contains(table, "PICOCHAT_MODEL") {
 		t.Fatalf("table does not contain model row")
 	}

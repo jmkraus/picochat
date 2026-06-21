@@ -84,7 +84,7 @@ func ConfigByField(field string) (EnvSpec, bool) {
 	return cfg, ok
 }
 
-// ConfigEnvVarsTable builds a table from env var state and values.
+// ListEnvVars builds a table from env var state and values.
 //
 // Parameters:
 //
@@ -93,7 +93,7 @@ func ConfigByField(field string) (EnvSpec, bool) {
 // Returns:
 //
 //	string - the full markdown table
-func ConfigEnvVarsTable() string {
+func ListEnvVars() string {
 	tableData := make([][]string, 0, len(ConfigEnvVars)+1)
 	tableData = append(tableData, []string{"Env", "Set", "Value"})
 
