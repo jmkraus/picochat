@@ -2,9 +2,9 @@ package envs
 
 import (
 	"os"
+	"picochat/utils"
 	"picochat/vartypes"
 	"strconv"
-	"strings"
 )
 
 // EnvVar represents the valid environment variables in this package.
@@ -110,75 +110,5 @@ func ConfigEnvVarsTable() string {
 		tableData = append(tableData, []string{string(spec.Env), set, val})
 	}
 
-	return markdownTable(tableData)
-}
-
-// markdownTable creates a markdown table from a 2-dim array
-// and adjusts the column widths according to content.
-//
-// Parameters:
-//
-//	tableData ([][]string) - the rows and columns of the table
-//
-// Returns:
-//
-//	string - markdown string with all line breaks
-func markdownTable(tableData [][]string) string {
-	if len(tableData) == 0 || len(tableData[0]) == 0 {
-		return ""
-	}
-
-	numColumns := len(tableData[0])
-	separator := make([]string, numColumns)
-	for i := range separator {
-		separator[i] = "---"
-	}
-
-	rows := make([][]string, 0, len(tableData)+1)
-	rows = append(rows, tableData[0], separator)
-	rows = append(rows, tableData[1:]...)
-
-	maxWidths := make([]int, numColumns)
-	for _, row := range rows {
-		for colIdx := range numColumns {
-			col := ""
-			if colIdx < len(row) {
-				col = row[colIdx]
-			}
-			if len(col) > maxWidths[colIdx] {
-				maxWidths[colIdx] = len(col)
-			}
-		}
-	}
-
-	pad := func(s string, width int, fill byte) string {
-		if len(s) >= width {
-			return s
-		}
-		return s + strings.Repeat(string(fill), width-len(s))
-	}
-
-	var builder strings.Builder
-	for rowIdx, row := range rows {
-		fill := byte(' ')
-		if rowIdx == 1 {
-			fill = '-'
-		}
-
-		builder.WriteByte('|')
-		for colIdx := range numColumns {
-			col := ""
-			if colIdx < len(row) {
-				col = row[colIdx]
-			}
-			builder.WriteByte(' ')
-			builder.WriteString(pad(col, maxWidths[colIdx], fill))
-			builder.WriteString(" |")
-		}
-		if rowIdx < len(rows)-1 {
-			builder.WriteByte('\n')
-		}
-	}
-
-	return builder.String()
+	return utils.MarkdownTable(tableData)
 }

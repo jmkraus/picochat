@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -130,5 +131,37 @@ func TestCapitalize(t *testing.T) {
 				t.Fatalf("capitalize(%q) = %q, want %q", tt.in, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestMarkdownTable_Empty(t *testing.T) {
+	if got := MarkdownTable(nil); got != "" {
+		t.Fatalf("MarkdownTable(nil) = %q, want empty string", got)
+	}
+	if got := MarkdownTable([][]string{}); got != "" {
+		t.Fatalf("MarkdownTable(empty) = %q, want empty string", got)
+	}
+	if got := MarkdownTable([][]string{{}}); got != "" {
+		t.Fatalf("MarkdownTable([[]]) = %q, want empty string", got)
+	}
+}
+
+func TestMarkdownTable_Basic(t *testing.T) {
+	table := [][]string{
+		{"Name", "Value"},
+		{"alpha", "1"},
+		{"beta", "22"},
+	}
+
+	got := MarkdownTable(table)
+	want := strings.Join([]string{
+		"| Name  | Value |",
+		"| ----- | ----- |",
+		"| alpha | 1     |",
+		"| beta  | 22    |",
+	}, "\n")
+
+	if got != want {
+		t.Fatalf("MarkdownTable result mismatch\nwant:\n%s\n\ngot:\n%s", want, got)
 	}
 }
