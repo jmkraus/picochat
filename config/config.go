@@ -28,7 +28,7 @@ type Config struct {
 	ImagePath  string            `toml:"-"` ////IMAGES
 	OutputFmt  string            `toml:"-"`
 	SchemaFmt  map[string]any    `toml:"-"`
-	Templates  map[string]string `json:"-" toml:"Templates"`
+	Templates  map[string]string `toml:"Templates"`
 }
 
 var (

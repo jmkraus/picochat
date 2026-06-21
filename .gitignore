@@ -1,4 +1,5 @@
 testdata/
+_*.md
 *.bak
 *.txt
 *.orig
