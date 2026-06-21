@@ -24,11 +24,11 @@ type Config struct {
 	Effort      string  `json:"effort"`
 	Quiet       bool    `json:"quiet"`
 
-	ConfigPath string            `toml:"-"`
-	ImagePath  string            `toml:"-"` ////IMAGES
-	OutputFmt  string            `toml:"-"`
-	SchemaFmt  map[string]any    `toml:"-"`
-	Templates  map[string]string `toml:"Templates"`
+	ConfigPath string              `toml:"-"`
+	ImagePath  string              `toml:"-"` ////IMAGES
+	OutputFmt  string              `toml:"-"`
+	SchemaFmt  map[string]any      `toml:"-"`
+	Templates  map[string]Template `toml:"Templates"`
 }
 
 var (

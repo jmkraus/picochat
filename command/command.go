@@ -196,6 +196,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: payload.Info}
 	case "paste":
 		tpl := config.GetTemplate(args)
+		if args != "" && tpl == "" {
+			return CommandResult{Error: fmt.Errorf("template %q not found", args)}
+		}
 		clip, err := readClipboard()
 		if err != nil {
 			return CommandResult{Error: err}
