@@ -246,8 +246,6 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		cfg.Model = model
 		return CommandResult{Info: fmt.Sprintf("Switched model to %q.", model)}
-	case "envs":
-		return CommandResult{Output: envs.ListEnvVars()}
 	case "set":
 		if args == "" {
 			list := []string{
