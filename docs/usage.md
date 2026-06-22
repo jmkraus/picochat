@@ -77,7 +77,6 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 | `/models`      | List downloaded models (and switch models)        |
 | `/clear`       | Clear chat history (retaining system prompt)      |
 | `/set`         | Set session variables (`key=value`)               |
-| `/envs`        | Show environment variable status table            |
 | `/image`       | Set image file path                               |
 | `/retry`       | Resend chat history excluding last answer         |
 | `/bye`         | Quit PicoChat                                     |
@@ -100,6 +99,10 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 - Index: copies message with specific index number.
 - Role: copies latest message by role.
 
+`/paste`, `/paste <key>`:
+- Without argument: pastes clipboard content as user prompt and sends request
+- `<key>` prepends a template‑stored instruction from the config file to the clipboard content.
+
 `/models <index>`:
 - Without argument: lists models.
 - With index: switches model from cached model list.
@@ -119,3 +122,7 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 - If the last entry is an assistant reply, continue with your next normal prompt.
 - If the last entry is a user prompt, continue with `/retry` to avoid two user prompts in a row.
 - Use `/message all` to inspect the full numbered history before choosing the index and trimming.
+
+`/? envs`, `/? templates`:
+- `envs`: shows environment variable status table.
+- `templates`: shows template key and description table.
