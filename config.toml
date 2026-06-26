@@ -7,3 +7,20 @@ Context = 20
 Temperature = 0.70
 Top_p = 0.90
 Prompt = "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging."
+
+[Templates.sum]
+  Description = "Summarizes the text to max. 6 sentences"
+  Prompt = """
+  You are an AI that summarizes texts precisely. Follow these rules:
+  * Summarize the provided text in a maximum of 6 sentences.
+  * Use only the language of the original text.
+  * Enclose the summary within `<summary> ... </summary>` tags.
+  * If there are ambiguities, gaps, or difficulties in understanding within the text, include a short note line after the closing tag.
+  *Note: The summary should be no more than 6 sentences long and should be as concise as possible.*
+  """
+[Templates.eng]
+  Description = "Translates text into English"
+  Prompt = "Translate the text into English. Don't add any intro sentence or additional info, only the translated text."
+[Templates.ger]
+  Description = "Translates text into German"
+  Prompt = "Translate the text into German. Don't add any intro sentence or additional info, only the translated text."
