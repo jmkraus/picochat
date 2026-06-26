@@ -16,20 +16,36 @@ func TestGetTemplate(t *testing.T) {
 		"eng": {Prompt: "Translate to English", Description: "Translate EN"},
 	})
 
-	if got := GetTemplate("eng"); got != "Translate to English" {
-		t.Fatalf("GetTemplate(eng) = %q, want %q", got, "Translate to English")
+	if got, err := GetTemplate("eng"); err != nil || got != "Translate to English" {
+		t.Fatalf("GetTemplate(eng) = (%q, %v), want (%q, nil)", got, err, "Translate to English")
 	}
-	if got := GetTemplate("sum"); got != "line 1\nline 2" {
-		t.Fatalf("GetTemplate(sum) = %q, want multiline value", got)
+	if got, err := GetTemplate("sum"); err != nil || got != "line 1\nline 2" {
+		t.Fatalf("GetTemplate(sum) = (%q, %v), want multiline value", got, err)
 	}
-	if got := GetTemplate("missing"); got != "" {
-		t.Fatalf("GetTemplate(missing) = %q, want empty string", got)
+	if got, err := GetTemplate("missing"); err == nil || got != "" {
+		t.Fatalf("GetTemplate(missing) = (%q, %v), want (empty, error)", got, err)
 	}
 	if got := GetTemplateDescription("eng"); got != "Translate EN" {
 		t.Fatalf("GetTemplateDescription(eng) = %q, want %q", got, "Translate EN")
 	}
 	if got := GetTemplateDescription("missing"); got != "" {
 		t.Fatalf("GetTemplateDescription(missing) = %q, want empty string", got)
+	}
+}
+
+func TestGetTemplate_EmptyPromptReturnsError(t *testing.T) {
+	prev := templates
+	t.Cleanup(func() {
+		templates = prev
+	})
+
+	setTemplates(map[string]Template{
+		"empty": {Prompt: "", Description: "Empty"},
+	})
+
+	got, err := GetTemplate("empty")
+	if err == nil || got != "" {
+		t.Fatalf("GetTemplate(empty) = (%q, %v), want (empty, error)", got, err)
 	}
 }
 

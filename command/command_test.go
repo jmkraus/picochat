@@ -110,6 +110,25 @@ func TestHandleCommand_Paste_UsesRuneCount(t *testing.T) {
 	}
 }
 
+func TestHandleCommand_Paste_UnknownTemplateError(t *testing.T) {
+	prevReadClipboard := readClipboard
+	t.Cleanup(func() {
+		readClipboard = prevReadClipboard
+	})
+
+	readClipboard = func() (string, error) { return "Hello", nil }
+
+	history := messages.NewHistory("sys", 10)
+	result := HandleCommand("/paste unknown", history, strings.NewReader(""))
+
+	if result.Error == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if !strings.Contains(result.Error.Error(), `template key "unknown" not found`) {
+		t.Fatalf("unexpected error: %v", result.Error)
+	}
+}
+
 func TestHandleCommand_Paste_ReadClipboardError(t *testing.T) {
 	prevReadClipboard := readClipboard
 	t.Cleanup(func() {

@@ -1,9 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"maps"
 	"picochat/utils"
 	"sort"
+	"strings"
 )
 
 type Template struct {
@@ -41,12 +43,19 @@ func setTemplates(in map[string]Template) {
 // Returns:
 //
 //	string - template prompt (empty string if not found)
-func GetTemplate(key string) string {
+//	error  - error if any
+func GetTemplate(key string) (string, error) {
+	if key == "" {
+		return "", nil
+	}
 	tpl, ok := templates[key]
 	if !ok {
-		return ""
+		return "", fmt.Errorf("template key %q not found", key)
 	}
-	return tpl.Prompt
+	if tpl.Prompt == "" {
+		return "", fmt.Errorf("template prompt for %q is empty", key)
+	}
+	return tpl.Prompt, nil
 }
 
 // GetTemplateDescription returns a template description by key.
@@ -98,7 +107,11 @@ func ListTemplates() string {
 	tableData = append(tableData, []string{"Key", "Description"})
 
 	for _, key := range listTemplateKeys() {
-		tableData = append(tableData, []string{key, templates[key].Description})
+		desc := strings.TrimSpace(templates[key].Description)
+		if desc == "" {
+			desc = "[none]"
+		}
+		tableData = append(tableData, []string{key, desc})
 	}
 
 	return utils.MarkdownTable(tableData)
