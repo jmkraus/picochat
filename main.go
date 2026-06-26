@@ -54,7 +54,7 @@ func sendPrompt(session *Session, prompt string) {
 // Returns:
 //
 //	none
-func repeatPrompt(session *Session) {
+func retryPrompt(session *Session) {
 	runChat(session)
 }
 
@@ -243,8 +243,8 @@ func main() {
 			if result.Quit {
 				break
 			}
-			if result.Repeat {
-				repeatPrompt(session)
+			if result.Retry {
+				retryPrompt(session)
 			} else if result.Pasted != "" {
 				// start the request with pasted content from clipboard
 				sendPrompt(session, result.Pasted)

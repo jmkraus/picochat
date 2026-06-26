@@ -25,7 +25,7 @@ type CommandResult struct {
 	Error  error
 	Quit   bool
 	Pasted string
-	Repeat bool
+	Retry  bool
 }
 
 var readClipboard = clipb.ReadClipboard
@@ -220,7 +220,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if !history.CheckIfLastEntryIsRole(messages.RoleUser) {
 			return CommandResult{Error: fmt.Errorf("last entry in chat history is not a user prompt")}
 		}
-		return CommandResult{Info: "Repeating last chat history user prompt.", Repeat: true}
+		return CommandResult{Info: "Repeating last chat history user prompt.", Retry: true}
 	case "models":
 		if args == "" {
 			models, err := backend.New(cfg).GetAvailableModels()

@@ -11,9 +11,9 @@ import (
 
 func newTestSession() *Session {
 	cfg := &config.Config{
-		URL:      "://invalid-url",
-		Model:    "test-model",
-		Prompt:   "system prompt",
+		URL:       "://invalid-url",
+		Model:     "test-model",
+		Prompt:    "system prompt",
 		OutputFmt: "plain",
 	}
 	history := messages.NewHistory(cfg.Prompt, 10)
@@ -91,7 +91,7 @@ func TestRepeatPrompt_InvalidURLDoesNotAppendAssistant(t *testing.T) {
 	}
 	before := session.History.Len()
 
-	repeatPrompt(session)
+	retryPrompt(session)
 
 	after := session.History.Len()
 	if after != before {
