@@ -25,6 +25,15 @@ func TestGetTemplate(t *testing.T) {
 	if got, err := GetTemplate("missing"); err == nil || got != "" {
 		t.Fatalf("GetTemplate(missing) = (%q, %v), want (empty, error)", got, err)
 	}
+	if got, err := GetTemplate(""); err != nil || got != "" {
+		t.Fatalf("GetTemplate(\"\") = (%q, %v), want (empty, nil)", got, err)
+	}
+	if got, err := GetTemplate("   "); err != nil || got != "" {
+		t.Fatalf("GetTemplate(\"   \") = (%q, %v), want (empty, nil)", got, err)
+	}
+	if got, err := GetTemplate(" eng "); err != nil || got != "Translate to English" {
+		t.Fatalf("GetTemplate(\" eng \") = (%q, %v), want (%q, nil)", got, err, "Translate to English")
+	}
 	if got := GetTemplateDescription("eng"); got != "Translate EN" {
 		t.Fatalf("GetTemplateDescription(eng) = %q, want %q", got, "Translate EN")
 	}
@@ -46,6 +55,19 @@ func TestGetTemplate_EmptyPromptReturnsError(t *testing.T) {
 	got, err := GetTemplate("empty")
 	if err == nil || got != "" {
 		t.Fatalf("GetTemplate(empty) = (%q, %v), want (empty, error)", got, err)
+	}
+}
+
+func TestGetTemplate_NilTemplatesMapReturnsNotFound(t *testing.T) {
+	prev := templates
+	t.Cleanup(func() {
+		templates = prev
+	})
+
+	templates = nil
+	got, err := GetTemplate("missing")
+	if err == nil || got != "" {
+		t.Fatalf("GetTemplate(missing) with nil map = (%q, %v), want (empty, error)", got, err)
 	}
 }
 

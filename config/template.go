@@ -45,6 +45,7 @@ func setTemplates(in map[string]Template) {
 //	string - template prompt (empty string if not found)
 //	error  - error if any
 func GetTemplate(key string) (string, error) {
+	key = strings.TrimSpace(key)
 	if key == "" {
 		return "", nil
 	}
@@ -52,7 +53,7 @@ func GetTemplate(key string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("template key %q not found", key)
 	}
-	if tpl.Prompt == "" {
+	if strings.TrimSpace(tpl.Prompt) == "" {
 		return "", fmt.Errorf("template prompt for %q is empty", key)
 	}
 	return tpl.Prompt, nil
