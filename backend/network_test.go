@@ -148,4 +148,3 @@ func TestOllamaInvalidBaseURLBranches(t *testing.T) {
 		t.Fatal("expected error for invalid version base url, got nil")
 	}
 }
-
