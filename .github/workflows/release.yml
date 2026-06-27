@@ -53,6 +53,7 @@ jobs:
           cd dist
           cp ../config.toml .
           cp ../config-dev.toml .
+          cp ../openai.toml .
           zip picochat-macOS.zip picochat config.toml config-dev.toml
 
       #
@@ -63,6 +64,7 @@ jobs:
           cd dist
           cp ../config.toml .
           cp ../config-dev.toml .
+          cp ../openai.toml .
           zip picochat-windows.zip picochat.exe config.toml config-dev.toml
 
       #
