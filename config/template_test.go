@@ -34,12 +34,6 @@ func TestGetTemplate(t *testing.T) {
 	if got, err := GetTemplate(" eng "); err != nil || got != "Translate to English" {
 		t.Fatalf("GetTemplate(\" eng \") = (%q, %v), want (%q, nil)", got, err, "Translate to English")
 	}
-	if got := GetTemplateDescription("eng"); got != "Translate EN" {
-		t.Fatalf("GetTemplateDescription(eng) = %q, want %q", got, "Translate EN")
-	}
-	if got := GetTemplateDescription("missing"); got != "" {
-		t.Fatalf("GetTemplateDescription(missing) = %q, want empty string", got)
-	}
 }
 
 func TestGetTemplate_EmptyPromptReturnsError(t *testing.T) {

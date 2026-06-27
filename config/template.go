@@ -59,23 +59,6 @@ func GetTemplate(key string) (string, error) {
 	return tpl.Prompt, nil
 }
 
-// GetTemplateDescription returns a template description by key.
-//
-// Parameters:
-//
-//	key (string) - template key
-//
-// Returns:
-//
-//	string - template description (empty string if not found)
-func GetTemplateDescription(key string) string {
-	tpl, ok := templates[key]
-	if !ok {
-		return ""
-	}
-	return tpl.Description
-}
-
 // listTemplateKeys returns all loaded template keys.
 //
 // Parameters:
