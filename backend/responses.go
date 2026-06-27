@@ -20,8 +20,8 @@ type responsesRequest struct {
 	Model       string               `json:"model"`
 	Input       []responsesInputItem `json:"input"`
 	Stream      bool                 `json:"stream"`
-	Temperature float64              `json:"temperature,omitempty"`
-	TopP        float64              `json:"top_p,omitempty"`
+	Temperature *float64             `json:"temperature,omitempty"`
+	TopP        *float64             `json:"top_p,omitempty"`
 	Text        *responsesText       `json:"text,omitempty"`
 }
 

@@ -30,6 +30,13 @@ type CommandResult struct {
 
 var readClipboard = clipb.ReadClipboard
 
+func formatOptionalFloat(v *float64) string {
+	if v == nil {
+		return "[model default]"
+	}
+	return fmt.Sprintf("%.2f", *v)
+}
+
 // HandleCommand processes a command line input, performs the requested action,
 // and returns a CommandResult containing the outcome of the command.
 //
@@ -250,8 +257,8 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if args == "" {
 			list := []string{
 				fmt.Sprintf("context = %d", cfg.Context),
-				fmt.Sprintf("temperature = %.2f", cfg.Temperature),
-				fmt.Sprintf("top_p = %.2f", cfg.Top_p),
+				fmt.Sprintf("temperature = %s", formatOptionalFloat(cfg.Temperature)),
+				fmt.Sprintf("top_p = %s", formatOptionalFloat(cfg.Top_p)),
 				fmt.Sprintf("reasoning = %t", cfg.Reasoning),
 				fmt.Sprintf("effort = %s", cfg.Effort),
 			}

@@ -30,8 +30,8 @@ type ollamaReasoning struct {
 }
 
 type ollamaOptions struct {
-	Temperature float64 `json:"temperature,omitempty"`
-	TopP        float64 `json:"top_p,omitempty"`
+	Temperature *float64 `json:"temperature,omitempty"`
+	TopP        *float64 `json:"top_p,omitempty"`
 }
 
 type ollamaStreamResponse struct {
@@ -72,18 +72,22 @@ func (c *ollamaClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 	}
 
 	ollamaMessages := normalizeOllamaImages(input.Messages)
+	var options *ollamaOptions
+	if input.Temperature != nil || input.TopP != nil {
+		options = &ollamaOptions{
+			Temperature: input.Temperature,
+			TopP:        input.TopP,
+		}
+	}
 
 	reqBody := ollamaChatRequest{
 		Model:     input.Model,
 		Messages:  ollamaMessages,
 		Reasoning: reasoning,
-		Options: &ollamaOptions{
-			Temperature: input.Temperature,
-			TopP:        input.TopP,
-		},
-		Stream: input.Format == nil, // no stream for structured output
-		Think:  input.Reasoning,
-		Format: input.Format,
+		Options:   options,
+		Stream:    input.Format == nil, // no stream for structured output
+		Think:     input.Reasoning,
+		Format:    input.Format,
 	}
 
 	jsonData, err := json.Marshal(reqBody)

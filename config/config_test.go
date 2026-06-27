@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+func floatPtr(v float64) *float64 { return &v }
+
 func TestDefaultConfig(t *testing.T) {
 	cfg := defaultConfig()
 
@@ -26,11 +28,11 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.Context != 20 {
 		t.Errorf("Context default = %d, want %d", cfg.Context, 20)
 	}
-	if cfg.Temperature != 0.7 {
-		t.Errorf("Temperature default = %v, want %v", cfg.Temperature, 0.7)
+	if cfg.Temperature != nil {
+		t.Errorf("Temperature default = %v, want nil", cfg.Temperature)
 	}
-	if cfg.Top_p != 0.9 {
-		t.Errorf("Top_p default = %v, want %v", cfg.Top_p, 0.9)
+	if cfg.Top_p != nil {
+		t.Errorf("Top_p default = %v, want nil", cfg.Top_p)
 	}
 	if cfg.Reasoning {
 		t.Errorf("Reasoning default = %v, want %v", cfg.Reasoning, false)
@@ -89,11 +91,11 @@ func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
 	if cfg.Context != 42 {
 		t.Errorf("Context = %d, want %d", cfg.Context, 42)
 	}
-	if cfg.Temperature != 0.2 {
-		t.Errorf("Temperature = %v, want %v", cfg.Temperature, 0.2)
+	if cfg.Temperature == nil || *cfg.Temperature != 0.2 {
+		t.Errorf("Temperature = %v, want %v", cfg.Temperature, floatPtr(0.2))
 	}
-	if cfg.Top_p != 0.6 {
-		t.Errorf("Top_p = %v, want %v", cfg.Top_p, 0.6)
+	if cfg.Top_p == nil || *cfg.Top_p != 0.6 {
+		t.Errorf("Top_p = %v, want %v", cfg.Top_p, floatPtr(0.6))
 	}
 	if !cfg.Reasoning {
 		t.Errorf("Reasoning = %v, want %v", cfg.Reasoning, true)

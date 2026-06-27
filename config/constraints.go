@@ -140,16 +140,20 @@ func NormalizeConfig(cfg *Config) []string {
 		warnings = append(warnings, fmt.Sprintf("config value 'context' (%d) out of range [%d..%d], clamped to %d", origCtx, MinContext, MaxContext, v))
 	}
 
-	origTemp := cfg.Temperature
-	if v, changed := clampFloat("temperature", cfg.Temperature, MinTemperature, MaxTemperature); changed {
-		cfg.Temperature = v
-		warnings = append(warnings, fmt.Sprintf("config value 'temperature' (%g) out of range [%g..%g], clamped to %g", origTemp, MinTemperature, MaxTemperature, v))
+	if cfg.Temperature != nil {
+		origTemp := *cfg.Temperature
+		if v, changed := clampFloat("temperature", *cfg.Temperature, MinTemperature, MaxTemperature); changed {
+			cfg.Temperature = &v
+			warnings = append(warnings, fmt.Sprintf("config value 'temperature' (%g) out of range [%g..%g], clamped to %g", origTemp, MinTemperature, MaxTemperature, v))
+		}
 	}
 
-	origTopP := cfg.Top_p
-	if v, changed := clampFloat("top_p", cfg.Top_p, MinTopP, MaxTopP); changed {
-		cfg.Top_p = v
-		warnings = append(warnings, fmt.Sprintf("config value 'top_p' (%g) out of range [%g..%g], clamped to %g", origTopP, MinTopP, MaxTopP, v))
+	if cfg.Top_p != nil {
+		origTopP := *cfg.Top_p
+		if v, changed := clampFloat("top_p", *cfg.Top_p, MinTopP, MaxTopP); changed {
+			cfg.Top_p = &v
+			warnings = append(warnings, fmt.Sprintf("config value 'top_p' (%g) out of range [%g..%g], clamped to %g", origTopP, MinTopP, MaxTopP, v))
+		}
 	}
 
 	origEffort := cfg.Effort

@@ -12,17 +12,17 @@ import (
 )
 
 type Config struct {
-	Backend     string  `json:"backend"`
-	URL         string  `json:"url"`
-	APIKey      string  `json:"api_key"`
-	Model       string  `json:"model"`
-	Prompt      string  `json:"prompt"`
-	Context     int     `json:"context"`
-	Temperature float64 `json:"temperature"`
-	Top_p       float64 `json:"top_p"`
-	Reasoning   bool    `json:"reasoning"`
-	Effort      string  `json:"effort"`
-	Quiet       bool    `json:"quiet"`
+	Backend     string   `json:"backend"`
+	URL         string   `json:"url"`
+	APIKey      string   `json:"api_key"`
+	Model       string   `json:"model"`
+	Prompt      string   `json:"prompt"`
+	Context     int      `json:"context"`
+	Temperature *float64 `json:"temperature"`
+	Top_p       *float64 `json:"top_p"`
+	Reasoning   bool     `json:"reasoning"`
+	Effort      string   `json:"effort"`
+	Quiet       bool     `json:"quiet"`
 
 	ConfigPath string              `toml:"-"`
 	ImagePath  string              `toml:"-"` ////IMAGES
@@ -113,17 +113,15 @@ func load(configPathArg string) {
 //	Config - a filled Config struct
 func defaultConfig() Config {
 	return Config{
-		URL:         "http://localhost:11434",
-		Backend:     "ollama",
-		APIKey:      "ollama",
-		Model:       "gpt-oss:latest",
-		Prompt:      "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
-		Context:     20,
-		Temperature: 0.7,
-		Top_p:       0.9,
-		Reasoning:   false,
-		Effort:      "medium",
-		Quiet:       false,
+		URL:       "http://localhost:11434",
+		Backend:   "ollama",
+		APIKey:    "ollama",
+		Model:     "gpt-oss:latest",
+		Prompt:    "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging.",
+		Context:   20,
+		Reasoning: false,
+		Effort:    "medium",
+		Quiet:     false,
 	}
 }
 

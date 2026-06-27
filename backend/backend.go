@@ -9,8 +9,8 @@ import (
 type ChatInput struct {
 	Model       string
 	Messages    []messages.Message
-	Temperature float64
-	TopP        float64
+	Temperature *float64
+	TopP        *float64
 	Reasoning   bool
 	Effort      string
 	Format      map[string]any

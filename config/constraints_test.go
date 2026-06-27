@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+func f64ptr(v float64) *float64 { return &v }
+
 func TestClampInt(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -74,8 +76,8 @@ func TestNormalizeConfig_NoChanges(t *testing.T) {
 	cfg := Config{
 		Backend:     "ollama",
 		Context:     20,
-		Temperature: 0.7,
-		Top_p:       0.9,
+		Temperature: f64ptr(0.7),
+		Top_p:       f64ptr(0.9),
 		Effort:      "medium",
 	}
 
@@ -83,7 +85,7 @@ func TestNormalizeConfig_NoChanges(t *testing.T) {
 	if len(warnings) != 0 {
 		t.Fatalf("warnings = %v, want empty", warnings)
 	}
-	if cfg.Backend != "ollama" || cfg.Context != 20 || cfg.Temperature != 0.7 || cfg.Top_p != 0.9 || cfg.Effort != "medium" {
+	if cfg.Backend != "ollama" || cfg.Context != 20 || cfg.Temperature == nil || *cfg.Temperature != 0.7 || cfg.Top_p == nil || *cfg.Top_p != 0.9 || cfg.Effort != "medium" {
 		t.Fatalf("config unexpectedly changed: %+v", cfg)
 	}
 }
@@ -92,8 +94,8 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 	cfg := Config{
 		Backend:     "invalid",
 		Context:     0,
-		Temperature: 3.2,
-		Top_p:       -0.5,
+		Temperature: f64ptr(3.2),
+		Top_p:       f64ptr(-0.5),
 		Effort:      "invalid",
 	}
 
@@ -102,10 +104,10 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 	if cfg.Context != MinContext {
 		t.Fatalf("context = %d, want %d", cfg.Context, MinContext)
 	}
-	if cfg.Temperature != MaxTemperature {
+	if cfg.Temperature == nil || *cfg.Temperature != MaxTemperature {
 		t.Fatalf("temperature = %v, want %v", cfg.Temperature, MaxTemperature)
 	}
-	if cfg.Top_p != MinTopP {
+	if cfg.Top_p == nil || *cfg.Top_p != MinTopP {
 		t.Fatalf("top_p = %v, want %v", cfg.Top_p, MinTopP)
 	}
 	if cfg.Effort != "medium" {

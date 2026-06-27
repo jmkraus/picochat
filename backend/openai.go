@@ -19,8 +19,8 @@ type openAIChatCompletionsRequest struct {
 	Model       string              `json:"model"`
 	Messages    []openAIChatMessage `json:"messages"`
 	Stream      bool                `json:"stream"`
-	Temperature float64             `json:"temperature,omitempty"`
-	TopP        float64             `json:"top_p,omitempty"`
+	Temperature *float64            `json:"temperature,omitempty"`
+	TopP        *float64            `json:"top_p,omitempty"`
 }
 
 type openAIChatMessage struct {
