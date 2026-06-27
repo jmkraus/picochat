@@ -42,7 +42,7 @@ func setTemplates(in map[string]Template) {
 //
 // Returns:
 //
-//	string - template prompt (empty string if not found)
+//	string - template prompt (error if not found)
 //	error  - error if any
 func GetTemplate(key string) (string, error) {
 	key = strings.TrimSpace(key)
