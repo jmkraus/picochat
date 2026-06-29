@@ -140,7 +140,7 @@ func TestResolveCopyPayload_DefaultAssistant(t *testing.T) {
 	if got, want := payload.Text, "assistant answer"; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
-	if got, want := payload.Info, "Last assistant prompt written to clipboard."; got != want {
+	if got, want := payload.Info, "Last assistant prompt copied to clipboard."; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
 }
@@ -155,7 +155,7 @@ func TestResolveCopyPayload_ByIndex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if got, want := payload.Info, "Message #1 written to clipboard"; got != want {
+	if got, want := payload.Info, "Message #1 copied to clipboard."; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
 	if got, want := payload.Text, "hello"; got != want {
