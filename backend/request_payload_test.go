@@ -52,7 +52,7 @@ func TestOllamaChatStream_RequestPayload(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			c := newOllamaClient(srv.URL)
+			c := &ollamaClient{baseURL: srv.URL}
 			_, err := c.ChatStream(ChatInput{
 				Model:       "m",
 				Messages:    []messages.Message{{Role: messages.RoleUser, Content: "hi"}},
@@ -131,7 +131,7 @@ func TestOpenAIChatCompletions_RequestPayload(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			c := newOpenAIClient(srv.URL, "sk-test")
+			c := &openAIClient{baseURL: srv.URL, apiKey: "sk-test"}
 			_, err := c.ChatStream(ChatInput{
 				Model:       "m",
 				Messages:    []messages.Message{{Role: messages.RoleUser, Content: "hi"}},
@@ -209,7 +209,7 @@ func TestResponsesAPI_RequestPayload(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			c := newOpenAIResponsesClient(srv.URL, "sk-test")
+			c := &openAIResponsesClient{baseURL: srv.URL, apiKey: "sk-test"}
 			_, err := c.ChatStream(ChatInput{
 				Model:    "m",
 				Messages: []messages.Message{{Role: messages.RoleUser, Content: "hi"}},

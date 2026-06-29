@@ -37,15 +37,18 @@ func consumeSSEStream(
 
 	for {
 		line, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
+		if err != nil && err != io.EOF {
 			return ChatFinal{}, fmt.Errorf("read stream failed: %w", err)
+		}
+		if err == io.EOF && line == "" {
+			break
 		}
 
 		line = strings.TrimSpace(line)
 		if line == "" || !strings.HasPrefix(line, "data:") {
+			if err == io.EOF {
+				break
+			}
 			continue
 		}
 
@@ -79,6 +82,10 @@ func consumeSSEStream(
 			}); err != nil {
 				return ChatFinal{}, err
 			}
+		}
+
+		if err == io.EOF {
+			break
 		}
 	}
 

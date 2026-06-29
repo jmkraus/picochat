@@ -34,14 +34,21 @@ type Client interface {
 }
 
 func New(cfg *config.Config) Client {
+	baseURL := strings.TrimRight(cfg.URL, "/")
 	switch strings.ToLower(strings.TrimSpace(cfg.Backend)) {
 	case "responses":
-		return newOpenAIResponsesClient(cfg.URL, cfg.APIKey)
+		return &openAIResponsesClient{
+			baseURL: baseURL,
+			apiKey:  cfg.APIKey,
+		}
 	case "openai":
-		return newOpenAIClient(cfg.URL, cfg.APIKey)
-	case "", "ollama":
-		fallthrough
+		return &openAIClient{
+			baseURL: baseURL,
+			apiKey:  cfg.APIKey,
+		}
 	default:
-		return newOllamaClient(cfg.URL)
+		return &ollamaClient{
+			baseURL: baseURL,
+		}
 	}
 }

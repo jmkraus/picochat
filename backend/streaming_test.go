@@ -91,3 +91,25 @@ func TestConsumeSSEStream_DoneChunkCallbackError(t *testing.T) {
 		t.Fatalf("expected done callback error, got %v", err)
 	}
 }
+
+func TestConsumeSSEStream_ProcessesFinalLineWithoutTrailingNewline(t *testing.T) {
+	parse := func(data string) (thinking, content string, done bool, err error) {
+		if data == "ev-final" {
+			return "t", "c", false, nil
+		}
+		return "", "", false, fmt.Errorf("unexpected event: %s", data)
+	}
+
+	stream := strings.NewReader("data: ev-final")
+
+	final, err := consumeSSEStream(stream, parse, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if final.Reasoning != "t" {
+		t.Fatalf("final reasoning = %q, want %q", final.Reasoning, "t")
+	}
+	if final.Content != "c" {
+		t.Fatalf("final content = %q, want %q", final.Content, "c")
+	}
+}

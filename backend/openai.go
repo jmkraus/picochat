@@ -1,11 +1,8 @@
 package backend
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"picochat/messages"
 	"strings"
 )
@@ -51,13 +48,6 @@ type openAIStreamEvent struct {
 //	ChatFinal - accumulated reasoning and content
 //	error     - error if request/stream handling fails
 func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
-	if strings.TrimSpace(c.apiKey) == "" {
-		return ChatFinal{}, fmt.Errorf("missing OpenAI API key")
-	}
-	if strings.TrimSpace(c.baseURL) == "" {
-		return ChatFinal{}, fmt.Errorf("missing OpenAI base URL")
-	}
-
 	payload := openAIChatCompletionsRequest{
 		Model:       input.Model,
 		Messages:    mapMessagesToOpenAIChatMessages(input.Messages),
@@ -66,35 +56,14 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		TopP:        input.TopP,
 	}
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return ChatFinal{}, fmt.Errorf("marshal json failed: %w", err)
-	}
-
-	endpoint, err := buildOpenAIURL(c.baseURL, "chat/completions")
-	if err != nil {
-		return ChatFinal{}, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewBuffer(body))
-	if err != nil {
-		return ChatFinal{}, fmt.Errorf("create request failed: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
-
-	resp, err := (&http.Client{Timeout: 0}).Do(req)
-	if err != nil {
-		return ChatFinal{}, fmt.Errorf("http request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		msg, _ := io.ReadAll(resp.Body)
-		return ChatFinal{}, fmt.Errorf("non-200 response: %d - %s", resp.StatusCode, string(msg))
-	}
-
-	return consumeSSEStream(resp.Body, parseOpenAIChatCompletionEvent, onChunk)
+	return postStreamingJSON(
+		c.baseURL,
+		c.apiKey,
+		"chat/completions",
+		payload,
+		parseOpenAIChatCompletionEvent,
+		onChunk,
+	)
 }
 
 // GetAvailableModels fetches models from the OpenAI-compatible models endpoint.
