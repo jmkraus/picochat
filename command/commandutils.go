@@ -263,7 +263,7 @@ func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload
 		}
 		return copyPayload{
 			Text: msg.Content,
-			Info: fmt.Sprintf("Message #%d written to clipboard", index),
+			Info: fmt.Sprintf("Message #%d copied to clipboard.", index),
 		}, nil
 	}
 
@@ -279,7 +279,7 @@ func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload
 		}
 		return copyPayload{
 			Text: lastMessage.Content,
-			Info: fmt.Sprintf("Last %s prompt written to clipboard.", args),
+			Info: fmt.Sprintf("Last %s prompt copied to clipboard.", args),
 		}, nil
 
 	case "think":
@@ -289,7 +289,7 @@ func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload
 		}
 		return copyPayload{
 			Text: encloseThinkingTags(lastMessage.Reasoning) + lastMessage.Content,
-			Info: "Last assistant prompt (with thinking) written to clipboard.",
+			Info: "Last assistant prompt (with thinking) copied to clipboard.",
 		}, nil
 
 	case "code":
@@ -303,7 +303,7 @@ func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload
 		}
 		return copyPayload{
 			Text: codeBlock,
-			Info: "First code block written to clipboard.",
+			Info: "First code block copied to clipboard.",
 		}, nil
 
 	default:
