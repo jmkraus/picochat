@@ -139,17 +139,22 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			serverVersion = fmt.Sprintf("%s connection error", console.ErrPrefix)
 		}
 
+		schemaFile := "no"
+		if len(cfg.SchemaFmt) > 0 {
+			schemaFile = "yes"
+		}
 		list := []string{
 			fmt.Sprintf("Configuration file: %s", cfg.ConfigPath),
 			fmt.Sprintf("Backend API used: %s", cfg.Backend),
 			fmt.Sprintf("Response output format: %s", cfg.OutputFmt),
+			fmt.Sprintf("JSON schema for structured output: %s", schemaFile),
 			fmt.Sprintf("Current model is %q", cfg.Model),
 			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),
 			fmt.Sprintf("Context token estimation: %.0f", math.Ceil(history.EstimateTokens())),
 			fmt.Sprintf("Server version: %s", serverVersion),
 		}
 
-		return CommandResult{Output: utils.FormatList(list, "Server info", false)}
+		return CommandResult{Output: utils.FormatList(list, "System info", false)}
 	case "trim":
 		args := strings.TrimPrefix(args, "#") // accept and ignore # prefix
 		if args == "" {
@@ -187,7 +192,6 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		default:
 			msg := history.GetLast().Content
 			return CommandResult{Output: msg}
-
 		}
 	case "copy":
 		payload, err := resolveCopyPayload(args, history)
@@ -325,9 +329,9 @@ func parseCommandArgs(input string) (string, string) {
 	if len(parts) == 0 {
 		return "", ""
 	}
-	cmd := strings.TrimSpace(parts[0])
 
 	// normalize
+	cmd := strings.TrimSpace(parts[0])
 	cmd = strings.ToLower(strings.TrimPrefix(cmd, "/"))
 
 	// command replacements
