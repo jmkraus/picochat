@@ -66,7 +66,8 @@ func TestClampFloat(t *testing.T) {
 }
 
 func TestNormalizeConfig_Nil(t *testing.T) {
-	warnings := NormalizeConfig(nil)
+	var cfg *Config
+	warnings := cfg.NormalizeConfig()
 	if warnings != nil {
 		t.Fatalf("warnings = %v, want nil", warnings)
 	}
@@ -81,7 +82,7 @@ func TestNormalizeConfig_NoChanges(t *testing.T) {
 		Effort:      "medium",
 	}
 
-	warnings := NormalizeConfig(&cfg)
+	warnings := cfg.NormalizeConfig()
 	if len(warnings) != 0 {
 		t.Fatalf("warnings = %v, want empty", warnings)
 	}
@@ -99,7 +100,7 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 		Effort:      "invalid",
 	}
 
-	warnings := NormalizeConfig(&cfg)
+	warnings := cfg.NormalizeConfig()
 
 	if cfg.Context != MinContext {
 		t.Fatalf("context = %d, want %d", cfg.Context, MinContext)
@@ -155,4 +156,34 @@ func TestNormalizeBackend(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestHasSchema(t *testing.T) {
+	t.Run("nil receiver", func(t *testing.T) {
+		var cfg *Config
+		if got := cfg.HasSchema(); got {
+			t.Fatalf("HasSchema() = %v, want false", got)
+		}
+	})
+
+	t.Run("nil schema map", func(t *testing.T) {
+		cfg := &Config{}
+		if got := cfg.HasSchema(); got {
+			t.Fatalf("HasSchema() = %v, want false", got)
+		}
+	})
+
+	t.Run("empty schema map", func(t *testing.T) {
+		cfg := &Config{SchemaFmt: map[string]any{}}
+		if got := cfg.HasSchema(); got {
+			t.Fatalf("HasSchema() = %v, want false", got)
+		}
+	})
+
+	t.Run("non-empty schema map", func(t *testing.T) {
+		cfg := &Config{SchemaFmt: map[string]any{"type": "object"}}
+		if got := cfg.HasSchema(); !got {
+			t.Fatalf("HasSchema() = %v, want true", got)
+		}
+	})
 }

@@ -72,7 +72,7 @@ func TestApplyEnvValues_OverridesConfigFields(t *testing.T) {
 	t.Setenv("PICOCHAT_EFFORT", "low")
 	t.Setenv("PICOCHAT_QUIET", "true")
 
-	if err := applyEnvValues(&cfg); err != nil {
+	if err := cfg.applyEnvValues(); err != nil {
 		t.Fatalf("applyEnvValues returned error: %v", err)
 	}
 
@@ -110,7 +110,7 @@ func TestApplyEnvValues_InvalidValueReturnsError(t *testing.T) {
 
 	t.Setenv("PICOCHAT_CONTEXT", "not-an-int")
 
-	err := applyEnvValues(&cfg)
+	err := cfg.applyEnvValues()
 	if err == nil {
 		t.Fatal("applyEnvValues returned nil error, want error")
 	}
@@ -133,7 +133,7 @@ func TestApplyEnvValues_InvalidFloat64ValueReturnsError(t *testing.T) {
 			cfg := defaultConfig()
 			t.Setenv(tt.envKey, "not-a-float")
 
-			err := applyEnvValues(&cfg)
+			err := cfg.applyEnvValues()
 			if err == nil {
 				t.Fatal("applyEnvValues returned nil error, want error")
 			}
@@ -150,7 +150,7 @@ func TestApplyEnvValues_EmptyValueIsIgnored(t *testing.T) {
 	t.Setenv("PICOCHAT_MODEL", "")
 	t.Setenv("PICOCHAT_QUIET", "")
 
-	if err := applyEnvValues(&cfg); err != nil {
+	if err := cfg.applyEnvValues(); err != nil {
 		t.Fatalf("applyEnvValues returned error: %v", err)
 	}
 

@@ -1,11 +1,9 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	"picochat/envs"
 	"picochat/paths"
-	"picochat/vartypes"
 	"sync"
 
 	"github.com/BurntSushi/toml"
@@ -86,14 +84,14 @@ func load(configPathArg string) {
 	}
 
 	// 3. Environment variables
-	err = applyEnvValues(&cfg)
+	err = cfg.applyEnvValues()
 	if err != nil {
 		loadError = fmt.Errorf("apply env var values failed: %w", err)
 		return
 	}
 
 	// 4. Check value contraints
-	loadWarn = append(loadWarn, NormalizeConfig(&cfg)...)
+	loadWarn = append(loadWarn, cfg.NormalizeConfig()...)
 
 	// 5. Load templates
 	setTemplates(cfg.Templates)
@@ -166,58 +164,12 @@ func Set(key string, value any) ([]string, error) {
 	}
 
 	next := *cfg // work on copy to avoid compromised config
-	if err := applyConfigValue(&next, key, value); err != nil {
+	if err := next.applyConfigValue(key, value); err != nil {
 		return nil, fmt.Errorf("apply config value failed: %w", err)
 	}
 
-	warnings := NormalizeConfig(&next)
+	warnings := next.NormalizeConfig()
 
 	*cfg = next
 	return warnings, nil
-}
-
-// applyConfig updates a specific config element.
-//
-// Parameters:
-//
-//	cfg (*Config) - the instance of the configuration struct
-//	key (string)  - the configuration key to modify
-//	value (any)   - the new value for the key
-//
-// Returns:
-//
-//	error - error if any
-func applyConfigValue(cfg *Config, key string, val any) error {
-	patch := map[string]any{key: val}
-	b, err := json.Marshal(patch)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(b, cfg)
-}
-
-// applyEnvValues updates config fields according to
-// set environment variables.
-//
-// Parameters:
-//
-//	cfg (*Config) - the instance of the configuration struct
-//
-// Returns:
-//
-//	error - error if any
-func applyEnvValues(cfg *Config) error {
-	for _, spec := range envs.ConfigEnvVars {
-		envVal, lookup := envs.GetEnv(spec.Env)
-		if !lookup || envVal == "" {
-			continue // Skip if not set or empty
-		}
-
-		v, err := vartypes.Convert(spec.Type, envVal)
-		if err != nil {
-			return fmt.Errorf("convert type for env %s failed: %w", spec.Env, err)
-		}
-		applyConfigValue(cfg, spec.Field, v)
-	}
-	return nil
 }
