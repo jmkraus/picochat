@@ -45,7 +45,7 @@ func sendPrompt(session *Session, prompt string) {
 	runChat(session)
 }
 
-// repeatPrompt triggers a new chat run based on existing history.
+// retryPrompt triggers a new chat run based on existing history.
 //
 // Parameters:
 //
