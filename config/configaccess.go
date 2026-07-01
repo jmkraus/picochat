@@ -11,7 +11,6 @@ import (
 //
 // Parameters:
 //
-//	cfg (*Config) - the instance of the configuration struct
 //	key (string)  - the configuration key to modify
 //	value (any)   - the new value for the key
 //
