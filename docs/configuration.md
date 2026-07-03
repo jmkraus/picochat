@@ -32,6 +32,8 @@ History files are stored in the PicoChat config directory (for example `.config/
 
 NOTE: The `Quiet` option is intended for pipeline and scripting use and should not be set for interactive mode.
 
+NOTE: The `Effort` option currently only works when backend mode is set to `ollama`.
+
 
 ## Environment variables
 
