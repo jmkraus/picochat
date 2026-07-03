@@ -139,15 +139,15 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			serverVersion = fmt.Sprintf("%s connection error", console.ErrPrefix)
 		}
 
-		schemaFile := "no"
-		if len(cfg.SchemaFmt) > 0 {
-			schemaFile = "yes"
+		schemaFmt := "no"
+		if cfg.HasSchema() {
+			schemaFmt = "yes"
 		}
 		list := []string{
 			fmt.Sprintf("Configuration file: %s", cfg.ConfigPath),
 			fmt.Sprintf("Backend API used: %s", cfg.Backend),
 			fmt.Sprintf("Response output format: %s", cfg.OutputFmt),
-			fmt.Sprintf("JSON schema for structured output: %s", schemaFile),
+			fmt.Sprintf("JSON schema for structured output: %s", schemaFmt),
 			fmt.Sprintf("Current model is %q", cfg.Model),
 			fmt.Sprintf("Context has %d messages (max. %d)", history.Len(), history.MaxCtx()),
 			fmt.Sprintf("Context token estimation: %.0f", math.Ceil(history.EstimateTokens())),
