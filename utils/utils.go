@@ -146,3 +146,21 @@ func capitalize(s string) string {
 	runes[0] = unicode.ToUpper(runes[0])
 	return string(runes)
 }
+
+type YesNo bool
+
+// YesNo transforms a boolean value in a "yes" or "no" string.
+//
+// Parameters:
+//
+//	y (YesNo) - the boolean representation
+//
+// Returns:
+//
+//	string - the string value, either "yes" (true) or "no" (false)
+func (y YesNo) String() string {
+	if y {
+		return "yes"
+	}
+	return "no"
+}
