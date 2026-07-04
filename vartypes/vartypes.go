@@ -99,3 +99,21 @@ func stringToBool(s string) (bool, error) {
 		return false, fmt.Errorf("invalid boolean value %q", s)
 	}
 }
+
+type YesNo bool
+
+// YesNo transforms a boolean value in a "yes" or "no" string.
+//
+// Parameters:
+//
+//	y (YesNo) - the boolean representation
+//
+// Returns:
+//
+//	string - the string value, either "yes" (true) or "no" (false)
+func (y YesNo) String() string {
+	if y {
+		return "yes"
+	}
+	return "no"
+}
