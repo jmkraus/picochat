@@ -30,13 +30,6 @@ type CommandResult struct {
 
 var readClipboard = clipb.ReadClipboard
 
-func formatOptionalFloat(v *float64) string {
-	if v == nil {
-		return "[model default]"
-	}
-	return fmt.Sprintf("%.2f", *v)
-}
-
 // HandleCommand processes a command line input, performs the requested action,
 // and returns a CommandResult containing the outcome of the command.
 //
@@ -346,4 +339,20 @@ func parseCommandArgs(input string) (string, string) {
 		arg = strings.TrimSpace(strings.Join(parts[1:], " "))
 	}
 	return cmd, arg
+}
+
+// formatOptionalFloat checks if config val is set or returns a default msg.
+//
+// Parameters:
+//
+//	v (float64) - config values
+//
+// Returns:
+//
+//	string - string representation of float64 or message
+func formatOptionalFloat(v *float64) string {
+	if v == nil {
+		return "[model default]"
+	}
+	return fmt.Sprintf("%.2f", *v)
 }
