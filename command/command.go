@@ -57,13 +57,15 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Error: fmt.Errorf("read config failed: %w", err)}
 	}
 
+	client := backend.New(cfg)
+
 	cmd, args := parseCommandArgs(commandLine)
 	switch cmd {
 	case "hello":
 		hello := "Hello, are you there?"
 		return CommandResult{Output: hello, Pasted: hello}
 	case "test":
-		models, err := backend.New(cfg).GetAvailableModels()
+		models, err := client.GetAvailableModels()
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
 		}
@@ -113,18 +115,16 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("get history filename failed: %w", err)}
 		}
-
-		if filename != "" {
-			filename = paths.EnsureSuffix(filename, paths.HistorySuffix)
-			loaded, err := messages.LoadHistoryFromFile(filename)
-			if err != nil {
-				return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}
-			}
-			history.Replace(loaded.Get())
-			return CommandResult{Info: fmt.Sprintf("History file %q loaded.", filename)}
-		} else {
+		if filename == "" {
 			return CommandResult{Warn: "Load canceled."}
 		}
+		filename = paths.EnsureSuffix(filename, paths.HistorySuffix)
+		loaded, err := messages.LoadHistoryFromFile(filename)
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("load history failed: %w", err)}
+		}
+		history.Replace(loaded.Get())
+		return CommandResult{Info: fmt.Sprintf("History file %q loaded.", filename)}
 	case "image":
 		if args != "" {
 			if !paths.FileExists(args) {
@@ -135,7 +135,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Error: fmt.Errorf("no image file path provided")}
 	case "info":
-		serverVersion, err := backend.New(cfg).GetServerVersion()
+		serverVersion, err := client.GetServerVersion()
 		if err != nil {
 			serverVersion = fmt.Sprintf("%s connection error", console.ErrPrefix)
 		}
@@ -161,15 +161,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if err != nil {
 			return CommandResult{Error: err}
 		}
-		ok := history.Trim(index)
-		if ok {
-			return CommandResult{Info: "Chat history has been truncated."}
+		if !history.Trim(index) {
+			return CommandResult{Warn: "Chat history not changed."}
 		}
-		return CommandResult{Warn: "Chat history not changed."}
+		return CommandResult{Info: "Chat history has been truncated."}
 	case "message":
-		ok := false
-		if args, ok = strings.CutPrefix(args, "#"); ok {
-			msg, err := getMessageByIndex(args, history)
+		if idxArg, ok := strings.CutPrefix(args, "#"); ok {
+			msg, err := getMessageByIndex(idxArg, history)
 			if err != nil {
 				return CommandResult{Error: err}
 			}
@@ -231,7 +229,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: "Repeating last chat history user prompt.", Retry: true}
 	case "models":
 		if args == "" {
-			models, err := backend.New(cfg).GetAvailableModels()
+			models, err := client.GetAvailableModels()
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
 			}
@@ -271,8 +269,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
 
-		var warnings []string
-		warnings, err = config.Set(key, value)
+		warnings, err := config.Set(key, value)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("apply to config failed: %w", err)}
 		}
