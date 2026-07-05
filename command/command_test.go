@@ -3,7 +3,7 @@ package command
 import (
 	"os"
 	"path/filepath"
-	// "picochat/command"
+
 	"fmt"
 	"picochat/messages"
 	"picochat/paths"

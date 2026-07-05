@@ -3,11 +3,12 @@ package output
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io"
 	"picochat/chat"
 	"picochat/console"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // AllowedKeys checks if the argument string is valid.i
