@@ -16,6 +16,12 @@ Single line:
 >>> Tell me a joke! [Ctrl]+D
 ```
 
+Commands (everything starting with a slash) can be sent with [Return]:
+
+```text
+>>> /models ↵
+```
+
 Multiline:
 
 ```text
