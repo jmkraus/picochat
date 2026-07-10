@@ -167,6 +167,9 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 
 		switch args {
+		case "":
+			msg := history.GetLast().Content
+			return CommandResult{Output: msg}
 		case "all":
 			conversation := output.FormatConversation(history.Get())
 			return CommandResult{Output: conversation}
@@ -177,8 +180,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			}
 			return CommandResult{Warn: fmt.Sprintf("No element for role %q found.", args)}
 		default:
-			msg := history.GetLast().Content
-			return CommandResult{Output: msg}
+			return CommandResult{Error: fmt.Errorf("unknown argument")}
 		}
 	case "copy":
 		payload, err := resolveCopyPayload(args, history)
