@@ -118,14 +118,14 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		history.Replace(loaded.Get())
 		return CommandResult{Info: fmt.Sprintf("History file %q loaded.", filename)}
 	case "image":
-		if args != "" {
-			if !paths.FileExists(args) {
-				return CommandResult{Error: fmt.Errorf("image file not found")}
-			}
-			cfg.ImagePath = args
-			return CommandResult{Info: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
+		if args == "" {
+			return CommandResult{Error: fmt.Errorf("no image file path provided")}
 		}
-		return CommandResult{Error: fmt.Errorf("no image file path provided")}
+		if !paths.FileExists(args) {
+			return CommandResult{Error: fmt.Errorf("image file not found")}
+		}
+		cfg.ImagePath = args
+		return CommandResult{Info: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
 	case "info":
 		serverVersion, err := client.GetServerVersion()
 		if err != nil {
