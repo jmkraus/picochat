@@ -84,7 +84,7 @@ func TestRunChat_InvalidURLDoesNotAppendAssistant(t *testing.T) {
 	}
 }
 
-func TestRepeatPrompt_InvalidURLDoesNotAppendAssistant(t *testing.T) {
+func TestRetryPrompt_InvalidURLDoesNotAppendAssistant(t *testing.T) {
 	session := newTestSession()
 	if err := session.History.AddUser("hello", ""); err != nil {
 		t.Fatalf("add user failed: %v", err)
@@ -95,7 +95,7 @@ func TestRepeatPrompt_InvalidURLDoesNotAppendAssistant(t *testing.T) {
 
 	after := session.History.Len()
 	if after != before {
-		t.Fatalf("history length changed on failed repeatPrompt: before=%d after=%d", before, after)
+		t.Fatalf("history length changed on failed retryPrompt: before=%d after=%d", before, after)
 	}
 }
 

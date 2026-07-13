@@ -42,7 +42,7 @@ var readClipboard = clipb.ReadClipboard
 // Returns:
 //
 //	CommandResult - a struct containing output, error, quit flag, prompt,
-//	and repeat flag for the command.
+//	and retry flag for the command.
 func HandleCommand(commandLine string, history *messages.ChatHistory, input io.Reader) CommandResult {
 	cfg, _, err := config.Get()
 	if err != nil {
@@ -185,7 +185,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "copy":
 		payload, err := resolveCopyPayload(args, history)
 		if err != nil {
-			return CommandResult{Error: fmt.Errorf("copy message data failed: %w", err)}
+			return CommandResult{Error: fmt.Errorf("copy message failed: %w", err)}
 		}
 		if payload.Text == "" {
 			return CommandResult{Warn: payload.Info}
@@ -220,7 +220,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		if !history.CheckIfLastEntryIsRole(messages.RoleUser) {
 			return CommandResult{Error: fmt.Errorf("last entry in chat history is not a user prompt")}
 		}
-		return CommandResult{Info: "Repeating last chat history user prompt.", Retry: true}
+		return CommandResult{Info: "Sending last chat history user prompt again.", Retry: true}
 	case "models":
 		if args == "" {
 			models, err := client.GetAvailableModels()
