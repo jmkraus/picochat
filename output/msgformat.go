@@ -55,9 +55,11 @@ func FormatConversation(msgs []messages.Message) string {
 	var builder strings.Builder
 
 	for index, msg := range msgs {
+		if index > 0 {
+			builder.WriteString("\n\n") // Maintains the double newline between messages
+		}
 		formatted := FormatMessage(msg, index, true, true)
 		builder.WriteString(formatted)
-		builder.WriteString("\n\n") // Maintains the double newline between messages
 	}
 
 	return builder.String()

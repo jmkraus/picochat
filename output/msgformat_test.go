@@ -39,7 +39,7 @@ func TestFormatConversation(t *testing.T) {
 	}
 
 	got := stripANSI(FormatConversation(msgs))
-	want := "(0:system)\nsys\n\n(1:user)\nhi\n\n(2:assistant)\nhey\n\n"
+	want := "(0:system)\nsys\n\n(1:user)\nhi\n\n(2:assistant)\nhey"
 	if got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
