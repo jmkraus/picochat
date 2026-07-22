@@ -6,12 +6,13 @@ import (
 	"io"
 	"picochat/chat"
 	"picochat/console"
+	"slices"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
-// AllowedKeys checks if the argument string is valid.i
+// AllowedKeys checks if the argument string is valid.
 //
 // Parameters:
 //
@@ -23,16 +24,9 @@ import (
 //	bool   - ok (true/false) if the input key was valid
 func AllowedKeys(input string) (string, bool) {
 	arr := []string{"plain", "json", "json-pretty", "yaml"}
+	normalized := strings.ToLower(input)
 
-	normalizedInput := strings.ToLower(input)
-
-	for _, str := range arr {
-		if normalizedInput == strings.ToLower(str) {
-			return normalizedInput, true
-		}
-	}
-
-	return normalizedInput, false
+	return normalized, slices.Contains(arr, normalized)
 }
 
 // RenderResult formats and writes the inference output to screen.

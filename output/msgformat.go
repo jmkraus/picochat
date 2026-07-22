@@ -46,7 +46,7 @@ func FormatMessage(msg messages.Message, index int, header, color bool) string {
 //
 // Parameters:
 //
-//	none
+//	msgs ([]Message) - Array of struct containing the full message history
 //
 // Returns:
 //
@@ -56,10 +56,9 @@ func FormatConversation(msgs []messages.Message) string {
 
 	for index, msg := range msgs {
 		if index > 0 {
-			builder.WriteString("\n\n") // Maintains the double newline between messages
+			builder.WriteString("\n\n")
 		}
-		formatted := FormatMessage(msg, index, true, true)
-		builder.WriteString(formatted)
+		builder.WriteString(FormatMessage(msg, index, true, true))
 	}
 
 	return builder.String()
