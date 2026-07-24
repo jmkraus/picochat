@@ -3,6 +3,7 @@ package command
 import (
 	"os"
 	"path/filepath"
+	"slices"
 
 	"fmt"
 	"picochat/messages"
@@ -203,75 +204,75 @@ func TestParseCommandArgs(t *testing.T) {
 		name    string
 		input   string
 		wantCmd string
-		wantArg string
+		wantArg []string
 	}{
 		{
 			name:    "empty input",
 			input:   "",
 			wantCmd: "",
-			wantArg: "",
+			wantArg: nil,
 		},
 		{
 			name:    "whitespace only",
 			input:   "   \t   ",
 			wantCmd: "",
-			wantArg: "",
+			wantArg: nil,
 		},
 		{
 			name:    "copy alias",
 			input:   "/c",
 			wantCmd: "copy",
-			wantArg: "",
+			wantArg: []string{""},
 		},
 		{
 			name:    "paste alias",
 			input:   "/v",
 			wantCmd: "paste",
-			wantArg: "",
+			wantArg: []string{""},
 		},
 		{
 			name:    "help alias",
 			input:   "/?",
 			wantCmd: "help",
-			wantArg: "",
+			wantArg: []string{""},
 		},
 		{
 			name:    "hallo alias",
 			input:   "/hallo",
 			wantCmd: "hello",
-			wantArg: "",
+			wantArg: []string{""},
 		},
 		{
 			name:    "normalization lowercase and trim slash",
 			input:   "/MoDeLs  #2",
 			wantCmd: "models",
-			wantArg: "#2",
+			wantArg: []string{"#2"},
 		},
 		{
 			name:    "unknown command passthrough normalized",
 			input:   "/FoObAr keep This ARG",
 			wantCmd: "foobar",
-			wantArg: "keep This ARG",
+			wantArg: []string{"keep", "This", "ARG"},
 		},
 		{
 			name:    "without slash",
 			input:   "copy think",
 			wantCmd: "copy",
-			wantArg: "think",
+			wantArg: []string{"think"},
 		},
 		{
 			name:    "args keep content but normalize spacing",
 			input:   "/set   temperature=0.7    now",
 			wantCmd: "set",
-			wantArg: "temperature=0.7 now",
+			wantArg: []string{"temperature=0.7", "now"},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd, arg := parseCommandArgs(tt.input)
-			if cmd != tt.wantCmd || arg != tt.wantArg {
-				t.Fatalf("parseCommandArgs(%q) = (%q, %q), want (%q, %q)", tt.input, cmd, arg, tt.wantCmd, tt.wantArg)
+			cmd, args := parseCommandArgs(tt.input)
+			if cmd != tt.wantCmd || !slices.Equal(args, tt.wantArg) {
+				t.Fatalf("parseCommandArgs(%q) = (%q, %q), want (%q, %q)", tt.input, cmd, args, tt.wantCmd, tt.wantArg)
 			}
 		})
 	}

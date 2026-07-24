@@ -14,6 +14,7 @@ import (
 	"picochat/output"
 	"picochat/paths"
 	"picochat/utils"
+	"slices"
 	"strings"
 	"unicode/utf8"
 )
@@ -71,12 +72,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
 		overwrite := false
-		if args != "" {
+		if args[0] != "" {
 			historyPath, err := paths.GetHistoryPath()
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("history path not found: %w", err)}
 			}
-			targetName := paths.EnsureSuffix(filepath.Base(args), paths.HistorySuffix)
+			targetName := paths.EnsureSuffix(filepath.Base(args[0]), paths.HistorySuffix)
 			targetPath := filepath.Join(historyPath, targetName)
 			if paths.FileExists(targetPath) {
 				overwrite, err = askConfirmation(fmt.Sprintf("File %q already exists. Overwrite?", targetName), input)
@@ -89,13 +90,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			}
 		}
 
-		filename, err := messages.SaveHistoryToFile(args, history.Get(), overwrite)
+		filename, err := messages.SaveHistoryToFile(args[0], history.Get(), overwrite)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
 		return CommandResult{Info: fmt.Sprintf("History saved as file %q.", filename)}
 	case "load":
-		if args == "" {
+		if args[0] == "" {
 			files, err := utils.ListHistoryFiles()
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("list history files failed: %w", err)}
@@ -103,7 +104,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			fmt.Println(files)
 		}
 
-		filename, err := getHistoryFilename(args, input)
+		filename, err := getHistoryFilename(args[0], input)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("get history filename failed: %w", err)}
 		}
@@ -118,13 +119,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		history.Replace(loaded.Get())
 		return CommandResult{Info: fmt.Sprintf("History file %q loaded.", filename)}
 	case "image":
-		if args == "" {
+		if args[0] == "" {
 			return CommandResult{Error: fmt.Errorf("no image file path provided")}
 		}
-		if !paths.FileExists(args) {
+		if !paths.FileExists(args[0]) {
 			return CommandResult{Error: fmt.Errorf("image file not found")}
 		}
-		cfg.ImagePath = args
+		cfg.ImagePath = args[0]
 		return CommandResult{Info: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
 	case "info":
 		serverVersion, err := client.GetServerVersion()
@@ -145,7 +146,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 
 		return CommandResult{Output: utils.FormatList(list, "System info", false)}
 	case "trim":
-		args := strings.TrimPrefix(args, "#") // accept and ignore # prefix
+		args := strings.TrimPrefix(args[0], "#") // accept and ignore # prefix
 		if args == "" {
 			return CommandResult{Error: fmt.Errorf("missing index argument")}
 		}
@@ -158,7 +159,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Info: "Chat history has been truncated."}
 	case "message":
-		if idxArg, ok := strings.CutPrefix(args, "#"); ok {
+		if idxArg, ok := strings.CutPrefix(args[0], "#"); ok {
 			msg, err := getMessageByIndex(idxArg, history)
 			if err != nil {
 				return CommandResult{Error: err}
@@ -166,7 +167,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: msg}
 		}
 
-		switch args {
+		switch args[0] {
 		case "":
 			msg := history.GetLast().Content
 			return CommandResult{Output: msg}
@@ -174,7 +175,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			conversation := output.FormatConversation(history.Get())
 			return CommandResult{Output: conversation}
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
-			msg, found := history.GetLastRole(args)
+			msg, found := history.GetLastRole(args[0])
 			if found {
 				return CommandResult{Output: msg.Content}
 			}
@@ -183,7 +184,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Error: fmt.Errorf("unknown argument")}
 		}
 	case "copy":
-		payload, err := resolveCopyPayload(args, history)
+		payload, err := resolveCopyPayload(args[0], history)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("copy message failed: %w", err)}
 		}
@@ -195,7 +196,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Info: payload.Info}
 	case "paste":
-		tpl, err := config.GetTemplate(args)
+		tpl, err := config.GetTemplate(args[0])
 		if err != nil {
 			return CommandResult{Error: err}
 		}
@@ -222,7 +223,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Info: "Sending last chat history user prompt again.", Retry: true}
 	case "models":
-		if args == "" {
+		if args[0] == "" {
 			models, err := client.GetAvailableModels()
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
@@ -235,7 +236,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: list}
 		}
 
-		args := strings.TrimPrefix(args, "#") // accept and ignore # prefix
+		args := strings.TrimPrefix(args[0], "#") // accept and ignore # prefix
 		index, err := parseIndex(args)
 		if err != nil {
 			return CommandResult{Error: err}
@@ -247,7 +248,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		cfg.Model = model
 		return CommandResult{Info: fmt.Sprintf("Switched model to %q.", model)}
 	case "set":
-		if args == "" {
+		if args[0] == "" {
 			list := []string{
 				fmt.Sprintf("context = %d", cfg.Context),
 				fmt.Sprintf("temperature = %s", formatOptionalFloat(cfg.Temperature)),
@@ -258,7 +259,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}
 
-		key, value, err := parseKeyVal(args)
+		key, value, err := parseKeyVal(args[0])
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("parse args failed: %w", err)}
 		}
@@ -288,13 +289,13 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		history.ClearExceptSystemPrompt()
 		return CommandResult{Info: "History cleared (system prompt retained)."}
 	case "help":
-		switch args {
+		switch args[0] {
 		case "env", "envs":
 			return CommandResult{Output: envs.ListEnvVars()}
 		case "tpl", "templates":
 			return CommandResult{Output: config.ListTemplates()}
 		default:
-			return CommandResult{Output: HelpText(args)}
+			return CommandResult{Output: HelpText(args[0])}
 		}
 	default:
 		return CommandResult{Error: fmt.Errorf("unknown command")}
@@ -310,12 +311,12 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 //
 // Returns:
 //
-//	string - the normalized command string without leading slash.
-//	string - the remaining arguments as a single string.
-func parseCommandArgs(input string) (string, string) {
+//	string   - the normalized command string without leading slash.
+//	[]string - the remaining arguments as slices of string.
+func parseCommandArgs(input string) (string, []string) {
 	parts := strings.Fields(input)
 	if len(parts) == 0 {
-		return "", ""
+		return "", nil
 	}
 
 	// normalize
@@ -336,11 +337,13 @@ func parseCommandArgs(input string) (string, string) {
 		cmd = "hello" // just in case...
 	}
 
-	arg := ""
+	var args []string
 	if len(parts) > 1 {
-		arg = strings.TrimSpace(strings.Join(parts[1:], " "))
+		args = slices.Clone(parts[1:])
+	} else {
+		args = []string{""}
 	}
-	return cmd, arg
+	return cmd, args
 }
 
 // formatOptionalFloat checks if config val is set or returns a default msg.
