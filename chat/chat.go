@@ -56,10 +56,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		Effort:      cfg.Effort,
 		Format:      cfg.SchemaFmt,
 	}, func(chunk backend.ChatChunk) error {
-		if (chunk.Content != "" ||
-			(chunk.Thinking != "" && cfg.Reasoning)) &&
-			firstToken &&
-			streamPlain {
+		if firstToken && (chunk.Content != "" || (chunk.Thinking != "" && cfg.Reasoning) || chunk.Done) {
 			console.StopSpinner(cfg.Quiet, stop)
 			firstToken = false
 		}
@@ -96,6 +93,10 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if seconds == 0 {
+		seconds, elapsed = elapsedTime(start)
 	}
 
 	if fullContent.Len() == 0 {
