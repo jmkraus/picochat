@@ -131,7 +131,6 @@ func ReadMultilineInput() InputResult {
 				continue
 			case 'B': // Down
 				if firstLine {
-					// cmd := NextCommand()
 					currentLine = []rune(NextCommand())
 					cursorPos = len(currentLine)
 					updateCurrentLine(currentLine, true, cursorPos)
