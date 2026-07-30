@@ -121,18 +121,21 @@ func ReadMultilineInput() InputResult {
 			// Arrow keys (e.g. [A, [B, [C, [D])
 			switch buf[1] {
 			case 'A': // Up
-				recalled := PrevCommand()
-				if recalled != "" {
-					currentLine = []rune(recalled)
-					cursorPos = len(currentLine)
-					updateCurrentLine(currentLine, firstLine, cursorPos)
+				if firstLine {
+					if cmd := PrevCommand(); cmd != "" {
+						currentLine = []rune(cmd)
+						cursorPos = len(currentLine)
+						updateCurrentLine(currentLine, true, cursorPos)
+					}
 				}
 				continue
 			case 'B': // Down
-				recalled := NextCommand()
-				currentLine = []rune(recalled)
-				cursorPos = len(currentLine)
-				updateCurrentLine(currentLine, firstLine, cursorPos)
+				if firstLine {
+					// cmd := NextCommand()
+					currentLine = []rune(NextCommand())
+					cursorPos = len(currentLine)
+					updateCurrentLine(currentLine, true, cursorPos)
+				}
 				continue
 			case 'C': // Right
 				if cursorPos < len(currentLine) {
