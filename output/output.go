@@ -64,9 +64,15 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 		return enc.Encode(result)
 
 	case "plain":
-		fmt.Println() // final newline after streamed token output
+		fmt.Fprintln(w) // final newline after streamed token output
+		if result.Structured {
+
+			if _, err := fmt.Fprintln(w, result.Output); err != nil {
+				return err
+			}
+		}
 		if !quiet {
-			fmt.Println()
+			fmt.Fprintln(w)
 			status := fmt.Sprintf("elapsed: %s · speed: %.1f tok/s", result.Elapsed, result.TokensPS)
 			console.ColorPrintln(console.Yellow, status)
 		}

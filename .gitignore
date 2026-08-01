@@ -1,4 +1,5 @@
 testdata/
+debug/
 _*.md
 *.bak
 *.txt

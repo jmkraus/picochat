@@ -59,8 +59,9 @@ Detailed guides are in [`/docs`](docs):
 
 ## Acknowledgements
 
-- [BurntSushi/toml](https://github.com/BurntSushi/toml)
 - [atotto/clipboard](https://github.com/atotto/clipboard)
+- [BurntSushi/toml](https://github.com/BurntSushi/toml)
+- [google/jsonschema-go](https://github.com/google/jsonschema-go)
 - [mattn/go-runewidth](https://github.com/mattn/go-runewidth)
 
 ## License

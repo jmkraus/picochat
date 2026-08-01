@@ -5,15 +5,17 @@ import (
 	"picochat/backend"
 	"picochat/config"
 	"picochat/console"
+	"picochat/jsonutils"
 	"picochat/messages"
 	"strings"
 	"time"
 )
 
 type ChatResult struct {
-	Output   string  `json:"output" yaml:"output"`
-	Elapsed  string  `json:"elapsed" yaml:"elapsed"`
-	TokensPS float64 `json:"tokens_per_sec" yaml:"tokens_per_sec"`
+	Output     string  `json:"output" yaml:"output"`
+	Elapsed    string  `json:"elapsed" yaml:"elapsed"`
+	TokensPS   float64 `json:"tokens_per_sec" yaml:"tokens_per_sec"`
+	Structured bool    `json:"-" yaml:"-"`
 }
 
 // HandleChat sends a chat request to the configured model, streams the response,
@@ -45,6 +47,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	firstToken := true
 	firstContent := true
 	streamPlain := cfg.OutputFmt == "plain"
+	structured := cfg.Backend == "ollama" && cfg.HasSchema()
 
 	client := backend.New(cfg)
 	_, err = client.ChatStream(backend.ChatInput{
@@ -72,7 +75,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		// Content
 		if chunk.Content != "" {
 			fullContent.WriteString(chunk.Content)
-			if streamPlain {
+			if streamPlain && !structured {
 				if firstContent {
 					if fullThinking.Len() != 0 && cfg.Reasoning {
 						fmt.Println()
@@ -104,14 +107,28 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		return nil, fmt.Errorf("no content received from model %q", cfg.Model)
 	}
 
-	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), fullContent.String())
+	processedContent := fullContent.String()
+
+	if structured && fullContent.Len() != 0 {
+		raw := processedContent
+		err := jsonutils.ValidateJSON(cfg.SchemaFmt, raw)
+		if err != nil {
+			return nil, err
+		}
+		processedContent, err = jsonutils.PrettyPrint(raw)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), processedContent)
 	err = history.AddAssistant(cleanReasoning, cleanContent)
 	if err != nil {
 		return nil, fmt.Errorf("add message to history failed: %w", err)
 	}
 	speed := tokenSpeed(seconds, cleanReasoning+cleanContent)
 
-	return &ChatResult{Output: cleanContent, Elapsed: elapsed, TokensPS: speed}, nil
+	return &ChatResult{Output: cleanContent, Elapsed: elapsed, TokensPS: speed, Structured: structured}, nil
 }
 
 // postProcessingChat separates reasoning part from content and cleans the text
