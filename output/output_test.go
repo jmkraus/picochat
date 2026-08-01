@@ -99,6 +99,22 @@ func TestRenderResult_YAML(t *testing.T) {
 	}
 }
 
+func TestRenderResult_PlainStructured(t *testing.T) {
+	var buf bytes.Buffer
+	result := testResult()
+	result.Output = "{\n  \"name\": \"Canada\"\n}"
+	result.Structured = true
+
+	err := RenderResult(&buf, result, "plain", true)
+	if err != nil {
+		t.Fatalf("RenderResult returned error: %v", err)
+	}
+
+	if got, want := buf.String(), "\n{\n  \"name\": \"Canada\"\n}\n"; got != want {
+		t.Errorf("plain structured output = %q, want %q", got, want)
+	}
+}
+
 func TestRenderResult_UnknownFormat(t *testing.T) {
 	var buf bytes.Buffer
 

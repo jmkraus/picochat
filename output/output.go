@@ -40,7 +40,7 @@ func AllowedKeys(input string) (string, bool) {
 //
 // Returns:
 //
-//	error - any error that might have occurred
+//	error - error if any
 func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet bool) error {
 
 	switch outputFmt {
@@ -66,7 +66,6 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 	case "plain":
 		fmt.Fprintln(w) // final newline after streamed token output
 		if result.Structured {
-
 			if _, err := fmt.Fprintln(w, result.Output); err != nil {
 				return err
 			}
