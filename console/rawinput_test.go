@@ -69,6 +69,37 @@ func TestDeleteCharAt(t *testing.T) {
 	}
 }
 
+func TestInsertLineBreak(t *testing.T) {
+	tests := []struct {
+		name       string
+		input      string
+		wantBefore string
+		wantAfter  string
+		wantCursor int
+	}{
+		{"split at last space", "hello world", "hello", "world", 5},
+		{"collapse spaces after split", "hello   world", "hello", "world", 5},
+		{"unicode keeps rune cursor index", "你好 世界", "你好", "世界", 2},
+		{"no space", "helloworld", "helloworld", "", 0},
+		{"trailing space", "hello ", "hello ", "", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			before, after, cursor := determineLineBreak([]rune(tt.input))
+			if string(before) != tt.wantBefore {
+				t.Errorf("before = %q, want %q", string(before), tt.wantBefore)
+			}
+			if string(after) != tt.wantAfter {
+				t.Errorf("after = %q, want %q", string(after), tt.wantAfter)
+			}
+			if cursor != tt.wantCursor {
+				t.Errorf("cursor = %d, want %d", cursor, tt.wantCursor)
+			}
+		})
+	}
+}
+
 // --- updateCurrentLine ---------------------------------------------
 
 func captureOutput(f func()) string {
