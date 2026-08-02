@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/mattn/go-runewidth"
@@ -220,12 +221,12 @@ func ReadMultilineInput() InputResult {
 //	int    - cursor rune index in the new line
 func determineLineBreak(currentLine []rune) ([]rune, []rune, int) {
 	splitAt := -1
-	for index, r := range currentLine {
+	for i, r := range slices.Backward(currentLine) {
 		if r == ' ' {
-			splitAt = index
+			splitAt = i
+			break
 		}
 	}
-
 	if splitAt <= 0 || splitAt >= len(currentLine)-1 {
 		return currentLine, nil, 0
 	}
@@ -234,13 +235,13 @@ func determineLineBreak(currentLine []rune) ([]rune, []rune, int) {
 	for end > 0 && currentLine[end-1] == ' ' {
 		end--
 	}
-	previousLine := append([]rune(nil), currentLine[:end]...)
 	start := splitAt + 1
 	for start < len(currentLine) && currentLine[start] == ' ' {
 		start++
 	}
 
-	nextLine := append([]rune(nil), currentLine[start:]...)
+	previousLine := currentLine[:end]
+	nextLine := currentLine[start:]
 	return previousLine, nextLine, len(nextLine)
 }
 
