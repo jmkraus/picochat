@@ -21,6 +21,7 @@ type Config struct {
 	Reasoning   bool     `json:"reasoning"`
 	Effort      string   `json:"effort"`
 	Quiet       bool     `json:"quiet"`
+	Validate    bool     `json:"validate"`
 
 	ConfigPath string              `toml:"-"`
 	ImagePath  string              `toml:"-"` ////IMAGES
@@ -120,6 +121,7 @@ func defaultConfig() Config {
 		Reasoning: false,
 		Effort:    "medium",
 		Quiet:     false,
+		Validate:  true, // can be disabled for debugging purposes
 	}
 }
 

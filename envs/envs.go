@@ -28,6 +28,7 @@ var ConfigEnvVars = []EnvSpec{
 	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "top_p", Runtime: true},
 	{Env: "PICOCHAT_REASONING", Type: vartypes.VarBool, Field: "reasoning", Runtime: true},
 	{Env: "PICOCHAT_EFFORT", Type: vartypes.VarString, Field: "effort", Runtime: true},
+	{Env: "PICOCHAT_VALIDATE", Type: vartypes.VarBool, Field: "validate", Runtime: true},
 	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "quiet"},
 }
 

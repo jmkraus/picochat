@@ -109,7 +109,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 
 	processedContent := fullContent.String()
 
-	if structured && fullContent.Len() != 0 {
+	if cfg.Validate && structured && fullContent.Len() != 0 {
 		raw := processedContent
 		err := jsonutils.ValidateJSON(cfg.SchemaFmt, raw)
 		if err != nil {
