@@ -192,12 +192,12 @@ func ReadMultilineInput() InputResult {
 				lineLength = lineLength - PromptWidth()
 			}
 			if visualWidth(currentLine, cursorPos) >= lineLength {
-				previousLine, nextLine, nextCursorPos := determineLineBreak(currentLine)
+				previousLine, nextLine := determineLineBreak(currentLine)
 				updateCurrentLine(previousLine, firstLine, len(previousLine))
 				lines = append(lines, string(previousLine))
 				currentLine = nextLine
-				cursorPos = nextCursorPos
-				fmt.Print("\r\n") // Println not sufficient here
+				cursorPos = len(nextLine)
+				fmt.Println()
 				updateCurrentLine(currentLine, false, cursorPos)
 			}
 		}
@@ -218,8 +218,7 @@ func ReadMultilineInput() InputResult {
 //
 //	[]rune - completed line
 //	[]rune - new line
-//	int    - cursor rune index in the new line
-func determineLineBreak(currentLine []rune) ([]rune, []rune, int) {
+func determineLineBreak(currentLine []rune) ([]rune, []rune) {
 	splitAt := -1
 	for i, r := range slices.Backward(currentLine) {
 		if r == ' ' {
@@ -228,7 +227,7 @@ func determineLineBreak(currentLine []rune) ([]rune, []rune, int) {
 		}
 	}
 	if splitAt <= 0 || splitAt >= len(currentLine)-1 {
-		return currentLine, nil, 0
+		return currentLine, nil
 	}
 
 	end := splitAt
@@ -242,7 +241,7 @@ func determineLineBreak(currentLine []rune) ([]rune, []rune, int) {
 
 	previousLine := currentLine[:end]
 	nextLine := currentLine[start:]
-	return previousLine, nextLine, len(nextLine)
+	return previousLine, nextLine
 }
 
 // deleteCharAt deletes the character at the cursor position in the current line.
