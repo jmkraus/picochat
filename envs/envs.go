@@ -96,19 +96,20 @@ func ConfigByField(field string) (EnvSpec, bool) {
 //	string - the full markdown table
 func ListEnvVars() string {
 	tableData := make([][]string, 0, len(ConfigEnvVars)+1)
-	tableData = append(tableData, []string{"Env", "Set", "Value"})
+	tableData = append(tableData, []string{"Env", "Type", "Set", "Value"})
 
 	for _, spec := range ConfigEnvVars {
 		val, lookup := GetEnv(spec.Env)
 		set := strconv.FormatBool(lookup)
+		typ := spec.Type.String()
 
-		if lookup && val == "" {
-			val = "[empty]"
-		}
 		if lookup && spec.Sensitive && val != "" {
 			val = "[hidden]"
 		}
-		tableData = append(tableData, []string{string(spec.Env), set, val})
+		if lookup && val == "" {
+			val = "[empty]"
+		}
+		tableData = append(tableData, []string{string(spec.Env), typ, set, val})
 	}
 
 	return utils.MarkdownTable(tableData)
