@@ -130,7 +130,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 	case "info":
 		serverVersion, err := client.GetServerVersion()
 		if err != nil {
-			serverVersion = fmt.Sprintf("%s connection error", console.ErrPrefix)
+			serverVersion = console.Colorize(console.Red, fmt.Sprintf("%s connection error", console.ErrPrefix))
 		}
 
 		list := []string{

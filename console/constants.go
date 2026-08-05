@@ -6,7 +6,7 @@ const (
 	ShadowText string = Gray256 + "Send a message (/? for help)" + ColorReset
 	InfoPrefix string = Green + Bold + "✓" + ColorReset
 	WarnPrefix string = BrightYellow + Bold + "!" + ColorReset
-	ErrPrefix  string = BrightRed + Bold + "×" + ColorReset
+	ErrPrefix  string = Bold + "×" + Regular
 )
 
 const (

@@ -20,8 +20,9 @@ func Error(err error) {
 		return
 	}
 
+	errMsg := Colorize(Red, fmt.Sprintf("%s %s\n", ErrPrefix, err.Error()))
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", ErrPrefix, err.Error())
+	fmt.Fprint(os.Stderr, errMsg)
 }
 
 // Warn prints a warning message to stderr, prefixed with "warning:"
