@@ -121,12 +121,12 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		}
 	}
 
-	cleanReasoning, cleanContent := postProcessingChat(fullThinking.String(), processedContent)
-	err = history.AddAssistant(cleanReasoning, cleanContent)
+	cleanThinking, cleanContent := postProcessingChat(fullThinking.String(), processedContent)
+	err = history.AddAssistant(cleanThinking, cleanContent)
 	if err != nil {
 		return nil, fmt.Errorf("add message to history failed: %w", err)
 	}
-	speed := tokenSpeed(seconds, cleanReasoning+cleanContent)
+	speed := tokenSpeed(seconds, cleanThinking+cleanContent)
 
 	return &ChatResult{Output: cleanContent, Elapsed: elapsed, TokensPS: speed, Structured: structured}, nil
 }
@@ -147,9 +147,9 @@ func postProcessingChat(thinking, content string) (string, string) {
 	// Case 1: thinking contains data
 	// This should be the default for ollama reasoning models
 	if thinking != "" {
-		cleanReasoning := trimEmptyLines(thinking)
+		cleanThinking := trimEmptyLines(thinking)
 		cleanContent := trimEmptyLines(content)
-		return cleanReasoning, cleanContent
+		return cleanThinking, cleanContent
 	}
 
 	// Case 2: Check if content contains <think> tags
