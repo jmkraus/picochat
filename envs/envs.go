@@ -5,6 +5,7 @@ import (
 	"picochat/utils"
 	"picochat/vartypes"
 	"strconv"
+	"strings"
 )
 
 // EnvVar represents the valid environment variables in this package.
@@ -19,25 +20,26 @@ type EnvSpec struct {
 }
 
 var ConfigEnvVars = []EnvSpec{
-	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "backend"},
-	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "url"},
-	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "api_key", Sensitive: true},
-	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "model"},
-	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "context", Runtime: true},
-	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "temperature", Runtime: true},
-	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "top_p", Runtime: true},
-	{Env: "PICOCHAT_REASONING", Type: vartypes.VarBool, Field: "reasoning", Runtime: true},
-	{Env: "PICOCHAT_EFFORT", Type: vartypes.VarString, Field: "effort", Runtime: true},
-	{Env: "PICOCHAT_VALIDATE", Type: vartypes.VarBool, Field: "validate", Runtime: true},
-	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "quiet"},
+	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "Backend"},
+	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "Url"},
+	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "ApiKey", Sensitive: true},
+	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "Model"},
+	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "Context", Runtime: true},
+	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "Temperature", Runtime: true},
+	{Env: "PICOCHAT_TOP_P", Type: vartypes.VarFloat, Field: "Top_p", Runtime: true},
+	{Env: "PICOCHAT_REASONING", Type: vartypes.VarBool, Field: "Reasoning", Runtime: true},
+	{Env: "PICOCHAT_EFFORT", Type: vartypes.VarString, Field: "Effort", Runtime: true},
+	{Env: "PICOCHAT_VALIDATE", Type: vartypes.VarBool, Field: "Validate", Runtime: true},
+	{Env: "PICOCHAT_QUIET", Type: vartypes.VarBool, Field: "Quiet"},
 }
 
-var configByField map[string]EnvSpec
+var envSpecByField map[string]EnvSpec
 
 func init() {
-	configByField = make(map[string]EnvSpec, len(ConfigEnvVars))
+	envSpecByField = make(map[string]EnvSpec, len(ConfigEnvVars))
 	for _, v := range ConfigEnvVars {
-		configByField[v.Field] = v
+		field := strings.ToLower(v.Field)
+		envSpecByField[field] = v
 	}
 }
 
@@ -46,14 +48,14 @@ func init() {
 //
 // Parameters:
 //
-//	envvar (EnvVar) - the name of the environment variable
+//	envVar (EnvVar) - the name of the environment variable
 //
 // Returns:
 //
 //	string - the value of the environment variable
 //	bool   - environment variable is actually set (but can be empty)
-func GetEnv(envvar EnvVar) (string, bool) {
-	return os.LookupEnv(string(envvar))
+func GetEnv(envVar EnvVar) (string, bool) {
+	return os.LookupEnv(string(envVar))
 }
 
 // AllowedRuntimeField checks if the given field can be set at runtime.
@@ -66,11 +68,12 @@ func GetEnv(envvar EnvVar) (string, bool) {
 //
 //	bool - field can be set at runtime: true or false
 func AllowedRuntimeField(field string) bool {
-	cfg, ok := configByField[field]
+	lowerField := strings.ToLower(field)
+	cfg, ok := envSpecByField[lowerField]
 	return ok && cfg.Runtime
 }
 
-// ConfigByField returns the config metadata for a field.
+// EnvSpecByField returns the EnvSpec for a given field.
 //
 // Parameters:
 //
@@ -80,8 +83,9 @@ func AllowedRuntimeField(field string) bool {
 //
 //	EnvSpec - metadata for the field
 //	bool    - true if field exists
-func ConfigByField(field string) (EnvSpec, bool) {
-	cfg, ok := configByField[field]
+func EnvSpecByField(field string) (EnvSpec, bool) {
+	lowerField := strings.ToLower(field)
+	cfg, ok := envSpecByField[lowerField]
 	return cfg, ok
 }
 

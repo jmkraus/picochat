@@ -249,14 +249,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: fmt.Sprintf("Switched model to %q.", model)}
 	case "set":
 		if args[0] == "" {
-			list := []string{
-				fmt.Sprintf("context = %d", cfg.Context),
-				fmt.Sprintf("temperature = %s", formatOptionalFloat(cfg.Temperature)),
-				fmt.Sprintf("top_p = %s", formatOptionalFloat(cfg.Top_p)),
-				fmt.Sprintf("reasoning = %t", cfg.Reasoning),
-				fmt.Sprintf("effort = %s", cfg.Effort),
-				fmt.Sprintf("validate = %t", cfg.Validate),
-			}
+			list := config.GetRuntimeConfigValues(cfg)
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}
 
@@ -349,20 +342,4 @@ func parseCommandArgs(input string) (string, []string) {
 		args = []string{""}
 	}
 	return cmd, args
-}
-
-// formatOptionalFloat checks if config val is set or returns a default msg.
-//
-// Parameters:
-//
-//	v (float64) - config values
-//
-// Returns:
-//
-//	string - string representation of float64 or message
-func formatOptionalFloat(v *float64) string {
-	if v == nil {
-		return "[model default]"
-	}
-	return fmt.Sprintf("%.2f", *v)
 }

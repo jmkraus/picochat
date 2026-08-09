@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"picochat/envs"
 	"picochat/vartypes"
+	"reflect"
+	"strings"
 )
 
-// applyConfig updates a specific config element.
+// applyConfigValue updates a specific config element.
 //
 // Parameters:
 //
@@ -18,7 +20,8 @@ import (
 //
 //	error - error if any
 func (c *Config) applyConfigValue(key string, val any) error {
-	patch := map[string]any{key: val}
+	lowerKey := strings.ToLower(key)
+	patch := map[string]any{lowerKey: val}
 	b, err := json.Marshal(patch)
 	if err != nil {
 		return err
@@ -127,4 +130,66 @@ func (c *Config) HasSchema() bool {
 		return false
 	}
 	return len(c.SchemaFmt) > 0
+}
+
+// GetRuntimeConfigValues returns current runtime config values for fields marked as runtime.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+// []string - slice with formatted "„key = value“" entries
+func GetRuntimeConfigValues(cfg *Config) []string {
+	if cfg == nil {
+		return nil
+	}
+
+	result := make([]string, 0, len(envs.ConfigEnvVars))
+
+	val := reflect.ValueOf(cfg)
+	val = val.Elem()
+
+	for _, spec := range envs.ConfigEnvVars {
+		if !spec.Runtime {
+			continue
+		}
+
+		key := strings.ToLower(spec.Field)
+		fieldVal := val.FieldByName(spec.Field)
+		if !fieldVal.IsValid() || !fieldVal.CanInterface() {
+			continue
+		}
+		if spec.Type == vartypes.VarFloat {
+			floatValue, ok := fieldVal.Interface().(*float64)
+			if !ok {
+				continue
+			}
+			result = append(result,
+				fmt.Sprintf("%s = %s", key, formatOptionalFloat(floatValue)))
+			continue
+		}
+
+		result = append(result,
+			fmt.Sprintf("%s = %v", key, fieldVal.Interface()))
+	}
+
+	return result
+}
+
+// formatOptionalFloat checks if config val is set or returns a default msg.
+//
+// Parameters:
+//
+//	v (float64) - config values
+//
+// Returns:
+//
+//	string - string representation of float64 or message
+func formatOptionalFloat(v *float64) string {
+	if v == nil {
+		return "[model default]"
+	}
+	return fmt.Sprintf("%.2f", *v)
 }
