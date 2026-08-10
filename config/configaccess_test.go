@@ -249,3 +249,41 @@ func TestConfig_HasSchema(t *testing.T) {
 		}
 	})
 }
+
+func TestGetRuntimeConfigValues(t *testing.T) {
+	t.Run("formats runtime values", func(t *testing.T) {
+		temperature := 0.7
+		cfg := &Config{
+			Context:     42,
+			Temperature: &temperature,
+			Reasoning:   true,
+			Effort:      "high",
+			Validate:    false,
+		}
+
+		got := GetRuntimeConfigValues(cfg)
+		want := []string{
+			"context = 42",
+			"temperature = 0.70",
+			"top_p = [model default]",
+			"reasoning = true",
+			"effort = high",
+			"validate = false",
+		}
+
+		if len(got) != len(want) {
+			t.Fatalf("value count = %d, want %d; got %v", len(got), len(want), got)
+		}
+		for index := range want {
+			if got[index] != want[index] {
+				t.Errorf("value[%d] = %q, want %q", index, got[index], want[index])
+			}
+		}
+	})
+
+	t.Run("nil config returns nil", func(t *testing.T) {
+		if got := GetRuntimeConfigValues(nil); got != nil {
+			t.Fatalf("values = %v, want nil", got)
+		}
+	})
+}
