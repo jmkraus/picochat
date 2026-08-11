@@ -140,15 +140,15 @@ func (c *Config) HasSchema() bool {
 //
 // Returns:
 //
-// []string - slice with formatted "„key = value“" entries
-func GetRuntimeConfigValues(cfg *Config) []string {
-	if cfg == nil {
+// []string - slice with formatted "key = value" entries
+func (c *Config) GetRuntimeConfigValues() []string {
+	if c == nil {
 		return nil
 	}
 
 	result := make([]string, 0, len(envs.ConfigEnvVars))
 
-	val := reflect.ValueOf(cfg)
+	val := reflect.ValueOf(c)
 	val = val.Elem()
 
 	for _, spec := range envs.ConfigEnvVars {

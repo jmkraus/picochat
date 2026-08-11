@@ -249,7 +249,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: fmt.Sprintf("Switched model to %q.", model)}
 	case "set":
 		if args[0] == "" {
-			list := config.GetRuntimeConfigValues(cfg)
+			list := cfg.GetRuntimeConfigValues()
 			return CommandResult{Output: utils.FormatList(list, "Config settings", false)}
 		}
 

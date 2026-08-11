@@ -261,7 +261,7 @@ func TestGetRuntimeConfigValues(t *testing.T) {
 			Validate:    false,
 		}
 
-		got := GetRuntimeConfigValues(cfg)
+		got := cfg.GetRuntimeConfigValues()
 		want := []string{
 			"context = 42",
 			"temperature = 0.70",
@@ -281,9 +281,27 @@ func TestGetRuntimeConfigValues(t *testing.T) {
 		}
 	})
 
-	t.Run("nil config returns nil", func(t *testing.T) {
-		if got := GetRuntimeConfigValues(nil); got != nil {
-			t.Fatalf("values = %v, want nil", got)
+	t.Run("excludes non-runtime values", func(t *testing.T) {
+		cfg := &Config{
+			Backend: "backend-value",
+			URL:     "url-value",
+			APIKey:  "api-key-value",
+			Model:   "model-value",
+			Quiet:   true,
+		}
+
+		got := cfg.GetRuntimeConfigValues()
+		for _, spec := range envs.ConfigEnvVars {
+			if spec.Runtime {
+				continue
+			}
+
+			prefix := strings.ToLower(spec.Field) + " = "
+			for _, value := range got {
+				if strings.HasPrefix(value, prefix) {
+					t.Errorf("non-runtime field %q found in result: %q", spec.Field, value)
+				}
+			}
 		}
 	})
 }
