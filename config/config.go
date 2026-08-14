@@ -12,7 +12,7 @@ import (
 type Config struct {
 	Backend     string   `json:"backend"`
 	URL         string   `json:"url"`
-	APIKey      string   `json:"apikey"`
+	APIKey      string   `json:"api_key"`
 	Model       string   `json:"model"`
 	Prompt      string   `json:"prompt"`
 	Context     int      `json:"context"`

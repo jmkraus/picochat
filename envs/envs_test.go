@@ -7,7 +7,7 @@ import (
 
 func TestAllowedRuntimeField_FollowsConfigRuntimeFlag(t *testing.T) {
 	for _, cfg := range ConfigEnvVars {
-		got := AllowedRuntimeField(cfg.Field)
+		got := AllowedRuntimeField(cfg.JsonField)
 		if got != cfg.Runtime {
 			t.Errorf("field %q allowed=%v, want %v", cfg.Field, got, cfg.Runtime)
 		}

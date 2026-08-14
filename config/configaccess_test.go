@@ -116,9 +116,10 @@ func TestConfig_applyEnvValues(t *testing.T) {
 	t.Run("returns apply config error", func(t *testing.T) {
 		orig := envs.ConfigEnvVars
 		envs.ConfigEnvVars = append(envs.ConfigEnvVars, envs.EnvSpec{
-			Env:   "PICOCHAT_BAD_CONTEXT",
-			Type:  vartypes.VarString,
-			Field: "context",
+			Env:       "PICOCHAT_BAD_CONTEXT",
+			Type:      vartypes.VarString,
+			Field:     "Context",
+			JsonField: "context",
 		})
 		t.Cleanup(func() {
 			envs.ConfigEnvVars = orig

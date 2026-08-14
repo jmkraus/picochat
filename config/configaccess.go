@@ -6,7 +6,6 @@ import (
 	"picochat/envs"
 	"picochat/vartypes"
 	"reflect"
-	"strings"
 )
 
 // applyConfigValue updates a specific config element.
@@ -20,8 +19,7 @@ import (
 //
 //	error - error if any
 func (c *Config) applyConfigValue(key string, val any) error {
-	lowerKey := strings.ToLower(key)
-	patch := map[string]any{lowerKey: val}
+	patch := map[string]any{key: val}
 	b, err := json.Marshal(patch)
 	if err != nil {
 		return err
@@ -50,7 +48,7 @@ func (c *Config) applyEnvValues() error {
 		if err != nil {
 			return fmt.Errorf("convert type for env %s failed: %w", spec.Env, err)
 		}
-		if err := c.applyConfigValue(spec.Field, v); err != nil {
+		if err := c.applyConfigValue(spec.JsonField, v); err != nil {
 			return fmt.Errorf("apply config value for env %s failed: %w", spec.Env, err)
 		}
 	}
@@ -156,7 +154,6 @@ func (c *Config) GetRuntimeConfigValues() []string {
 			continue
 		}
 
-		key := strings.ToLower(spec.Field)
 		fieldVal := val.FieldByName(spec.Field)
 		if !fieldVal.IsValid() || !fieldVal.CanInterface() {
 			continue
@@ -167,12 +164,12 @@ func (c *Config) GetRuntimeConfigValues() []string {
 				continue
 			}
 			result = append(result,
-				fmt.Sprintf("%s = %s", key, formatOptionalFloat(floatValue)))
+				fmt.Sprintf("%s = %s", spec.JsonField, formatOptionalFloat(floatValue)))
 			continue
 		}
 
 		result = append(result,
-			fmt.Sprintf("%s = %v", key, fieldVal.Interface()))
+			fmt.Sprintf("%s = %v", spec.JsonField, fieldVal.Interface()))
 	}
 
 	return result
