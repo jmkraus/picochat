@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/jsonschema-go/jsonschema"
 	"strings"
+
+	"github.com/google/jsonschema-go/jsonschema"
 )
 
 var (
