@@ -24,6 +24,21 @@ func TestAllowedRuntimeField_InvalidFieldsAreRejected(t *testing.T) {
 	}
 }
 
+func TestConfigEnvVars_JSONFieldsAreNonEmptyAndUnique(t *testing.T) {
+	seen := make(map[string]struct{}, len(ConfigEnvVars))
+
+	for _, spec := range ConfigEnvVars {
+		if spec.JsonField == "" {
+			t.Errorf("environment variable %q has an empty JSON field", spec.Env)
+			continue
+		}
+		if _, exists := seen[spec.JsonField]; exists {
+			t.Errorf("JSON field %q is configured more than once", spec.JsonField)
+		}
+		seen[spec.JsonField] = struct{}{}
+	}
+}
+
 func TestListEnvVars_HidesSensitiveValues(t *testing.T) {
 	t.Setenv("PICOCHAT_API_KEY", "sk-secret-value")
 
