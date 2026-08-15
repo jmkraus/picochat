@@ -252,6 +252,21 @@ func TestConfig_HasSchema(t *testing.T) {
 }
 
 func TestGetRuntimeConfigValues(t *testing.T) {
+	t.Run("nil receiver returns error", func(t *testing.T) {
+		var cfg *Config
+
+		got, err := cfg.GetRuntimeConfigValues()
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if got != nil {
+			t.Fatalf("values = %v, want nil", got)
+		}
+		if err.Error() != "config is nil" {
+			t.Fatalf("error = %q, want %q", err, "config is nil")
+		}
+	})
+
 	t.Run("formats runtime values", func(t *testing.T) {
 		temperature := 0.7
 		cfg := &Config{
@@ -262,7 +277,10 @@ func TestGetRuntimeConfigValues(t *testing.T) {
 			Validate:    false,
 		}
 
-		got := cfg.GetRuntimeConfigValues()
+		got, err := cfg.GetRuntimeConfigValues()
+		if err != nil {
+			t.Fatalf("GetRuntimeConfigValues returned error: %v", err)
+		}
 		want := []string{
 			"context = 42",
 			"temperature = 0.70",
@@ -291,7 +309,10 @@ func TestGetRuntimeConfigValues(t *testing.T) {
 			Quiet:   true,
 		}
 
-		got := cfg.GetRuntimeConfigValues()
+		got, err := cfg.GetRuntimeConfigValues()
+		if err != nil {
+			t.Fatalf("GetRuntimeConfigValues returned error: %v", err)
+		}
 		for _, spec := range envs.ConfigEnvVars {
 			if spec.Runtime {
 				continue

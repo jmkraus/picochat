@@ -19,6 +19,10 @@ import (
 //
 //	error - error if any
 func (c *Config) applyConfigValue(key string, val any) error {
+	if c == nil {
+		return fmt.Errorf("config is nil")
+	}
+
 	patch := map[string]any{key: val}
 	b, err := json.Marshal(patch)
 	if err != nil {
@@ -38,6 +42,10 @@ func (c *Config) applyConfigValue(key string, val any) error {
 //
 //	error - error if any
 func (c *Config) applyEnvValues() error {
+	if c == nil {
+		return fmt.Errorf("config is nil")
+	}
+
 	for _, spec := range envs.ConfigEnvVars {
 		envVal, lookup := envs.GetEnv(spec.Env)
 		if !lookup || envVal == "" {
@@ -139,9 +147,11 @@ func (c *Config) HasSchema() bool {
 // Returns:
 //
 // []string - slice with formatted "key = value" entries
-func (c *Config) GetRuntimeConfigValues() []string {
+//
+//	error - error if any
+func (c *Config) GetRuntimeConfigValues() ([]string, error) {
 	if c == nil {
-		return nil
+		return nil, fmt.Errorf("config is nil")
 	}
 
 	result := make([]string, 0, len(envs.ConfigEnvVars))
@@ -172,7 +182,7 @@ func (c *Config) GetRuntimeConfigValues() []string {
 			fmt.Sprintf("%s = %v", spec.JsonField, fieldVal.Interface()))
 	}
 
-	return result
+	return result, nil
 }
 
 // formatOptionalFloat checks if config val is set or returns a default msg.
