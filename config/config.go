@@ -148,7 +148,7 @@ func Get() (*Config, []string, error) {
 //
 // Parameters:
 //
-//	key (string) - the configuration key to modify
+//	key (string) - the canonical lowercase JSON configuration key to modify
 //	value (any)  - the new value for the key
 //
 // Returns:

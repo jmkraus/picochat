@@ -57,11 +57,12 @@ func GetEnv(envVar EnvVar) (string, bool) {
 	return os.LookupEnv(string(envVar))
 }
 
-// AllowedRuntimeField checks if the given field can be set at runtime.
+// AllowedRuntimeField checks if the given canonical lowercase JSON field can
+// be set at runtime.
 //
 // Parameters:
 //
-//	field (string) - the field name to be checked
+//	field (string) - the canonical lowercase JSON field name to be checked
 //
 // Returns:
 //
@@ -71,11 +72,11 @@ func AllowedRuntimeField(field string) bool {
 	return ok && cfg.Runtime
 }
 
-// EnvSpecByField returns the EnvSpec for a given field.
+// EnvSpecByField returns the EnvSpec for a given canonical lowercase JSON field.
 //
 // Parameters:
 //
-//	field (string) - the config field name
+//	field (string) - the canonical lowercase JSON field name
 //
 // Returns:
 //

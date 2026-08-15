@@ -19,7 +19,8 @@ type copyPayload struct {
 }
 
 // parseKeyVal parses a string of the form "key=value" and returns
-// the key, converted value, and error.
+// the canonical lowercase JSON key, converted value, and error. User input
+// is accepted case-insensitively.
 //
 // Parameters:
 //
@@ -48,7 +49,7 @@ func parseKeyVal(args string) (string, any, error) {
 
 	fieldCfg, ok := envs.EnvSpecByField(key)
 	if !ok || !fieldCfg.Runtime {
-		return "", nil, fmt.Errorf("unsupported config key %q'", key)
+		return "", nil, fmt.Errorf("unsupported config key %q", key)
 	}
 
 	convertedValue, err := vartypes.Convert(fieldCfg.Type, value)

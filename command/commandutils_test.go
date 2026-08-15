@@ -58,6 +58,28 @@ func TestParseArgs_Valid(t *testing.T) {
 	}
 }
 
+func TestParseKeyVal_AcceptsCaseInsensitiveRuntimeFields(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"TeMPerATure=0.7", "temperature"},
+		{"TOP_P=0.9", "top_p"},
+		{"CoNtExT=42", "context"},
+	}
+
+	for _, tt := range tests {
+		key, _, err := parseKeyVal(tt.input)
+		if err != nil {
+			t.Errorf("parseKeyVal(%q) returned error: %v", tt.input, err)
+			continue
+		}
+		if key != tt.want {
+			t.Errorf("parseKeyVal(%q) key = %q, want %q", tt.input, key, tt.want)
+		}
+	}
+}
+
 func TestParseArgs_Invalid(t *testing.T) {
 	tests := []string{
 		"notakeyvalue",
@@ -95,7 +117,7 @@ func TestParseKeyVal_RuntimeFieldsFromEnvSpec(t *testing.T) {
 			t.Fatalf("unsupported spec type %q for field %q", spec.Type, spec.Field)
 		}
 
-		input := fmt.Sprintf("%s=%s", spec.Field, sample)
+		input := fmt.Sprintf("%s=%s", spec.JsonField, sample)
 		_, _, err := parseKeyVal(input)
 
 		if spec.Runtime && err != nil {
