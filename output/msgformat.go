@@ -15,7 +15,7 @@ import (
 //	msg (messages.Message) - the message to format
 //	index (int)            - the message index shown in the header
 //	header (bool)          - include role/index header if true
-//	color (bool)           - apply role-based colors if true
+//	color (bool)           - apply role-based colors or styles if true
 //
 // Returns:
 //
@@ -24,7 +24,9 @@ func FormatMessage(msg messages.Message, index int, header, color bool) string {
 	headerText := ""
 	if header {
 		headerText = fmt.Sprintf("(%d:%s)\n", index, msg.Role)
-		headerText = console.Style(console.Bold, headerText)
+		if color {
+			headerText = console.Style(console.Bold, headerText)
+		}
 	}
 
 	output := fmt.Sprintf("%s%s", headerText, msg.Content)
@@ -39,6 +41,7 @@ func FormatMessage(msg messages.Message, index int, header, color bool) string {
 			// nothing to do here
 		}
 	}
+
 	return output
 }
 
@@ -47,18 +50,19 @@ func FormatMessage(msg messages.Message, index int, header, color bool) string {
 // Parameters:
 //
 //	msgs ([]Message) - Array of struct containing the full message history
+//	color (bool)     - apply role-based colors or styles if true
 //
 // Returns:
 //
 //	string - the full conversation text (without reasoning)
-func FormatConversation(msgs []messages.Message) string {
+func FormatConversation(msgs []messages.Message, color bool) string {
 	var builder strings.Builder
 
 	for index, msg := range msgs {
 		if index > 0 {
 			builder.WriteString("\n\n")
 		}
-		builder.WriteString(FormatMessage(msg, index, true, true))
+		builder.WriteString(FormatMessage(msg, index, true, color))
 	}
 
 	return builder.String()

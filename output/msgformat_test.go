@@ -38,7 +38,7 @@ func TestFormatConversation(t *testing.T) {
 		{Role: messages.RoleAssistant, Content: "hey"},
 	}
 
-	got := stripANSI(FormatConversation(msgs))
+	got := stripANSI(FormatConversation(msgs, false))
 	want := "(0:system)\nsys\n\n(1:user)\nhi\n\n(2:assistant)\nhey"
 	if got != want {
 		t.Fatalf("expected %q, got %q", want, got)

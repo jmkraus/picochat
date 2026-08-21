@@ -172,7 +172,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			msg := history.GetLast().Content
 			return CommandResult{Output: msg}
 		case "all":
-			conversation := output.FormatConversation(history.Get())
+			conversation := output.FormatConversation(history.Get(), true)
 			return CommandResult{Output: conversation}
 		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
 			msg, found := history.GetLastRole(args[0])

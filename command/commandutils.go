@@ -283,6 +283,12 @@ func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload
 			Info: fmt.Sprintf("Last %s prompt copied to clipboard.", args),
 		}, nil
 
+	case "all":
+		conversation := output.FormatConversation(history.Get(), false)
+		return copyPayload{
+			Text: conversation,
+			Info: "Full conversation copied to clipboard.",
+		}, nil
 	case "think":
 		lastMessage, found := history.GetLastRole(messages.RoleAssistant)
 		if !found || (lastMessage.Content == "" && lastMessage.Reasoning == "") {
