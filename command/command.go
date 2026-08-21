@@ -72,12 +72,17 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		return CommandResult{Info: "Chat has ended.", Quit: true}
 	case "save":
 		overwrite := false
+		var argFilename string
 		if args[0] != "" {
 			historyPath, err := paths.GetHistoryPath()
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("history path not found: %w", err)}
 			}
-			targetName := paths.EnsureSuffix(filepath.Base(args[0]), paths.HistorySuffix)
+			argFilename = args[0]
+			if len(args) > 1 {
+				argFilename = strings.Join(args, "_")
+			}
+			targetName := paths.EnsureSuffix(filepath.Base(argFilename), paths.HistorySuffix)
 			targetPath := filepath.Join(historyPath, targetName)
 			if paths.FileExists(targetPath) {
 				overwrite, err = askConfirmation(fmt.Sprintf("File %q already exists. Overwrite?", targetName), input)
@@ -90,7 +95,7 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 			}
 		}
 
-		filename, err := messages.SaveHistoryToFile(args[0], history.Get(), overwrite)
+		filename, err := messages.SaveHistoryToFile(argFilename, history.Get(), overwrite)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("save history failed: %w", err)}
 		}
