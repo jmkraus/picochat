@@ -185,6 +185,32 @@ func TestResolveCopyPayload_ByIndex(t *testing.T) {
 	}
 }
 
+func TestResolveCopyPayload_All(t *testing.T) {
+	h := messages.NewHistory("system prompt", 10)
+	if err := h.AddUser("user message", ""); err != nil {
+		t.Fatalf("failed to add user message: %v", err)
+	}
+	if err := h.AddAssistant("internal reasoning", "assistant response"); err != nil {
+		t.Fatalf("failed to add assistant message: %v", err)
+	}
+
+	payload, err := resolveCopyPayload("all", h)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	wantText := "(0:system)\nsystem prompt\n\n(1:user)\nuser message\n\n(2:assistant)\nassistant response"
+	if payload.Text != wantText {
+		t.Errorf("payload text = %q, want %q", payload.Text, wantText)
+	}
+	if strings.Contains(payload.Text, "\x1b[") {
+		t.Errorf("payload text contains ANSI escape sequence: %q", payload.Text)
+	}
+	if got, want := payload.Info, "Full conversation copied to clipboard."; got != want {
+		t.Errorf("payload info = %q, want %q", got, want)
+	}
+}
+
 func TestResolveCopyPayload_UnknownArg(t *testing.T) {
 	h := messages.NewHistory("sys", 10)
 

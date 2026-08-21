@@ -98,10 +98,11 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 `/save <filename>`:
 - Without argument: uses a timestamp filename (for example `2025-05-11_20-26-32.chat`).
 
-`/copy`, `/copy code`, `/copy think`, `/copy #<index>`, `/copy <role>`:
+`/copy`, `/copy code`, `/copy think`, `/copy #<index>`, `/copy <role>`, `/copy all`:
 - Without argument: copies latest assistant content.
 - `code`: copies first fenced code block.
 - `think`: includes reasoning section.
+- `all` : copies full conversation without any ANSI formatting.
 - Index: copies message with specific index number.
 - Role: copies latest message by role.
 
