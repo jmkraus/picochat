@@ -24,8 +24,7 @@ func StartSpinner(quiet bool, stop <-chan struct{}) {
 	frames := []rune{'⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'}
 	i := 0
 
-	fmt.Print(DisableCursor)
-	fmt.Print(ClearLine + Blue)
+	fmt.Print(ClearLine + Blue + DisableCursor)
 
 	for {
 		select {
