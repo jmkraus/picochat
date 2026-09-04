@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/atotto/clipboard v0.1.4
 	github.com/google/jsonschema-go v0.4.3
-	github.com/mattn/go-runewidth v0.0.28
+	github.com/mattn/go-runewidth v0.0.29
 	golang.org/x/term v0.35.0
 	gopkg.in/yaml.v3 v3.0.1
 )
