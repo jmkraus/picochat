@@ -61,6 +61,6 @@ func StopSpinner(quiet bool, stop chan struct{}) {
 		return //channel already closed, do nothing
 	default:
 		close(stop)
-		fmt.Print(ClearLine + ColorReset)
+		fmt.Print(ClearLine + ColorReset + EnableCursor)
 	}
 }
