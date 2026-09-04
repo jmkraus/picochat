@@ -25,8 +25,6 @@ func StartSpinner(quiet bool, stop <-chan struct{}) {
 	i := 0
 
 	fmt.Print(DisableCursor)
-	defer fmt.Print(EnableCursor)
-
 	fmt.Print(ClearLine + Blue)
 
 	for {
