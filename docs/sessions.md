@@ -27,18 +27,18 @@ List sessions:
 Create and switch between sessions:
 
 ```text
-[1]❯ /chat new
-New chat 3 created.
+[2]❯ /chat new
+New chat session 3 created.
 
-[1]❯ /chat 1
-Switched to chat session 1.
+[1]❯ /chat 2
+Switched to chat session 2. 
 ```
 
 Branch a session at a message index:
 
 ```text
-[1]❯ /chat copy 4
-Chat copied to 4.
+[1]❯ /chat copy 7
+Chat copied to session 2.
 ```
 
 Creating, switching, or copying a session changes the active conversation used by subsequent prompts.
