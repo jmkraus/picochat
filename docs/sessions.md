@@ -19,7 +19,7 @@ Session numbers shown by `/chat` start at `1`. Message indexes used by `/chat co
 List sessions:
 
 ```text
->>> /chat
+[1]❯ /chat
 * 1: 8 messages
   2: 3 messages
 ```
@@ -27,17 +27,17 @@ List sessions:
 Create and switch between sessions:
 
 ```text
->>> /chat new
+[1]❯ /chat new
 New chat 3 created.
 
->>> /chat 1
+[1]❯ /chat 1
 Switched to chat session 1.
 ```
 
 Branch a session at a message index:
 
 ```text
->>> /chat copy 4
+[1]❯ /chat copy 4
 Chat copied to 4.
 ```
 

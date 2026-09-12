@@ -11,7 +11,7 @@ picochat -image ./imgfile.jpg
 Or via command:
 
 ```text
->>> /image ./imgfile.jpg
+[1]❯ /image ./imgfile.jpg
 ```
 
 Behavior:

@@ -13,19 +13,19 @@ PicoChat uses raw input mode for multiline prompts.
 Single line:
 
 ```text
->>> Tell me a joke! [Ctrl]+D
+[1]❯ Tell me a joke! [Ctrl]+D
 ```
 
 Commands (everything starting with a slash) can be sent with [Return]:
 
 ```text
->>> /models ↵
+[1]❯ /models ↵
 ```
 
 Multiline:
 
 ```text
->>> Hello, PicoChat! ↵
+[1]❯ Hello, PicoChat! ↵
 How are you today? ↵
 ↵
 [Ctrl]+D
