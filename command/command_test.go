@@ -16,7 +16,7 @@ func TestHandleClear(t *testing.T) {
 	h := messages.NewHistory("initial system prompt", 50)
 	h.AddUser("hello", "")
 
-	result := HandleCommand("/clear", h, strings.NewReader(""))
+	result := HandleCommand("/clear", h, nil, strings.NewReader(""))
 	if !h.IsEmpty() {
 		t.Error("expected history to be cleared except system prompt")
 	}
@@ -27,7 +27,7 @@ func TestHandleClear(t *testing.T) {
 
 func TestHandleHelp(t *testing.T) {
 	h := messages.NewHistory("prompt", 50)
-	result := HandleCommand("/help", h, strings.NewReader(""))
+	result := HandleCommand("/help", h, nil, strings.NewReader(""))
 	if !strings.Contains(result.Output, "/save") {
 		t.Errorf("expected help to contain /save, got: %s", result.Info)
 	}
@@ -61,7 +61,7 @@ func TestHandleLoad_WithFilename(t *testing.T) {
 	h := messages.NewHistory("system prompt", 50)
 	input := strings.NewReader("dummy.chat\n")
 
-	result := HandleCommand("/load", h, input)
+	result := HandleCommand("/load", h, nil, input)
 
 	if result.Error != nil {
 		t.Fatalf("expected no error, got: %v", result.Error)
@@ -97,7 +97,7 @@ func TestHandleCommand_Paste_UsesRuneCount(t *testing.T) {
 	}
 
 	history := messages.NewHistory("sys", 10)
-	result := HandleCommand("/paste", history, strings.NewReader(""))
+	result := HandleCommand("/paste", history, nil, strings.NewReader(""))
 
 	if result.Error != nil {
 		t.Fatalf("expected no error, got %v", result.Error)
@@ -120,7 +120,7 @@ func TestHandleCommand_Paste_UnknownTemplateError(t *testing.T) {
 	readClipboard = func() (string, error) { return "Hello", nil }
 
 	history := messages.NewHistory("sys", 10)
-	result := HandleCommand("/paste unknown", history, strings.NewReader(""))
+	result := HandleCommand("/paste unknown", history, nil, strings.NewReader(""))
 
 	if result.Error == nil {
 		t.Fatal("expected error, got nil")
@@ -141,7 +141,7 @@ func TestHandleCommand_Paste_ReadClipboardError(t *testing.T) {
 	}
 
 	history := messages.NewHistory("sys", 10)
-	result := HandleCommand("/paste", history, strings.NewReader(""))
+	result := HandleCommand("/paste", history, nil, strings.NewReader(""))
 
 	if result.Error == nil {
 		t.Fatal("expected error, got nil")
@@ -166,7 +166,7 @@ func TestHandleCommand_Save_ExistingFile_NoOverwrite(t *testing.T) {
 		t.Fatalf("initial save failed: %v", err)
 	}
 
-	result := HandleCommand("/save "+existingName, h, strings.NewReader("n\n"))
+	result := HandleCommand("/save "+existingName, h, nil, strings.NewReader("n\n"))
 	if result.Error != nil {
 		t.Fatalf("expected no error, got: %v", result.Error)
 	}
@@ -190,7 +190,7 @@ func TestHandleCommand_Save_ExistingFile_Overwrite(t *testing.T) {
 		t.Fatalf("initial save failed: %v", err)
 	}
 
-	result := HandleCommand("/save "+existingName, h, strings.NewReader("y\n"))
+	result := HandleCommand("/save "+existingName, h, nil, strings.NewReader("y\n"))
 	if result.Error != nil {
 		t.Fatalf("expected no error, got: %v", result.Error)
 	}

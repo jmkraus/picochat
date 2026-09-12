@@ -52,6 +52,7 @@ echo "Write a Haiku about Cheese" | ./picochat -quiet
 Detailed guides are in [`/docs`](docs):
 
 - [Usage Guide](docs/usage.md)
+- [Sessions](docs/sessions.md)
 - [Configuration](docs/configuration.md)
 - [Output and Structured Content](docs/output-and-structured-content.md)
 - [Image Processing](docs/image-processing.md)

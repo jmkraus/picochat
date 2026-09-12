@@ -15,10 +15,12 @@ import (
 	"picochat/version"
 )
 
-type Session struct {
-	Config  *config.Config
-	History *messages.ChatHistory
-	Quiet   bool
+// Central data for running instance of PicoChat
+type Instance struct {
+	Config   *config.Config
+	History  *messages.ChatHistory
+	Sessions *messages.SessionManager
+	Quiet    bool
 }
 
 const (
@@ -29,50 +31,73 @@ const (
 //
 // Parameters:
 //
-//	session (*Session) - active runtime session
-//	prompt  (string)   - user input prompt
+//	instance (*Instance) - active runtime instance
+//	prompt  (string)     - user input prompt
 //
 // Returns:
 //
 //	none
-func sendPrompt(session *Session, prompt string) {
-	if err := session.History.AddUser(prompt, session.Config.ImagePath); err != nil {
+func sendPrompt(instance *Instance, prompt string) {
+	if err := instance.History.AddUser(prompt, instance.Config.ImagePath); err != nil {
 		console.Error(err)
 		return
 	}
 
-	session.Config.ImagePath = "" // store once in history and forget
-	runChat(session)
+	instance.Config.ImagePath = "" // store once in history and forget
+	runChat(instance)
 }
 
 // retryPrompt triggers a new chat run based on existing history.
 //
 // Parameters:
 //
-//	session (*Session) - active runtime session
+//	instance (*Instance) - active runtime instance
 //
 // Returns:
 //
 //	none
-func retryPrompt(session *Session) {
-	runChat(session)
+func retryPrompt(instance *Instance) {
+	runChat(instance)
+}
+
+// getActiveHistory retrieves the pointer to the active history from the
+// session manager and stores it in the instance.
+//
+// Parameters:
+//
+//	instance (*Instance) - active runtime instance
+//
+// Returns:
+//
+//	error - error if the session manager is unavailable
+func getActiveHistory(instance *Instance) error {
+	if instance.Sessions == nil {
+		return fmt.Errorf("session manager is unavailable")
+	}
+
+	history, err := instance.Sessions.Active()
+	if err != nil {
+		return err
+	}
+	instance.History = history
+	return nil
 }
 
 // runChat sends the prepared chat request and renders the final result.
 //
 // Parameters:
 //
-//	session (*Session) - active runtime session
+//	instance (*Instance) - active runtime instance
 //
 // Returns:
 //
 //	none
-func runChat(session *Session) {
+func runChat(instance *Instance) {
 	stop := make(chan struct{})
-	go console.StartSpinner(session.Quiet, stop)
-	defer console.StopSpinner(session.Quiet, stop)
+	go console.StartSpinner(instance.Quiet, stop)
+	defer console.StopSpinner(instance.Quiet, stop)
 
-	result, err := chat.HandleChat(session.Config, session.History, stop)
+	result, err := chat.HandleChat(instance.Config, instance.History, stop)
 	if err != nil {
 		console.Error(err)
 		return
@@ -81,15 +106,15 @@ func runChat(session *Session) {
 	if err := output.RenderResult(
 		os.Stdout,
 		result,
-		session.Config.OutputFmt,
-		session.Quiet,
+		instance.Config.OutputFmt,
+		instance.Quiet,
 	); err != nil {
 		console.Error(fmt.Errorf("output failed: %w", err))
 	}
 }
 
-// initSessionFromArgs parses CLI args, loads config, applies overrides,
-// initializes history, and returns a prepared session.
+// initInstanceFromArgs parses CLI args, loads config, applies overrides,
+// initializes history, and returns a prepared instance.
 //
 // Parameters:
 //
@@ -97,11 +122,11 @@ func runChat(session *Session) {
 //
 // Returns:
 //
-//	bool     - true if caller should print version and exit
-//	*Session - prepared runtime session
-//	[]string - startup warnings if any
-//	error    - error if startup initialization fails
-func initSessionFromArgs() (bool, *Session, []string, error) {
+//	bool      - true if caller should print version and exit
+//	*Instance - prepared runtime instance
+//	[]string  - startup warnings if any
+//	error     - error if startup initialization fails
+func initInstanceFromArgs() (bool, *Instance, []string, error) {
 	args.Parse()
 
 	if *args.ShowVersion {
@@ -156,21 +181,33 @@ func initSessionFromArgs() (bool, *Session, []string, error) {
 		if err != nil {
 			return false, nil, nil, fmt.Errorf("load history failed: %w", err)
 		}
+		ctxSize := max(cfg.Context, history.Len()+1)
+		ctxSize = min(ctxSize, config.MaxContext)
+		if err := history.SetContextSize(ctxSize); err != nil {
+			return false, nil, nil, fmt.Errorf("set context size failed: %w", err)
+		}
 	} else {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	session := &Session{
-		Config:  cfg,
-		History: history,
-		Quiet:   cfg.Quiet,
+	manager := messages.NewSessionManager()
+	_, err = manager.Add(history)
+	if err != nil {
+		return false, nil, nil, fmt.Errorf("init session manager failed: %w", err)
 	}
 
-	return false, session, warn, nil
+	instance := &Instance{
+		Config:   cfg,
+		History:  history,
+		Sessions: manager,
+		Quiet:    cfg.Quiet,
+	}
+
+	return false, instance, warn, nil
 }
 
 func main() {
-	showVersion, session, warn, err := initSessionFromArgs()
+	showVersion, instance, warn, err := initInstanceFromArgs()
 	if showVersion {
 		fmt.Printf("picochat version is %s\n", version.Version)
 		os.Exit(0)
@@ -181,27 +218,28 @@ func main() {
 	}
 
 	printNewLine := func() {
-		if !session.Quiet {
+		if !instance.Quiet {
 			fmt.Println()
 		}
 	}
 
-	if !session.Quiet {
+	if !instance.Quiet {
 		console.Warns(warn)
 		if *args.Model != "" {
-			console.Info(fmt.Sprintf("Using model from CLI override: %q.", session.Config.Model))
+			console.Info(fmt.Sprintf("Using model from CLI override: %q.", instance.Config.Model))
 		}
 		console.Info("PicoChat started.")
 	}
 
 	for {
 		printNewLine()
-		if !session.Quiet {
-			fmt.Print(console.Prompt + console.ShadowText)
+		prompt := console.NumberedPrompt(instance.Sessions.ActiveIndex())
+		if !instance.Quiet {
+			fmt.Print(prompt + console.ShadowText)
 			console.SetCursorPos(console.PromptWidth() + 1)
 		}
 
-		input := console.ReadMultilineInput()
+		input := console.ReadMultilineInputWithPrompt(prompt)
 		if input.Error != nil {
 			console.Error(input.Error)
 			continue
@@ -209,7 +247,7 @@ func main() {
 
 		if input.Aborted {
 			printNewLine()
-			if !session.Quiet {
+			if !instance.Quiet {
 				console.Warn("Input canceled.")
 			}
 			continue
@@ -227,13 +265,19 @@ func main() {
 
 		if input.IsCommand {
 			fmt.Println() // newline even in quiet mode
-			result := command.HandleCommand(input.Text, session.History, os.Stdin)
+			result := command.HandleCommand(input.Text, instance.History, instance.Sessions, os.Stdin)
 			console.AddCommand(input.Text)
 			if result.Error != nil {
 				console.Error(fmt.Errorf("command handler error: %w", result.Error))
 				continue
 			}
-			if !session.Quiet {
+			if result.SessionChanged {
+				if err := getActiveHistory(instance); err != nil {
+					console.Error(fmt.Errorf("get active session failed: %w", err))
+					continue
+				}
+			}
+			if !instance.Quiet {
 				console.Warn(result.Warn)
 				console.Info(result.Info)
 			}
@@ -244,10 +288,10 @@ func main() {
 				break
 			}
 			if result.Retry {
-				retryPrompt(session)
+				retryPrompt(instance)
 			} else if result.Pasted != "" {
 				// start the request with pasted content from clipboard
-				sendPrompt(session, result.Pasted)
+				sendPrompt(instance, result.Pasted)
 			}
 
 			if input.EOF {
@@ -258,7 +302,7 @@ func main() {
 			}
 		}
 
-		sendPrompt(session, input.Text)
+		sendPrompt(instance, input.Text)
 
 		if input.EOF {
 			break

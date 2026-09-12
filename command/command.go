@@ -11,7 +11,6 @@ import (
 	"picochat/console"
 	"picochat/envs"
 	"picochat/messages"
-	"picochat/output"
 	"picochat/paths"
 	"picochat/utils"
 	"slices"
@@ -20,13 +19,14 @@ import (
 )
 
 type CommandResult struct {
-	Output string
-	Info   string
-	Warn   string
-	Error  error
-	Quit   bool
-	Pasted string
-	Retry  bool
+	Output         string
+	Info           string
+	Warn           string
+	Error          error
+	Quit           bool
+	Pasted         string
+	Retry          bool
+	SessionChanged bool
 }
 
 var readClipboard = clipb.ReadClipboard
@@ -38,13 +38,17 @@ var readClipboard = clipb.ReadClipboard
 //
 //	commandLine - the raw command line string entered by the user.
 //	history     - the chat history to operate on.
+//	sessions    - the chat history session manager instance.
 //	input       - io.Reader (default: os.Stdin) used for unit tests
 //
 // Returns:
 //
 //	CommandResult - a struct containing output, error, quit flag, prompt,
 //	and retry flag for the command.
-func HandleCommand(commandLine string, history *messages.ChatHistory, input io.Reader) CommandResult {
+func HandleCommand(commandLine string,
+	history *messages.ChatHistory,
+	sessions *messages.SessionManager,
+	input io.Reader) CommandResult {
 	cfg, _, err := config.Get()
 	if err != nil {
 		return CommandResult{Error: fmt.Errorf("read config failed: %w", err)}
@@ -164,42 +168,11 @@ func HandleCommand(commandLine string, history *messages.ChatHistory, input io.R
 		}
 		return CommandResult{Info: "Chat history has been truncated."}
 	case "message":
-		if idxArg, ok := strings.CutPrefix(args[0], "#"); ok {
-			msg, err := getMessageByIndex(idxArg, history)
-			if err != nil {
-				return CommandResult{Error: err}
-			}
-			return CommandResult{Output: msg}
-		}
-
-		switch args[0] {
-		case "":
-			msg := history.GetLast().Content
-			return CommandResult{Output: msg}
-		case "all":
-			conversation := output.FormatConversation(history.Get(), true)
-			return CommandResult{Output: conversation}
-		case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
-			msg, found := history.GetLastRole(args[0])
-			if found {
-				return CommandResult{Output: msg.Content}
-			}
-			return CommandResult{Warn: fmt.Sprintf("No element for role %q found.", args)}
-		default:
-			return CommandResult{Error: fmt.Errorf("unknown argument")}
-		}
+		return handleMessageCommand(args, history)
+	case "chat":
+		return handleChatCommand(args, history, sessions)
 	case "copy":
-		payload, err := resolveCopyPayload(args[0], history)
-		if err != nil {
-			return CommandResult{Error: fmt.Errorf("copy message failed: %w", err)}
-		}
-		if payload.Text == "" {
-			return CommandResult{Warn: payload.Info}
-		}
-		if err := clipb.WriteClipboard(payload.Text); err != nil {
-			return CommandResult{Error: err}
-		}
-		return CommandResult{Info: payload.Info}
+		return handleCopyCommand(args[0], history)
 	case "paste":
 		tpl, err := config.GetTemplate(args[0])
 		if err != nil {

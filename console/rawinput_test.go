@@ -119,18 +119,22 @@ func captureOutput(f func()) string {
 	return buf.String()
 }
 
-func TestUpdateCurrentLine(t *testing.T) {
+func TestUpdateCurrentLineWithPrompt(t *testing.T) {
+	prompt := "test> "
 	out := captureOutput(func() {
-		updateCurrentLine([]rune("Hello"), true, 5)
+		updateCurrentLineWithPrompt([]rune("Hello"), true, 5, prompt)
 	})
-	if !strings.Contains(out, ">>> Hello") {
+	if !strings.Contains(out, prompt+"Hello") {
 		t.Errorf("expected prompt + text, got %q", out)
 	}
 
 	out = captureOutput(func() {
-		updateCurrentLine([]rune("World"), false, 3)
+		updateCurrentLineWithPrompt([]rune("World"), false, 3, prompt)
 	})
 	if !strings.Contains(out, "World") {
 		t.Errorf("expected text without prompt, got %q", out)
+	}
+	if strings.Contains(out, prompt) {
+		t.Errorf("unexpected prompt for non-first line, got %q", out)
 	}
 }

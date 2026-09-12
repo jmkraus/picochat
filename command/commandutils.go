@@ -9,14 +9,8 @@ import (
 	"picochat/output"
 	"picochat/utils"
 	"picochat/vartypes"
-	"regexp"
 	"strings"
 )
-
-type copyPayload struct {
-	Text string
-	Info string
-}
 
 // parseKeyVal parses a string of the form "key=value" and returns
 // the canonical lowercase JSON key, converted value, and error. User input
@@ -203,117 +197,4 @@ func askConfirmation(question string, input io.Reader) (bool, error) {
 	}
 
 	return converted.(bool), nil
-}
-
-// extractCodeBlock extracts the first code block from a string
-// formatted with triple backticks.
-//
-// Parameters:
-//
-//	s (string) - the input string containing code blocks.
-//
-// Returns:
-//
-//	string - the extracted code block content.
-//	bool   - true if a code block was found, false otherwise.
-func extractCodeBlock(s string) (string, bool) {
-	re := regexp.MustCompile("(?s)```\\w*\\n(.*?)```")
-	match := re.FindStringSubmatch(s)
-	if len(match) >= 2 {
-		return match[1], true
-	}
-	return "", false
-}
-
-// encloseThinkingTags adds tags around a given string to
-// identify it as the reasoning part of the text
-//
-// Parameters:
-//
-//	s (string) - the string to be tagged
-//
-// Returns:
-//
-//	string - the tagged text
-func encloseThinkingTags(s string) string {
-	return fmt.Sprintf("<think>\n%s\n</think>\n\n", s)
-}
-
-// resolveCopyPayload determines which text should be copied based on the given
-// /copy arguments and returns the text plus the corresponding status info.
-//
-// Parameters:
-//
-//	args (string) - argument passed to the /copy command (e.g. "#3", "assistant", "code")
-//	history (*messages.ChatHistory) - chat history used as source for message lookup
-//
-// Returns:
-//
-//	copyPayload - resolved text and info message for clipboard handling
-//	error       - error if argument is invalid or index lookup fails
-func resolveCopyPayload(args string, history *messages.ChatHistory) (copyPayload, error) {
-	nothing := "Nothing to copy."
-	if indexStr, ok := strings.CutPrefix(args, "#"); ok {
-		index, err := parseIndex(indexStr)
-		if err != nil {
-			return copyPayload{}, err
-		}
-		msg, err := history.GetByIndex(index)
-		if err != nil {
-			return copyPayload{}, err
-		}
-		return copyPayload{
-			Text: msg.Content,
-			Info: fmt.Sprintf("Message #%d copied to clipboard.", index),
-		}, nil
-	}
-
-	if args == "" {
-		args = messages.RoleAssistant
-	}
-
-	switch args {
-	case messages.RoleAssistant, messages.RoleUser, messages.RoleSystem:
-		lastMessage, found := history.GetLastRole(args)
-		if !found || lastMessage.Content == "" {
-			return copyPayload{Info: nothing}, nil
-		}
-		return copyPayload{
-			Text: lastMessage.Content,
-			Info: fmt.Sprintf("Last %s prompt copied to clipboard.", args),
-		}, nil
-
-	case "all":
-		conversation := output.FormatConversation(history.Get(), false)
-		return copyPayload{
-			Text: conversation,
-			Info: "Full conversation copied to clipboard.",
-		}, nil
-	case "think":
-		lastMessage, found := history.GetLastRole(messages.RoleAssistant)
-		if !found || (lastMessage.Content == "" && lastMessage.Reasoning == "") {
-			return copyPayload{Info: nothing}, nil
-		}
-		return copyPayload{
-			Text: encloseThinkingTags(lastMessage.Reasoning) + lastMessage.Content,
-			Info: "Last assistant prompt (with thinking) copied to clipboard.",
-		}, nil
-
-	case "code":
-		lastMessage, found := history.GetLastRole(messages.RoleAssistant)
-		if !found || lastMessage.Content == "" {
-			return copyPayload{Info: nothing}, nil
-		}
-		codeBlock, found := extractCodeBlock(lastMessage.Content)
-		if !found {
-			return copyPayload{Info: nothing}, nil
-		}
-		return copyPayload{
-			Text: codeBlock,
-			Info: "First code block copied to clipboard.",
-		}, nil
-
-	default:
-		return copyPayload{}, fmt.Errorf("unknown copy argument")
-	}
 }

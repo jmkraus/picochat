@@ -2,7 +2,6 @@ package console
 
 // Constants
 const (
-	Prompt     string = ">>> "
 	ShadowText string = Gray256 + "Send a message (/? for help)" + ColorReset
 	InfoPrefix string = Green + Bold + "✓" + ColorReset
 	WarnPrefix string = BrightYellow + Bold + "!" + ColorReset
@@ -74,6 +73,8 @@ const (
 	Bold        string = "\033[1m"
 	Italics     string = "\033[3m"
 	BoldItalics string = "\033[1;3m"
+	InvertOn    string = "\033[7m"
+	InvertOff   string = "\033[27m"
 
 	// Reset
 	ColorReset string = "\033[0m"

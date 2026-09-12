@@ -20,32 +20,16 @@ type InputResult struct {
 	Error     error
 }
 
-// PromptWidth returns the width of the predefined prompt symbols
-// as correct runewidth calculation.
-//
-// Pramaters:
-//
-//	none
-//
-// Returns:
-//
-//	int - the width of the symbols
-func PromptWidth() int {
-	return runewidth.StringWidth(Prompt)
-}
-
-// ReadMultilineInput reads multiline input from stdin. It handles raw mode,
-// ape sequences, command detection, and returns an InputResult containing
-// the entered text, flags for EOF, Aborted, IsCommand, and any error.
+// ReadMultilineInputWithPrompt reads multiline input using the supplied numbered prompt.
 //
 // Parameters:
 //
-//	none
+//	prompt (String) - the numbered prompt
 //
 // Returns:
 //
-//	InputResult - A structure containing entered text and specific states
-func ReadMultilineInput() InputResult {
+//	InputResult - a struct with the result of the raw input
+func ReadMultilineInputWithPrompt(prompt string) InputResult {
 	in := os.Stdin
 	fd := int(in.Fd())
 	if !term.IsTerminal(fd) {
@@ -86,7 +70,7 @@ func ReadMultilineInput() InputResult {
 		switch r {
 		case 3: // Ctrl+C
 			if firstLine {
-				fmt.Print(ClearLine + Prompt)
+				fmt.Print(ClearLine + prompt)
 			}
 			return InputResult{Aborted: true}
 
@@ -105,7 +89,7 @@ func ReadMultilineInput() InputResult {
 			if err != nil || len(peekBuf) < 2 {
 				// Plain  → abort immediately
 				if firstLine {
-					fmt.Print(ClearLine + Prompt)
+					fmt.Print(ClearLine + prompt)
 				}
 				return InputResult{Aborted: true}
 			}
@@ -126,7 +110,7 @@ func ReadMultilineInput() InputResult {
 					if cmd := PrevCommand(); cmd != "" {
 						currentLine = []rune(cmd)
 						cursorPos = len(currentLine)
-						updateCurrentLine(currentLine, true, cursorPos)
+						updateCurrentLineWithPrompt(currentLine, true, cursorPos, prompt)
 					}
 				}
 				continue
@@ -134,7 +118,7 @@ func ReadMultilineInput() InputResult {
 				if firstLine {
 					currentLine = []rune(NextCommand())
 					cursorPos = len(currentLine)
-					updateCurrentLine(currentLine, true, cursorPos)
+					updateCurrentLineWithPrompt(currentLine, true, cursorPos, prompt)
 				}
 				continue
 			case 'C': // Right
@@ -162,7 +146,7 @@ func ReadMultilineInput() InputResult {
 		case 127: // Backspace
 			if cursorPos > 0 {
 				currentLine, cursorPos = deleteCharAt(currentLine, cursorPos)
-				updateCurrentLine(currentLine, firstLine, cursorPos)
+				updateCurrentLineWithPrompt(currentLine, firstLine, cursorPos, prompt)
 			}
 		case 13, 10: // Enter
 			line := string(currentLine)
@@ -175,7 +159,7 @@ func ReadMultilineInput() InputResult {
 
 			// first line is empty
 			if firstLine && len(trimLine) == 0 {
-				fmt.Print(ClearLine + Prompt)
+				fmt.Print(ClearLine + prompt)
 			}
 
 			lines = append(lines, line)
@@ -184,7 +168,7 @@ func ReadMultilineInput() InputResult {
 			fmt.Print("\r\n") // Println not sufficient here
 		default:
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(r))
-			updateCurrentLine(currentLine, firstLine, cursorPos)
+			updateCurrentLineWithPrompt(currentLine, firstLine, cursorPos, prompt)
 
 			// A simple approach for word wrap at terminal windows width
 			lineLength := getTerminalWidth(fd) - 1
@@ -193,12 +177,12 @@ func ReadMultilineInput() InputResult {
 			}
 			if visualWidth(currentLine, cursorPos) >= lineLength {
 				previousLine, nextLine := determineLineBreak(currentLine)
-				updateCurrentLine(previousLine, firstLine, len(previousLine))
+				updateCurrentLineWithPrompt(previousLine, firstLine, len(previousLine), prompt)
 				lines = append(lines, string(previousLine))
 				currentLine = nextLine
 				cursorPos = len(nextLine)
 				fmt.Println()
-				updateCurrentLine(currentLine, false, cursorPos)
+				updateCurrentLineWithPrompt(currentLine, false, cursorPos, prompt)
 			}
 		}
 	}
@@ -315,25 +299,26 @@ func insertCharAt(line []rune, cursorPos int, char rune) ([]rune, int) {
 //
 //	line ([]rune)    - the current line to be drawn
 //	firstLine (bool) - is the line the first line (true / false)
-//	cursorPos        - the cursor position for the redraw
+//	cursorPos (int)  - the cursor position for the redraw
+//	prompt (String)  - the numbered prompt
 //
 // Returns:
 //
 //	none
-func updateCurrentLine(line []rune, firstLine bool, cursorPos int) {
+func updateCurrentLineWithPrompt(line []rune, firstLine bool, cursorPos int, prompt string) {
 	fmt.Print(ClearLine)
 
 	prefix := ""
 	prefixWidth := 0
 	if firstLine {
-		prefix = Prompt
+		prefix = prompt
 		prefixWidth = PromptWidth()
 	}
 
 	visualPos := visualWidth(line, cursorPos)
 
 	if firstLine && len(line) == 0 {
-		fmt.Print(Prompt + ShadowText)
+		fmt.Print(prefix + ShadowText)
 	} else {
 		fmt.Print(prefix + string(line))
 	}

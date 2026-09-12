@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"picochat/envs"
-	"picochat/messages"
 	"picochat/vartypes"
 	"reflect"
 	"strings"
@@ -145,80 +144,6 @@ func TestParseIndex_Invalid(t *testing.T) {
 		t.Fatal("expected error, got nil")
 	}
 	if got, want := err.Error(), "value not an integer"; got != want {
-		t.Fatalf("expected %q, got %q", want, got)
-	}
-}
-
-func TestResolveCopyPayload_DefaultAssistant(t *testing.T) {
-	h := messages.NewHistory("sys", 10)
-	if err := h.AddAssistant("", "assistant answer"); err != nil {
-		t.Fatalf("failed to add assistant message: %v", err)
-	}
-
-	payload, err := resolveCopyPayload("", h)
-	if err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
-	if got, want := payload.Text, "assistant answer"; got != want {
-		t.Fatalf("expected %q, got %q", want, got)
-	}
-	if got, want := payload.Info, "Last assistant prompt copied to clipboard."; got != want {
-		t.Fatalf("expected %q, got %q", want, got)
-	}
-}
-
-func TestResolveCopyPayload_ByIndex(t *testing.T) {
-	h := messages.NewHistory("sys", 10)
-	if err := h.AddUser("hello", ""); err != nil {
-		t.Fatalf("failed to add user message: %v", err)
-	}
-
-	payload, err := resolveCopyPayload("#1", h)
-	if err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
-	if got, want := payload.Info, "Message #1 copied to clipboard."; got != want {
-		t.Fatalf("expected %q, got %q", want, got)
-	}
-	if got, want := payload.Text, "hello"; got != want {
-		t.Fatalf("expected %q, got %q", want, got)
-	}
-}
-
-func TestResolveCopyPayload_All(t *testing.T) {
-	h := messages.NewHistory("system prompt", 10)
-	if err := h.AddUser("user message", ""); err != nil {
-		t.Fatalf("failed to add user message: %v", err)
-	}
-	if err := h.AddAssistant("internal reasoning", "assistant response"); err != nil {
-		t.Fatalf("failed to add assistant message: %v", err)
-	}
-
-	payload, err := resolveCopyPayload("all", h)
-	if err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
-
-	wantText := "(0:system)\nsystem prompt\n\n(1:user)\nuser message\n\n(2:assistant)\nassistant response"
-	if payload.Text != wantText {
-		t.Errorf("payload text = %q, want %q", payload.Text, wantText)
-	}
-	if strings.Contains(payload.Text, "\x1b[") {
-		t.Errorf("payload text contains ANSI escape sequence: %q", payload.Text)
-	}
-	if got, want := payload.Info, "Full conversation copied to clipboard."; got != want {
-		t.Errorf("payload info = %q, want %q", got, want)
-	}
-}
-
-func TestResolveCopyPayload_UnknownArg(t *testing.T) {
-	h := messages.NewHistory("sys", 10)
-
-	_, err := resolveCopyPayload("invalid", h)
-	if err == nil {
-		t.Fatal("expected error, got nil")
-	}
-	if got, want := err.Error(), "unknown copy argument"; got != want {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
 }

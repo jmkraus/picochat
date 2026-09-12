@@ -82,7 +82,7 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 | `/save`        | Save current chat history to file                 |
 | `/models`      | List downloaded models (and switch models)        |
 | `/clear`       | Clear chat history (retaining system prompt)      |
-| `/set`         | Set session variables (`key=value`)               |
+| `/set`         | Set configuration variables (`key=value`)         |
 | `/image`       | Set image file path                               |
 | `/retry`       | Resend chat history excluding last answer         |
 | `/bye`         | Quit PicoChat                                     |
@@ -115,8 +115,8 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 - With index: switches model from cached model list.
 
 `/set <key=value>`:
-- Without argument: shows current configurable session values.
-- With argument: changes runtime setting for current session only.
+- Without argument: shows current configurable values.
+- With argument: changes runtime setting without altering the config file.
 
 `/message <role>`, `/message #<index>`, `/message all`:
 - Without argument: shows latest message.
