@@ -23,6 +23,16 @@ func TestPrettyPrint(t *testing.T) {
 		}
 	})
 
+	t.Run("input without opening brace does not panic", func(t *testing.T) {
+		_, err := PrettyPrint("not json")
+		if err == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "opening bracket not found") {
+			t.Fatalf("error = %q, want to contain %q", err.Error(), "opening bracket not found")
+		}
+	})
+
 	t.Run("formats object", func(t *testing.T) {
 		got, err := PrettyPrint("{\"a\":1,\"b\":true}")
 		if err != nil {
@@ -33,6 +43,17 @@ func TestPrettyPrint(t *testing.T) {
 		}
 		if !strings.Contains(got, "\"a\"") || !strings.Contains(got, "\"b\"") {
 			t.Fatalf("unexpected formatted json: %q", got)
+		}
+	})
+
+	t.Run("removes text before json object", func(t *testing.T) {
+		got, err := PrettyPrint("Here is the response:\n```json\n{\"a\":1}")
+		if err != nil {
+			t.Fatalf("PrettyPrint returned error: %v", err)
+		}
+		want := "{\n  \"a\": 1\n}"
+		if got != want {
+			t.Fatalf("PrettyPrint returned %q, want %q", got, want)
 		}
 	})
 }
@@ -75,6 +96,16 @@ func TestValidateJSON(t *testing.T) {
 		}
 	})
 
+	t.Run("input without opening brace does not panic", func(t *testing.T) {
+		err := ValidateJSON(schema, "not json")
+		if err == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "opening bracket not found") {
+			t.Fatalf("error = %q, want to contain %q", err.Error(), "opening bracket not found")
+		}
+	})
+
 	t.Run("trailing data", func(t *testing.T) {
 		err := ValidateJSON(schema, `{"a":1} trailing`)
 		if err == nil {
@@ -88,6 +119,12 @@ func TestValidateJSON(t *testing.T) {
 	t.Run("valid instance passes", func(t *testing.T) {
 		if err := ValidateJSON(schema, `{"a":1}`); err != nil {
 			t.Fatalf("expected no error, got %v", err)
+		}
+	})
+
+	t.Run("removes text before json object", func(t *testing.T) {
+		if err := ValidateJSON(schema, "The model says:\n```json\n{\"a\":1}"); err != nil {
+			t.Fatalf("expected no error for json preceded by text, got %v", err)
 		}
 	})
 

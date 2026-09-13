@@ -28,7 +28,11 @@ func PrettyPrint(jsonStr string) (string, error) {
 	if jsonStr == "" {
 		return "", fmt.Errorf("json string is empty")
 	}
-	jsonStr = jsonStr[strings.Index(jsonStr, "{"):]
+	index := strings.Index(jsonStr, "{")
+	if index < 0 {
+		return "", fmt.Errorf("invalid json - opening bracket not found")
+	}
+	jsonStr = jsonStr[index:]
 
 	var buf bytes.Buffer
 	if err := json.Indent(&buf, []byte(jsonStr), "", "  "); err != nil {
@@ -55,7 +59,11 @@ func ValidateJSON(schemaMap map[string]any, jsonStr string) error {
 	if jsonStr == "" {
 		return fmt.Errorf("json string is empty")
 	}
-	jsonStr = jsonStr[strings.Index(jsonStr, "{"):]
+	index := strings.Index(jsonStr, "{")
+	if index < 0 {
+		return fmt.Errorf("invalid json - opening bracket not found")
+	}
+	jsonStr = jsonStr[index:]
 
 	resolved := resolvedSchema
 
