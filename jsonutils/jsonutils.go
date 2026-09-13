@@ -13,6 +13,29 @@ var (
 	resolvedSchema *jsonschema.Resolved
 )
 
+// sanityCheck trims whitespace, removes text before the first opening brace,
+// and rejects empty input or input without an opening brace.
+//
+// Parameters:
+//
+//	jsonStr (string) - the JSON as a single or multiline string
+//
+// Returns:
+//
+//	string - the trimmed JSON
+//	error  - error if any
+func sanityCheck(jsonStr string) (string, error) {
+	jsonStr = strings.TrimSpace(jsonStr)
+	if jsonStr == "" {
+		return "", fmt.Errorf("json string is empty")
+	}
+	index := strings.Index(jsonStr, "{")
+	if index < 0 {
+		return "", fmt.Errorf("invalid json - opening bracket not found")
+	}
+	return jsonStr[index:], nil
+}
+
 // PrettyPrint reformats a JSON string representation into pretty style.
 //
 // Parameters:
@@ -24,15 +47,10 @@ var (
 //	string - the formatted JSON
 //	error  - error if any
 func PrettyPrint(jsonStr string) (string, error) {
-	jsonStr = strings.TrimSpace(jsonStr)
-	if jsonStr == "" {
-		return "", fmt.Errorf("json string is empty")
+	jsonStr, err := sanityCheck(jsonStr)
+	if err != nil {
+		return "", err
 	}
-	index := strings.Index(jsonStr, "{")
-	if index < 0 {
-		return "", fmt.Errorf("invalid json - opening bracket not found")
-	}
-	jsonStr = jsonStr[index:]
 
 	var buf bytes.Buffer
 	if err := json.Indent(&buf, []byte(jsonStr), "", "  "); err != nil {
@@ -55,15 +73,10 @@ func ValidateJSON(schemaMap map[string]any, jsonStr string) error {
 	if len(schemaMap) == 0 {
 		return fmt.Errorf("schema definition is empty")
 	}
-	jsonStr = strings.TrimSpace(jsonStr)
-	if jsonStr == "" {
-		return fmt.Errorf("json string is empty")
+	jsonStr, err := sanityCheck(jsonStr)
+	if err != nil {
+		return err
 	}
-	index := strings.Index(jsonStr, "{")
-	if index < 0 {
-		return fmt.Errorf("invalid json - opening bracket not found")
-	}
-	jsonStr = jsonStr[index:]
 
 	resolved := resolvedSchema
 
