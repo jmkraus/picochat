@@ -75,6 +75,7 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 | `[Up]/[Down]`  | Browse prompt history (commands only)             |
 | `/copy`, `/c`  | Copy selected answer to clipboard                 |
 | `/paste`, `/v` | Paste clipboard content as user input and send    |
+| `/chat`        | List and switch chat sessions                     |
 | `/info`        | Show system information                           |
 | `/trim`        | Remove all elements after given index             |
 | `/message`     | Show message(s) from chat history                 |
@@ -97,6 +98,13 @@ NOTE: The `-quiet` flag is intended for pipeline and scripting use and should no
 
 `/save <filename>`:
 - Without argument: uses a timestamp filename (for example `2025-05-11_20-26-32.chat`).
+
+`/chat`, `/chat new`, `/chat <number>`, `/chat copy`, `/chat copy <index>`: 
+- Without argument: lists current sessions.
+- `new`: creates a new chat session.
+- Number: switches to the chat session by number.
+- `copy`: copies the current chat to a new session.
+- Index: copies the chat up to the message with specific index.
 
 `/copy`, `/copy code`, `/copy think`, `/copy #<index>`, `/copy <role>`, `/copy all`:
 - Without argument: copies latest assistant content.
