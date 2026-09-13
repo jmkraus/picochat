@@ -5,6 +5,73 @@ import (
 	"testing"
 )
 
+func TestSanityCheck(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    string
+		wantErr string
+	}{
+		{
+			name:    "empty input",
+			input:   "",
+			wantErr: "json string is empty",
+		},
+		{
+			name:    "whitespace only",
+			input:   " \n\t ",
+			wantErr: "json string is empty",
+		},
+		{
+			name:    "opening brace not found",
+			input:   "not json",
+			wantErr: "invalid json - opening bracket not found",
+		},
+		{
+			name:  "trims surrounding whitespace",
+			input: " \n {\"a\":1} \n ",
+			want:  "{\"a\":1}",
+		},
+		{
+			name:  "removes text before opening brace",
+			input: "Here is the response:\n```json\n{\"a\":1}",
+			want:  "{\"a\":1}",
+		},
+		{
+			name:  "preserves trailing text",
+			input: "{\"a\":1} trailing",
+			want:  "{\"a\":1} trailing",
+		},
+		{
+			name:  "uses first opening brace",
+			input: "prefix {\"a\":{\"b\":2}}",
+			want:  "{\"a\":{\"b\":2}}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := sanityCheck(tt.input)
+			if tt.wantErr != "" {
+				if err == nil {
+					t.Fatalf("sanityCheck(%q) returned nil error, want %q", tt.input, tt.wantErr)
+				}
+				if err.Error() != tt.wantErr {
+					t.Fatalf("sanityCheck(%q) error = %q, want %q", tt.input, err.Error(), tt.wantErr)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("sanityCheck(%q) returned error: %v", tt.input, err)
+			}
+			if got != tt.want {
+				t.Fatalf("sanityCheck(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestPrettyPrint(t *testing.T) {
 	t.Run("empty input", func(t *testing.T) {
 		_, err := PrettyPrint("   ")
