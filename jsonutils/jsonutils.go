@@ -104,7 +104,7 @@ func ValidateJSON(schemaMap map[string]any, jsonStr string) error {
 		return fmt.Errorf("invalid json: %w", err)
 	}
 	if dec.More() {
-		return fmt.Errorf("invalid json: trailing data")
+		return fmt.Errorf("invalid json - trailing data")
 	}
 
 	return resolved.Validate(instance)
