@@ -327,3 +327,33 @@ func TestGetRuntimeConfigValues(t *testing.T) {
 		}
 	})
 }
+
+func TestConfig_IsStructuredBackend(t *testing.T) {
+	tests := []struct {
+		name    string
+		backend string
+		want    bool
+	}{
+		{name: "ollama", backend: "ollama", want: true},
+		{name: "responses", backend: "responses", want: true},
+		{name: "openai", backend: "openai", want: true},
+		{name: "case and whitespace", backend: " Responses ", want: true},
+		{name: "unsupported backend", backend: "unknown", want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &Config{Backend: tt.backend}
+			if got := cfg.IsStructuredBackend(); got != tt.want {
+				t.Fatalf("IsStructuredBackend() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+
+	t.Run("nil receiver", func(t *testing.T) {
+		var cfg *Config
+		if cfg.IsStructuredBackend() {
+			t.Fatal("IsStructuredBackend() = true, want false")
+		}
+	})
+}

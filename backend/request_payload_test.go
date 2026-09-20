@@ -93,19 +93,32 @@ func TestOpenAIChatCompletions_RequestPayload(t *testing.T) {
 		name        string
 		temperature *float64
 		topP        *float64
+		format      map[string]any
 		wantTemp    bool
 		wantTopP    bool
+		wantFormat  bool
 	}{
 		{
-			name:     "omit sampling when unset",
-			wantTemp: false,
-			wantTopP: false,
+			name:       "omit sampling and response format when unset",
+			wantTemp:   false,
+			wantTopP:   false,
+			wantFormat: false,
 		},
 		{
-			name:     "include only top_p",
-			topP:     fptr(0.8),
-			wantTemp: false,
-			wantTopP: true,
+			name:       "include only top_p",
+			topP:       fptr(0.8),
+			wantTemp:   false,
+			wantTopP:   true,
+			wantFormat: false,
+		},
+		{
+			name: "include json schema response format",
+			format: map[string]any{
+				"type":       "object",
+				"properties": map[string]any{"answer": map[string]any{"type": "string"}},
+				"required":   []any{"answer"},
+			},
+			wantFormat: true,
 		},
 	}
 
@@ -137,6 +150,7 @@ func TestOpenAIChatCompletions_RequestPayload(t *testing.T) {
 				Messages:    []messages.Message{{Role: messages.RoleUser, Content: "hi"}},
 				Temperature: tt.temperature,
 				TopP:        tt.topP,
+				Format:      tt.format,
 			}, nil)
 			if err != nil {
 				t.Fatalf("ChatStream failed: %v", err)
@@ -156,6 +170,27 @@ func TestOpenAIChatCompletions_RequestPayload(t *testing.T) {
 			_, hasTopP := gotBody["top_p"]
 			if hasTopP != tt.wantTopP {
 				t.Fatalf("top_p present = %v, want %v", hasTopP, tt.wantTopP)
+			}
+
+			responseFormat, hasFormat := gotBody["response_format"].(map[string]any)
+			if hasFormat != tt.wantFormat {
+				t.Fatalf("response_format present = %v, want %v", hasFormat, tt.wantFormat)
+			}
+			if !tt.wantFormat {
+				return
+			}
+			if responseFormat["type"] != "json_schema" {
+				t.Fatalf("response_format type = %v, want json_schema", responseFormat["type"])
+			}
+			jsonSchema, ok := responseFormat["json_schema"].(map[string]any)
+			if !ok {
+				t.Fatalf("json_schema block missing")
+			}
+			if jsonSchema["name"] != "user" || jsonSchema["strict"] != false {
+				t.Fatalf("unexpected json_schema metadata: %+v", jsonSchema)
+			}
+			if _, ok := jsonSchema["schema"].(map[string]any); !ok {
+				t.Fatalf("schema missing from json_schema block")
 			}
 		})
 	}

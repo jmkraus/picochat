@@ -47,7 +47,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 	firstToken := true
 	firstContent := true
 	streamPlain := cfg.OutputFmt == "plain"
-	structured := cfg.Backend == "ollama" && cfg.HasSchema()
+	structured := cfg.IsStructuredBackend() && cfg.HasSchema()
 
 	client := backend.New(cfg)
 	_, err = client.ChatStream(backend.ChatInput{

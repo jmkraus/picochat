@@ -13,11 +13,23 @@ type openAIClient struct {
 }
 
 type openAIChatCompletionsRequest struct {
-	Model       string              `json:"model"`
-	Messages    []openAIChatMessage `json:"messages"`
-	Stream      bool                `json:"stream"`
-	Temperature *float64            `json:"temperature,omitempty"`
-	TopP        *float64            `json:"top_p,omitempty"`
+	Model          string                `json:"model"`
+	Messages       []openAIChatMessage   `json:"messages"`
+	Stream         bool                  `json:"stream"`
+	Temperature    *float64              `json:"temperature,omitempty"`
+	TopP           *float64              `json:"top_p,omitempty"`
+	ResponseFormat *openAIResponseFormat `json:"response_format,omitempty"`
+}
+
+type openAIResponseFormat struct {
+	Type       string                  `json:"type"`
+	JSONSchema *openAIJSONSchemaFormat `json:"json_schema,omitempty"`
+}
+
+type openAIJSONSchemaFormat struct {
+	Name   string         `json:"name"`
+	Schema map[string]any `json:"schema"`
+	Strict bool           `json:"strict"`
 }
 
 type openAIChatMessage struct {
@@ -49,11 +61,12 @@ type openAIStreamEvent struct {
 //	error     - error if request/stream handling fails
 func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error) (ChatFinal, error) {
 	payload := openAIChatCompletionsRequest{
-		Model:       input.Model,
-		Messages:    mapMessagesToOpenAIChatMessages(input.Messages),
-		Stream:      true,
-		Temperature: input.Temperature,
-		TopP:        input.TopP,
+		Model:          input.Model,
+		Messages:       mapMessagesToOpenAIChatMessages(input.Messages),
+		Stream:         true,
+		Temperature:    input.Temperature,
+		TopP:           input.TopP,
+		ResponseFormat: buildOpenAIResponseFormat(input.Format),
 	}
 
 	return postStreamingJSON(
@@ -64,6 +77,31 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 		parseOpenAIChatCompletionEvent,
 		onChunk,
 	)
+}
+
+// buildOpenAIResponseFormat builds the Chat Completions response_format payload
+// for either plain text or structured JSON schema output.
+//
+// Parameters:
+//
+//	schema (map[string]any) - optional schema definition
+//
+// Returns:
+//
+//	*openAIResponseFormat - formatted response format, or nil without a schema
+func buildOpenAIResponseFormat(schema map[string]any) *openAIResponseFormat {
+	if len(schema) == 0 {
+		return nil
+	}
+
+	return &openAIResponseFormat{
+		Type: "json_schema",
+		JSONSchema: &openAIJSONSchemaFormat{
+			Name:   "user",
+			Schema: schema,
+			Strict: false,
+		},
+	}
 }
 
 // GetAvailableModels fetches models from the OpenAI-compatible models endpoint.

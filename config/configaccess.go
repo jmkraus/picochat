@@ -6,6 +6,7 @@ import (
 	"picochat/envs"
 	"picochat/vartypes"
 	"reflect"
+	"strings"
 )
 
 // applyConfigValue updates a specific config element.
@@ -183,6 +184,28 @@ func (c *Config) GetRuntimeConfigValues() ([]string, error) {
 	}
 
 	return result, nil
+}
+
+// IsStructuredBackend checks if the configured backend supports structured JSON output.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	bool - true or false
+func (c *Config) IsStructuredBackend() bool {
+	if c == nil {
+		return false
+	}
+
+	switch strings.ToLower(strings.TrimSpace(c.Backend)) {
+	case "ollama", "responses", "openai":
+		return true
+	default:
+		return false
+	}
 }
 
 // formatOptionalFloat checks if config val is set or returns a default msg.
