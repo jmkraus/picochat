@@ -6,11 +6,43 @@ import (
 	"slices"
 
 	"fmt"
+	"picochat/config"
 	"picochat/messages"
 	"picochat/paths"
 	"strings"
 	"testing"
 )
+
+func TestHandleCommand_Image_ExpandsHomeDir(t *testing.T) {
+	homeDir := t.TempDir()
+	t.Setenv("HOME", homeDir)
+
+	imageDir := filepath.Join(homeDir, "images")
+	if err := os.MkdirAll(imageDir, 0755); err != nil {
+		t.Fatalf("create image directory failed: %v", err)
+	}
+	imagePath := filepath.Join(imageDir, "myfile.jpg")
+	if err := os.WriteFile(imagePath, []byte("image data"), 0644); err != nil {
+		t.Fatalf("write image file failed: %v", err)
+	}
+
+	cfg, _, err := config.Get()
+	if err != nil {
+		t.Fatalf("get config failed: %v", err)
+	}
+	previousImagePath := cfg.ImagePath
+	t.Cleanup(func() { cfg.ImagePath = previousImagePath })
+
+	history := messages.NewHistory("system prompt", 10)
+	result := HandleCommand("/image ~/images/myfile.jpg", history, nil, strings.NewReader(""))
+
+	if result.Error != nil {
+		t.Fatalf("expected no error, got: %v", result.Error)
+	}
+	if cfg.ImagePath != imagePath {
+		t.Fatalf("image path = %q, want expanded path %q", cfg.ImagePath, imagePath)
+	}
+}
 
 func TestHandleClear(t *testing.T) {
 	h := messages.NewHistory("initial system prompt", 50)
