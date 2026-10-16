@@ -131,10 +131,14 @@ func HandleCommand(commandLine string,
 		if args[0] == "" {
 			return CommandResult{Error: fmt.Errorf("no image file path provided")}
 		}
-		if !paths.FileExists(args[0]) {
+		imagePath, err := paths.ExpandHomeDir(args[0])
+		if err != nil {
+			return CommandResult{Error: fmt.Errorf("expand image path failed: %w", err)}
+		}
+		if !paths.FileExists(imagePath) {
 			return CommandResult{Error: fmt.Errorf("image file not found")}
 		}
-		cfg.ImagePath = args[0]
+		cfg.ImagePath = imagePath
 		return CommandResult{Info: fmt.Sprintf("Image file path set to: %s", cfg.ImagePath)}
 	case "info":
 		serverVersion, err := client.GetServerVersion()

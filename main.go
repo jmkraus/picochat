@@ -169,7 +169,10 @@ func initInstanceFromArgs() (bool, *Instance, []string, error) {
 	}
 
 	if *args.Image != "" {
-		cfg.ImagePath = *args.Image
+		cfg.ImagePath, err = paths.ExpandHomeDir(*args.Image)
+		if err != nil {
+			return false, nil, nil, fmt.Errorf("expand image path failed: %w", err)
+		}
 		if !paths.FileExists(cfg.ImagePath) {
 			return false, nil, nil, fmt.Errorf("image file not found")
 		}
