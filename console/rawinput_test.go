@@ -100,6 +100,33 @@ func TestDetermineLineBreak(t *testing.T) {
 	}
 }
 
+func TestDetermineLineBreakAtWidth(t *testing.T) {
+	tests := []struct {
+		name       string
+		input      string
+		width      int
+		wantBefore string
+		wantAfter  string
+	}{
+		{"break at word boundary", "hello world", 6, "hello", "world"},
+		{"keep long word intact", "helloworld", 5, "helloworld", ""},
+		{"keep wide characters intact", "你好世界", 5, "你好世界", ""},
+		{"keep text intact at narrow width", "abc", 1, "abc", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			before, after := determineLineBreakAtWidth([]rune(tt.input), tt.width)
+			if string(before) != tt.wantBefore {
+				t.Errorf("before = %q, want %q", string(before), tt.wantBefore)
+			}
+			if string(after) != tt.wantAfter {
+				t.Errorf("after = %q, want %q", string(after), tt.wantAfter)
+			}
+		})
+	}
+}
+
 // --- updateCurrentLine ---------------------------------------------
 
 func captureOutput(f func()) string {

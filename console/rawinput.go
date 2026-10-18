@@ -170,13 +170,17 @@ func ReadMultilineInputWithPrompt(prompt string) InputResult {
 			currentLine, cursorPos = insertCharAt(currentLine, cursorPos, rune(r))
 			updateCurrentLineWithPrompt(currentLine, firstLine, cursorPos, prompt)
 
-			// A simple approach for word wrap at terminal windows width
-			lineLength := getTerminalWidth(fd) - 1
+			// Reserve the final terminal column to avoid relying on terminal wrapping.
+			availableWidth := getTerminalWidth(fd) - 1
 			if firstLine {
-				lineLength = lineLength - PromptWidth()
+				availableWidth -= PromptWidth()
 			}
-			if visualWidth(currentLine, cursorPos) >= lineLength {
-				previousLine, nextLine := determineLineBreak(currentLine)
+			if availableWidth < 1 {
+				availableWidth = 1
+			}
+			if cursorPos == len(currentLine) &&
+				visualWidth(currentLine, len(currentLine)) >= availableWidth {
+				previousLine, nextLine := determineLineBreakAtWidth(currentLine, availableWidth)
 				updateCurrentLineWithPrompt(previousLine, firstLine, len(previousLine), prompt)
 				lines = append(lines, string(previousLine))
 				currentLine = nextLine
@@ -226,6 +230,52 @@ func determineLineBreak(currentLine []rune) ([]rune, []rune) {
 	previousLine := currentLine[:end]
 	nextLine := currentLine[start:]
 	return previousLine, nextLine
+}
+
+// determineLineBreakAtWidth splits a line at a word boundary when possible,
+// or hard-wraps it when a word cannot fit within the available width.
+//
+// Parameters:
+//
+//	currentLine ([]rune) - the current line to split
+//	maxWidth (int)       - the maximum visual width of the completed line
+//
+// Returns:
+//
+//	[]rune - completed line
+//	[]rune - remaining line
+func determineLineBreakAtWidth(currentLine []rune, maxWidth int) ([]rune, []rune) {
+	if maxWidth < 1 {
+		return currentLine, nil
+	}
+
+	width := 0
+	lastSpace := -1
+	for i, r := range currentLine {
+		runeWidth := runewidth.RuneWidth(r)
+		if width+runeWidth > maxWidth {
+			break
+		}
+		width += runeWidth
+		if r == ' ' {
+			lastSpace = i
+		}
+	}
+
+	if lastSpace <= 0 || lastSpace >= len(currentLine)-1 {
+		return currentLine, nil
+	}
+
+	end := lastSpace
+	for end > 0 && currentLine[end-1] == ' ' {
+		end--
+	}
+	start := lastSpace + 1
+	for start < len(currentLine) && currentLine[start] == ' ' {
+		start++
+	}
+
+	return currentLine[:end], currentLine[start:]
 }
 
 // deleteCharAt deletes the character at the cursor position in the current line.
