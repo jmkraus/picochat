@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -17,13 +18,37 @@ func TestFormatList_WithBullets(t *testing.T) {
 }
 
 func TestFormatList_WithNumbers(t *testing.T) {
-	items := []string{"model-a", "model-b", "model-c"}
-	expected := "Language models:\n(01) model-a\n(02) model-b\n(03) model-c"
+	tests := []struct {
+		name  string
+		count int
+		width int
+	}{
+		{name: "single digit", count: 9, width: 1},
+		{name: "two digits", count: 10, width: 2},
+		{name: "two digit maximum", count: 99, width: 2},
+		{name: "three digits", count: 100, width: 3},
+	}
 
-	result := FormatList(items, "language models", true)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			items := make([]string, tt.count)
+			for i := range items {
+				items[i] = fmt.Sprintf("model-%d", i+1)
+			}
 
-	if result != expected {
-		t.Errorf("Expected:\n%q\nGot:\n%q", expected, result)
+			result := FormatList(items, "language models", true)
+			lines := strings.Split(result, "\n")
+			if len(lines) != tt.count+1 {
+				t.Fatalf("got %d lines, want %d", len(lines), tt.count+1)
+			}
+
+			for i := 1; i < len(lines); i++ {
+				want := fmt.Sprintf("(%0*d) model-%d", tt.width, i, i)
+				if lines[i] != want {
+					t.Errorf("line %d = %q, want %q", i, lines[i], want)
+				}
+			}
+		})
 	}
 }
 
@@ -53,7 +78,7 @@ func TestListAvailableModels_SingleEntry(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	want := "Language models:\n(01) model-x"
+	want := "Language models:\n(1) model-x"
 	if got != want {
 		t.Fatalf("result = %q, want %q", got, want)
 	}
@@ -90,7 +115,7 @@ func TestListAvailableModels_MultipleEntries_SortsAndIndexes(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
-			want := "Language models:\n(01) " + tt.sorted[0] + "\n(02) " + tt.sorted[1] + "\n(03) " + tt.sorted[2]
+			want := "Language models:\n(1) " + tt.sorted[0] + "\n(2) " + tt.sorted[1] + "\n(3) " + tt.sorted[2]
 			if got != want {
 				t.Fatalf("result = %q, want %q", got, want)
 			}

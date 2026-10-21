@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -47,10 +48,11 @@ func FormatList(content []string, heading string, numbered bool) string {
 		return fmt.Sprintf("No %s found.", strings.ToLower(heading))
 	}
 
+	width := len(strconv.Itoa(len(content)))
 	var lines []string
 	for i, item := range content {
 		if numbered {
-			lines = append(lines, fmt.Sprintf("(%02d) %s", i+1, item))
+			lines = append(lines, fmt.Sprintf("(%0*d) %s", width, i+1, item))
 		} else {
 			lines = append(lines, " - "+item)
 		}

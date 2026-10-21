@@ -31,7 +31,7 @@ func TestListHistoryFiles(t *testing.T) {
 		t.Fatalf("ListHistoryFiles returned error: %v", err)
 	}
 
-	want := "History files:\n(01) a.chat\n(02) z.chat"
+	want := "History files:\n(1) a.chat\n(2) z.chat"
 	if got != want {
 		t.Fatalf("unexpected output\nwant: %q\ngot:  %q", want, got)
 	}
