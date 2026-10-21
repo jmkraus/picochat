@@ -3,8 +3,8 @@ package console
 // Constants
 const (
 	ShadowText string = Gray256 + "Send a message (/? for help)" + ColorReset
-	InfoPrefix string = Green + Bold + "✓" + Regular
-	WarnPrefix string = BrightYellow + Bold + "!" + Regular
+	InfoPrefix string = Bold + "✓" + Regular
+	WarnPrefix string = Bold + "!" + Regular
 	ErrPrefix  string = Bold + "×" + Regular
 )
 
