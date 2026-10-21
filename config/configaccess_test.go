@@ -99,6 +99,23 @@ func TestConfig_applyEnvValues(t *testing.T) {
 		}
 	})
 
+	t.Run("consumes API key environment variable", func(t *testing.T) {
+		t.Setenv("PICOCHAT_API_KEY", "sk-test-token")
+
+		cfg := defaultConfig()
+		if err := cfg.applyEnvValues(); err != nil {
+			t.Fatalf("applyEnvValues returned error: %v", err)
+		}
+
+		if cfg.APIKey != "sk-test-token" {
+			t.Fatalf("APIKey = %q, want %q", cfg.APIKey, "sk-test-token")
+		}
+
+		if _, ok := os.LookupEnv("PICOCHAT_API_KEY"); ok {
+			t.Fatalf("PICOCHAT_API_KEY is still set after applyEnvValues")
+		}
+	})
+
 	t.Run("returns convert error", func(t *testing.T) {
 		restore := setEnv(t, "PICOCHAT_CONTEXT", "not-an-int")
 		defer restore()

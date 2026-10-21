@@ -1,6 +1,7 @@
 package envs
 
 import (
+	"fmt"
 	"os"
 	"picochat/utils"
 	"picochat/vartypes"
@@ -16,13 +17,12 @@ type EnvSpec struct {
 	Field     string
 	JsonField string
 	Runtime   bool
-	Sensitive bool
 }
 
 var ConfigEnvVars = []EnvSpec{
 	{Env: "PICOCHAT_BACKEND", Type: vartypes.VarString, Field: "Backend", JsonField: "backend"},
 	{Env: "PICOCHAT_URL", Type: vartypes.VarString, Field: "Url", JsonField: "url"},
-	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "ApiKey", JsonField: "api_key", Sensitive: true},
+	{Env: "PICOCHAT_API_KEY", Type: vartypes.VarString, Field: "ApiKey", JsonField: "api_key"},
 	{Env: "PICOCHAT_MODEL", Type: vartypes.VarString, Field: "Model", JsonField: "model"},
 	{Env: "PICOCHAT_CONTEXT", Type: vartypes.VarInt, Field: "Context", JsonField: "context", Runtime: true},
 	{Env: "PICOCHAT_TEMPERATURE", Type: vartypes.VarFloat, Field: "Temperature", JsonField: "temperature", Runtime: true},
@@ -57,6 +57,35 @@ func GetEnv(envVar EnvVar) (string, bool) {
 	return os.LookupEnv(string(envVar))
 }
 
+// UnsetApiKeyEnv unsets the environment variable
+// holding an api key (access token) for accessing
+// ai backend systems.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	error - error if any
+func UnsetApiKeyEnv() error {
+	spec, ok := EnvSpecByField("api_key")
+	if !ok {
+		return fmt.Errorf("get env specs failed")
+	}
+
+	_, lookup := GetEnv(spec.Env)
+	if !lookup {
+		return nil
+	}
+
+	if err := os.Unsetenv(string(spec.Env)); err != nil {
+		return fmt.Errorf("unset env var %q: %w", spec.Env, err)
+	}
+
+	return nil
+}
+
 // AllowedRuntimeField checks if the given canonical lowercase JSON field can
 // be set at runtime.
 //
@@ -68,8 +97,8 @@ func GetEnv(envVar EnvVar) (string, bool) {
 //
 //	bool - field can be set at runtime: true or false
 func AllowedRuntimeField(field string) bool {
-	cfg, ok := envSpecByField[field]
-	return ok && cfg.Runtime
+	spec, ok := envSpecByField[field]
+	return ok && spec.Runtime
 }
 
 // EnvSpecByField returns the EnvSpec for a given canonical lowercase JSON field.
@@ -83,8 +112,8 @@ func AllowedRuntimeField(field string) bool {
 //	EnvSpec - metadata for the field
 //	bool    - true if field exists
 func EnvSpecByField(field string) (EnvSpec, bool) {
-	cfg, ok := envSpecByField[field]
-	return cfg, ok
+	spec, ok := envSpecByField[field]
+	return spec, ok
 }
 
 // ListEnvVars builds a table from env var state and values.
@@ -105,9 +134,6 @@ func ListEnvVars() string {
 		set := strconv.FormatBool(lookup)
 		typ := spec.Type.String()
 
-		if lookup && spec.Sensitive && val != "" {
-			val = "[hidden]"
-		}
 		if lookup && val == "" {
 			val = "[empty]"
 		}

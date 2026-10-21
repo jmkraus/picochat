@@ -61,6 +61,12 @@ func (c *Config) applyEnvValues() error {
 			return fmt.Errorf("apply config value for env %s failed: %w", spec.Env, err)
 		}
 	}
+
+	err := envs.UnsetApiKeyEnv()
+	if err != nil {
+		return fmt.Errorf("apply env values failed: %w", err)
+	}
+
 	return nil
 }
 

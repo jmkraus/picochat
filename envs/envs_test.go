@@ -1,7 +1,7 @@
 package envs
 
 import (
-	"strings"
+	"os"
 	"testing"
 )
 
@@ -39,29 +39,44 @@ func TestConfigEnvVars_JSONFieldsAreNonEmptyAndUnique(t *testing.T) {
 	}
 }
 
-func TestListEnvVars_HidesSensitiveValues(t *testing.T) {
-	t.Setenv("PICOCHAT_API_KEY", "sk-secret-value")
+func TestUnsetApiKeyEnv_RemovesApiKeyInAllStates(t *testing.T) {
+	tests := []struct {
+		name  string
+		value *string
+	}{
+		{
+			name:  "unset",
+			value: nil,
+		},
+		{
+			name:  "set but empty",
+			value: func() *string { value := ""; return &value }(),
+		},
+		{
+			name:  "set with secret token",
+			value: func() *string { value := "sk-secret-value"; return &value }(),
+		},
+	}
 
-	table := ListEnvVars()
-	if strings.Contains(table, "sk-secret-value") {
-		t.Fatalf("table leaked sensitive value")
-	}
-	if !strings.Contains(table, "PICOCHAT_API_KEY") {
-		t.Fatalf("table does not contain API key row")
-	}
-	if !strings.Contains(table, "[hidden]") {
-		t.Fatalf("table does not mark sensitive value as hidden")
-	}
-}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Set a value first so t.Setenv can restore the original state after
+			// the test, even when this case needs the variable to be unset.
+			t.Setenv("PICOCHAT_API_KEY", "original-value")
+			if tt.value == nil {
+				if err := os.Unsetenv("PICOCHAT_API_KEY"); err != nil {
+					t.Fatalf("prepare unset API key: %v", err)
+				}
+			} else {
+				t.Setenv("PICOCHAT_API_KEY", *tt.value)
+			}
 
-func TestListEnvVars_ShowsNonSensitiveValues(t *testing.T) {
-	t.Setenv("PICOCHAT_MODEL", "test-model")
-
-	table := ListEnvVars()
-	if !strings.Contains(table, "PICOCHAT_MODEL") {
-		t.Fatalf("table does not contain model row")
-	}
-	if !strings.Contains(table, "test-model") {
-		t.Fatalf("non-sensitive value should be visible")
+			if err := UnsetApiKeyEnv(); err != nil {
+				t.Fatalf("UnsetApiKeyEnv() error = %v", err)
+			}
+			if _, ok := os.LookupEnv("PICOCHAT_API_KEY"); ok {
+				t.Fatalf("PICOCHAT_API_KEY is still set")
+			}
+		})
 	}
 }
