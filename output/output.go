@@ -73,7 +73,7 @@ func RenderResult(w io.Writer, result *chat.ChatResult, outputFmt string, quiet 
 		if !quiet {
 			fmt.Fprintln(w)
 			status := fmt.Sprintf("elapsed: %s · speed: %.1f tok/s", result.Elapsed, result.TokensPS)
-			console.ColorPrintln(console.Yellow, status)
+			console.ColorPrintln(console.Blue, status)
 		}
 		return nil
 

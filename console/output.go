@@ -39,8 +39,9 @@ func Warn(msg string) {
 		return
 	}
 
+	warnMsg := Colorize(Yellow, fmt.Sprintf("%s %s\n", WarnPrefix, msg))
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stderr, "%s %s\n", WarnPrefix, msg)
+	fmt.Fprint(os.Stderr, warnMsg)
 }
 
 // Warns calls the Warn func multiple times for a number of similar warnings.
@@ -79,8 +80,9 @@ func Info(msg string) {
 		return
 	}
 
+	infoMsg := Colorize(Green, fmt.Sprintf("%s %s\n", InfoPrefix, msg))
 	fmt.Print(ClearLine)
-	fmt.Fprintf(os.Stdout, "%s %s\n", InfoPrefix, msg)
+	fmt.Fprint(os.Stdout, infoMsg)
 }
 
 // SetCursorPos places the cursor into the given column
