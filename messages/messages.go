@@ -304,7 +304,7 @@ func (h *ChatHistory) compress() {
 		return
 	}
 
-	if !h.MaxContextReached {
+	if !h.MaxContextReached && max > 3 {
 		fmt.Println()
 		console.Warn(fmt.Sprintf("Context size limit of %d reached.", max))
 		h.MaxContextReached = true

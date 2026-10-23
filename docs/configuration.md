@@ -34,6 +34,7 @@ NOTE: The `Quiet` option is intended for pipeline and scripting use and should n
 
 NOTE: The `Effort` option currently only works when backend mode is set to `ollama`.
 
+NOTE: Setting `Context` to `3` suppresses the warning displayed when the context limit is reached. The history is still compressed normally, retaining the system prompt and the two most recent messages.
 
 ## Environment variables
 
