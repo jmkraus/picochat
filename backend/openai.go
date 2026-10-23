@@ -7,9 +7,17 @@ import (
 	"strings"
 )
 
-type openAIClient struct {
+type openAIBase struct {
 	baseURL string
 	apiKey  string
+}
+
+func (b openAIBase) GetAvailableModels() ([]string, error) {
+	return fetchOpenAIModels(b.baseURL, b.apiKey)
+}
+
+type openAIClient struct {
+	openAIBase
 }
 
 type openAIChatCompletionsRequest struct {
@@ -79,16 +87,8 @@ func (c *openAIClient) ChatStream(input ChatInput, onChunk func(ChatChunk) error
 	)
 }
 
-// buildOpenAIResponseFormat builds the Chat Completions response_format payload
-// for either plain text or structured JSON schema output.
-//
-// Parameters:
-//
-//	schema (map[string]any) - optional schema definition
-//
-// Returns:
-//
-//	*openAIResponseFormat - formatted response format, or nil without a schema
+// buildOpenAIResponseFormat builds the Chat Completions response_format
+// payload, or nil when no schema is provided.
 func buildOpenAIResponseFormat(schema map[string]any) *openAIResponseFormat {
 	if len(schema) == 0 {
 		return nil
@@ -102,20 +102,6 @@ func buildOpenAIResponseFormat(schema map[string]any) *openAIResponseFormat {
 			Strict: false,
 		},
 	}
-}
-
-// GetAvailableModels fetches models from the OpenAI-compatible models endpoint.
-//
-// Parameters:
-//
-//	none
-//
-// Returns:
-//
-//	[]string - list of model IDs
-//	error    - error if request or decoding fails
-func (c *openAIClient) GetAvailableModels() ([]string, error) {
-	return fetchOpenAIModels(c.baseURL, c.apiKey)
 }
 
 // GetServerVersion returns a static descriptor for this backend protocol.
@@ -132,19 +118,8 @@ func (c *openAIClient) GetServerVersion() (string, error) {
 	return "unknown (using OpenAI Chat Completions API)", nil
 }
 
-// parseOpenAIChatCompletionEvent parses one SSE event payload and extracts
-// incremental reasoning/content plus completion state.
-//
-// Parameters:
-//
-//	data (string) - SSE event payload (JSON)
-//
-// Returns:
-//
-//	string - reasoning delta
-//	string - content delta
-//	bool   - done flag
-//	error  - error if decoding fails
+// parseOpenAIChatCompletionEvent extracts reasoning, content, and completion
+// state from a Chat Completions SSE event.
 func parseOpenAIChatCompletionEvent(data string) (thinking, content string, done bool, err error) {
 	var evt openAIStreamEvent
 	if err := json.Unmarshal([]byte(data), &evt); err != nil {
@@ -168,15 +143,7 @@ func parseOpenAIChatCompletionEvent(data string) (thinking, content string, done
 	return thinking, content, done, nil
 }
 
-// mapMessagesToOpenAIChatMessages maps internal messages to chat-completions format.
-//
-// Parameters:
-//
-//	in ([]messages.Message) - internal chat history messages
-//
-// Returns:
-//
-//	[]openAIChatMessage - mapped request messages
+// mapMessagesToOpenAIChatMessages maps internal messages to Chat Completions format.
 func mapMessagesToOpenAIChatMessages(in []messages.Message) []openAIChatMessage {
 	out := make([]openAIChatMessage, 0, len(in))
 	for _, msg := range in {

@@ -144,7 +144,7 @@ func TestOpenAIChatCompletions_RequestPayload(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			c := &openAIClient{baseURL: srv.URL, apiKey: "sk-test"}
+			c := &openAIClient{openAIBase: openAIBase{baseURL: srv.URL, apiKey: "sk-test"}}
 			_, err := c.ChatStream(ChatInput{
 				Model:       "m",
 				Messages:    []messages.Message{{Role: messages.RoleUser, Content: "hi"}},
@@ -244,7 +244,7 @@ func TestResponsesAPI_RequestPayload(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			c := &openAIResponsesClient{baseURL: srv.URL, apiKey: "sk-test"}
+			c := &openAIResponsesClient{openAIBase: openAIBase{baseURL: srv.URL, apiKey: "sk-test"}}
 			_, err := c.ChatStream(ChatInput{
 				Model:    "m",
 				Messages: []messages.Message{{Role: messages.RoleUser, Content: "hi"}},

@@ -9,22 +9,8 @@ import (
 	"strings"
 )
 
-// postStreamingJSON posts a JSON payload to an OpenAI-compatible endpoint and
-// consumes the response as SSE stream.
-//
-// Parameters:
-//
-//	baseURL (string)                - OpenAI-compatible server base URL
-//	apiKey (string)                 - bearer token for authorization
-//	endpoint (string)               - endpoint path without leading slash
-//	payload (any)                   - request payload to marshal as JSON
-//	parse (parseEventFn)            - SSE event parser callback
-//	onChunk (func(ChatChunk) error) - callback for streamed chunks
-//
-// Returns:
-//
-//	ChatFinal - accumulated reasoning and content
-//	error     - error if request/stream handling fails
+// postStreamingJSON posts a JSON payload to an OpenAI-compatible endpoint
+// and consumes the response as an SSE stream.
 func postStreamingJSON(
 	baseURL string,
 	apiKey string,

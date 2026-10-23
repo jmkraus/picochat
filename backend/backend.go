@@ -38,13 +38,17 @@ func New(cfg *config.Config) Client {
 	switch strings.ToLower(strings.TrimSpace(cfg.Backend)) {
 	case "responses":
 		return &openAIResponsesClient{
-			baseURL: baseURL,
-			apiKey:  cfg.APIKey,
+			openAIBase: openAIBase{
+				baseURL: baseURL,
+				apiKey:  cfg.APIKey,
+			},
 		}
 	case "openai":
 		return &openAIClient{
-			baseURL: baseURL,
-			apiKey:  cfg.APIKey,
+			openAIBase: openAIBase{
+				baseURL: baseURL,
+				apiKey:  cfg.APIKey,
+			},
 		}
 	default:
 		return &ollamaClient{

@@ -9,8 +9,7 @@ import (
 )
 
 type openAIResponsesClient struct {
-	baseURL string
-	apiKey  string
+	openAIBase
 }
 
 type responsesRequest struct {
@@ -76,16 +75,8 @@ func (c *openAIResponsesClient) ChatStream(input ChatInput, onChunk func(ChatChu
 	)
 }
 
-// buildResponsesText builds the Responses API text.format payload for either
-// plain text or strict json_schema output.
-//
-// Parameters:
-//
-//	schema (map[string]any) - optional schema definition
-//
-// Returns:
-//
-//	*responsesText - formatted text block for request payload
+// buildResponsesText builds the Responses API text.format payload for plain
+// text or json_schema output.
 func buildResponsesText(schema map[string]any) *responsesText {
 	if len(schema) == 0 {
 		return &responsesText{
@@ -105,20 +96,6 @@ func buildResponsesText(schema map[string]any) *responsesText {
 	}
 }
 
-// GetAvailableModels fetches models from the OpenAI-compatible models endpoint.
-//
-// Parameters:
-//
-//	none
-//
-// Returns:
-//
-//	[]string - list of model IDs
-//	error    - error if request or decoding fails
-func (c *openAIResponsesClient) GetAvailableModels() ([]string, error) {
-	return fetchOpenAIModels(c.baseURL, c.apiKey)
-}
-
 // GetServerVersion returns a static descriptor for this backend protocol.
 //
 // Parameters:
@@ -134,14 +111,6 @@ func (c *openAIResponsesClient) GetServerVersion() (string, error) {
 }
 
 // mapMessagesToResponsesInput maps internal messages to Responses API input items.
-//
-// Parameters:
-//
-//	in ([]messages.Message) - internal chat history messages
-//
-// Returns:
-//
-//	[]responsesInputItem - mapped request input items
 func mapMessagesToResponsesInput(in []messages.Message) []responsesInputItem {
 	out := make([]responsesInputItem, 0, len(in))
 
@@ -175,19 +144,8 @@ func mapMessagesToResponsesInput(in []messages.Message) []responsesInputItem {
 	return out
 }
 
-// parseResponsesEvent parses one SSE event payload and extracts incremental
-// reasoning/content plus completion state.
-//
-// Parameters:
-//
-//	data (string) - SSE event payload (JSON)
-//
-// Returns:
-//
-//	string - reasoning delta
-//	string - content delta
-//	bool   - done flag
-//	error  - error if decoding fails
+// parseResponsesEvent extracts reasoning, content, and completion state from
+// a Responses API SSE event.
 func parseResponsesEvent(data string) (thinking, content string, done bool, err error) {
 	var evt map[string]any
 	if err := json.Unmarshal([]byte(data), &evt); err != nil {

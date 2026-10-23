@@ -107,28 +107,28 @@ func TestChatStream_InputValidationErrors(t *testing.T) {
 	dummyInput := ChatInput{}
 
 	t.Run("openai missing key", func(t *testing.T) {
-		_, err := (&openAIClient{baseURL: "https://api.example.com"}).ChatStream(dummyInput, nil)
+		_, err := (&openAIClient{openAIBase: openAIBase{baseURL: "https://api.example.com"}}).ChatStream(dummyInput, nil)
 		if err == nil || !strings.Contains(err.Error(), "missing OpenAI API key") {
 			t.Fatalf("expected missing key error, got %v", err)
 		}
 	})
 
 	t.Run("openai missing base url", func(t *testing.T) {
-		_, err := (&openAIClient{apiKey: "k"}).ChatStream(dummyInput, nil)
+		_, err := (&openAIClient{openAIBase: openAIBase{apiKey: "k"}}).ChatStream(dummyInput, nil)
 		if err == nil || !strings.Contains(err.Error(), "missing OpenAI base URL") {
 			t.Fatalf("expected missing base url error, got %v", err)
 		}
 	})
 
 	t.Run("responses missing key", func(t *testing.T) {
-		_, err := (&openAIResponsesClient{baseURL: "https://api.example.com"}).ChatStream(dummyInput, nil)
+		_, err := (&openAIResponsesClient{openAIBase: openAIBase{baseURL: "https://api.example.com"}}).ChatStream(dummyInput, nil)
 		if err == nil || !strings.Contains(err.Error(), "missing OpenAI API key") {
 			t.Fatalf("expected missing key error, got %v", err)
 		}
 	})
 
 	t.Run("responses missing base url", func(t *testing.T) {
-		_, err := (&openAIResponsesClient{apiKey: "k"}).ChatStream(dummyInput, nil)
+		_, err := (&openAIResponsesClient{openAIBase: openAIBase{apiKey: "k"}}).ChatStream(dummyInput, nil)
 		if err == nil || !strings.Contains(err.Error(), "missing OpenAI base URL") {
 			t.Fatalf("expected missing base url error, got %v", err)
 		}

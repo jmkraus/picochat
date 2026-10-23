@@ -226,17 +226,8 @@ func (c *ollamaClient) GetServerVersion() (string, error) {
 	return v.Version, nil
 }
 
-// normalizeOllamaImages normalizes image payloads for Ollama requests.
-// If an image is a data URL, the prefix is removed and only plain base64
-// data is kept.
-//
-// Parameters:
-//
-//	in ([]messages.Message) - input messages
-//
-// Returns:
-//
-//	[]messages.Message - copied slice with normalized image payloads
+// normalizeOllamaImages copies the messages and removes data-URL prefixes
+// from image payloads for Ollama requests.
 func normalizeOllamaImages(in []messages.Message) []messages.Message {
 	out := make([]messages.Message, len(in))
 	copy(out, in)
