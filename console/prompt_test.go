@@ -1,6 +1,10 @@
 package console
 
-import "testing"
+import (
+	"fmt"
+	"strconv"
+	"testing"
+)
 
 func TestNumberedPrompt(t *testing.T) {
 	tests := []struct {
@@ -15,8 +19,9 @@ func TestNumberedPrompt(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NumberedPrompt(tt.slot); got != tt.want {
-				t.Errorf("NumberedPrompt(%d) = %q, want %q", tt.slot, got, tt.want)
+			want := fmt.Sprintf(numPrompt, Blue+strconv.Itoa(tt.slot+1)+ColorReset)
+			if got := NumberedPrompt(tt.slot); got != want {
+				t.Errorf("NumberedPrompt(%d) = %q, want %q", tt.slot, got, want)
 			}
 		})
 	}

@@ -2,26 +2,19 @@ package console
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/mattn/go-runewidth"
 )
 
 const (
-	NumPrompt string = "[%d]\u276F " // requires a parameter
+	numPrompt string = "[%s]\u276F " // requires a parameter
 )
 
 // numberedPrompt returns the plain prompt without formatting.
-// (Kept for compatibility if esc sequences are introduced again.)
-//
-// Parameters:
-//
-//	slot (int) - the slot number
-//
-// Returns:
-//
-//	string - the unformatted prompt string
 func numberedPrompt(slot int) string {
-	return NumberedPrompt(slot)
+	num := strconv.Itoa(slot + 1)
+	return fmt.Sprintf(numPrompt, num)
 }
 
 // NumberedPrompt returns the prompt with formatting.
@@ -34,7 +27,8 @@ func numberedPrompt(slot int) string {
 //
 //	string - the formatted prompt string for CLI output
 func NumberedPrompt(slot int) string {
-	return fmt.Sprintf(NumPrompt, slot+1)
+	num := Colorize(Blue, strconv.Itoa(slot+1))
+	return fmt.Sprintf(numPrompt, num)
 }
 
 // PromptWidth returns the visible width of the numbered prompt.
