@@ -11,9 +11,13 @@ func testChatSessions(t *testing.T) (*messages.SessionManager, *messages.ChatHis
 	t.Helper()
 
 	sessions := messages.NewSessionManager()
-	_, history, err := sessions.Create("system prompt", 10)
+	_, err := sessions.Create("system prompt", 10)
 	if err != nil {
 		t.Fatalf("create session failed: %v", err)
+	}
+	history, err := sessions.Active()
+	if err != nil {
+		t.Fatalf("get active session failed: %v", err)
 	}
 	return sessions, history
 }
@@ -82,6 +86,24 @@ func TestHandleChatCommand_CopyPrefix(t *testing.T) {
 	}
 	if copied.GetLast().Content != "one" {
 		t.Fatalf("copied last message = %q, want %q", copied.GetLast().Content, "one")
+	}
+}
+
+func TestHandleChatCommand_CopyRejectsInvalidMessageIndex(t *testing.T) {
+	sessions, history := testChatSessions(t)
+	if err := history.AddUser("message", ""); err != nil {
+		t.Fatalf("add message failed: %v", err)
+	}
+
+	result := handleChatCommand([]string{"copy", "2"}, history, sessions)
+	if result.Error == nil {
+		t.Fatal("expected invalid copy index to fail")
+	}
+	if got := len(sessions.List()); got != 1 {
+		t.Fatalf("session count = %d, want 1", got)
+	}
+	if sessions.ActiveIndex() != 0 {
+		t.Fatalf("active index = %d, want 0", sessions.ActiveIndex())
 	}
 }
 

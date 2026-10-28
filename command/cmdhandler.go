@@ -42,7 +42,7 @@ func handleChatCommand(args []string, history *messages.ChatHistory, sessions *m
 		if !found {
 			return CommandResult{Error: fmt.Errorf("current history has no system prompt")}
 		}
-		index, _, err := sessions.Create(system.Content, history.MaxCtx())
+		index, err := sessions.Create(system.Content, history.MaxCtx())
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("create chat failed: %w", err)}
 		}
@@ -65,7 +65,7 @@ func handleChatCommand(args []string, history *messages.ChatHistory, sessions *m
 			messageIndex = &index
 		}
 
-		index, _, err := sessions.Copy(messageIndex)
+		index, err := sessions.Copy(messageIndex)
 		if err != nil {
 			return CommandResult{Error: fmt.Errorf("copy chat failed: %w", err)}
 		}

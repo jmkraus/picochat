@@ -112,9 +112,13 @@ func TestSyncActiveHistory(t *testing.T) {
 	instance := newTestInstance()
 	original := instance.History
 
-	_, active, err := instance.Sessions.Create("new system prompt", 10)
+	_, err := instance.Sessions.Create("new system prompt", 10)
 	if err != nil {
 		t.Fatalf("create session failed: %v", err)
+	}
+	active, err := instance.Sessions.Active()
+	if err != nil {
+		t.Fatalf("get active session failed: %v", err)
 	}
 	if instance.History != original {
 		t.Fatal("creating a session unexpectedly changed instance history")

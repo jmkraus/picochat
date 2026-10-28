@@ -39,9 +39,13 @@ func TestSessionManagerAddRejectsNil(t *testing.T) {
 func TestSessionManagerCreateAndSwitch(t *testing.T) {
 	manager := NewSessionManager()
 
-	firstIndex, first, err := manager.Create("system", 10)
+	firstIndex, err := manager.Create("system", 10)
 	if err != nil {
 		t.Fatalf("create first session failed: %v", err)
+	}
+	first, err := manager.Active()
+	if err != nil {
+		t.Fatalf("get first active session failed: %v", err)
 	}
 	if firstIndex != 0 {
 		t.Fatalf("first session index = %d, want 0", firstIndex)
@@ -50,9 +54,13 @@ func TestSessionManagerCreateAndSwitch(t *testing.T) {
 		t.Fatalf("active index = %d, want 0", manager.ActiveIndex())
 	}
 
-	secondIndex, second, err := manager.Create("system", 10)
+	secondIndex, err := manager.Create("system", 10)
 	if err != nil {
 		t.Fatalf("create second session failed: %v", err)
+	}
+	second, err := manager.Active()
+	if err != nil {
+		t.Fatalf("get second active session failed: %v", err)
 	}
 	if secondIndex != 1 {
 		t.Fatalf("second session index = %d, want 1", secondIndex)
@@ -79,9 +87,13 @@ func TestSessionManagerCreateAndSwitch(t *testing.T) {
 
 func TestSessionManagerCopyCompleteHistory(t *testing.T) {
 	manager := NewSessionManager()
-	_, source, err := manager.Create("system", 10)
+	_, err := manager.Create("system", 10)
 	if err != nil {
 		t.Fatalf("create session failed: %v", err)
+	}
+	source, err := manager.Active()
+	if err != nil {
+		t.Fatalf("get active session failed: %v", err)
 	}
 
 	if err := source.AddUser("question", ""); err != nil {
@@ -91,9 +103,13 @@ func TestSessionManagerCopyCompleteHistory(t *testing.T) {
 		t.Fatalf("add assistant message failed: %v", err)
 	}
 
-	index, copied, err := manager.Copy(nil)
+	index, err := manager.Copy(nil)
 	if err != nil {
 		t.Fatalf("copy failed: %v", err)
+	}
+	copied, err := manager.Active()
+	if err != nil {
+		t.Fatalf("get copied session failed: %v", err)
 	}
 	if index != 1 {
 		t.Fatalf("copied session index = %d, want 1", index)
@@ -111,11 +127,15 @@ func TestSessionManagerCopyCompleteHistory(t *testing.T) {
 	}
 }
 
-func TestSessionManagerCopyPrefix(t *testing.T) {
+func TestSessionManagerCopyThenTrim(t *testing.T) {
 	manager := NewSessionManager()
-	_, source, err := manager.Create("system", 10)
+	_, err := manager.Create("system", 10)
 	if err != nil {
 		t.Fatalf("create session failed: %v", err)
+	}
+	source, err := manager.Active()
+	if err != nil {
+		t.Fatalf("get active session failed: %v", err)
 	}
 	for _, content := range []string{"one", "two", "three"} {
 		if err := source.AddUser(content, ""); err != nil {
@@ -124,21 +144,25 @@ func TestSessionManagerCopyPrefix(t *testing.T) {
 	}
 
 	messageIndex := 2
-	_, copied, err := manager.Copy(&messageIndex)
+	_, err = manager.Copy(&messageIndex)
 	if err != nil {
-		t.Fatalf("copy prefix failed: %v", err)
+		t.Fatalf("copy and trim failed: %v", err)
+	}
+	copied, err := manager.Active()
+	if err != nil {
+		t.Fatalf("get copied session failed: %v", err)
 	}
 	if copied.Len() != 3 {
-		t.Fatalf("copied prefix length = %d, want 3", copied.Len())
+		t.Fatalf("copied history length = %d, want 3", copied.Len())
 	}
 	if copied.GetLast().Content != "two" {
-		t.Fatalf("copied prefix last message = %q, want %q", copied.GetLast().Content, "two")
+		t.Fatalf("copied history last message = %q, want %q", copied.GetLast().Content, "two")
 	}
 }
 
 func TestSessionManagerRejectsInvalidIndexes(t *testing.T) {
 	manager := NewSessionManager()
-	if _, _, err := manager.Create("system", 10); err != nil {
+	if _, err := manager.Create("system", 10); err != nil {
 		t.Fatalf("create session failed: %v", err)
 	}
 
@@ -150,20 +174,23 @@ func TestSessionManagerRejectsInvalidIndexes(t *testing.T) {
 	}
 
 	messageIndex := 1
-	if _, _, err := manager.Copy(&messageIndex); err == nil {
+	if _, err := manager.Copy(&messageIndex); err == nil {
 		t.Fatal("expected out-of-range copy index to fail")
+	}
+	if got := len(manager.List()); got != 1 {
+		t.Fatalf("session count = %d, want 1", got)
 	}
 }
 
 func TestSessionManagerLimitsSessions(t *testing.T) {
 	manager := NewSessionManager()
 	for i := 0; i < MaxSessions; i++ {
-		if _, _, err := manager.Create("system", 10); err != nil {
+		if _, err := manager.Create("system", 10); err != nil {
 			t.Fatalf("create session %d failed: %v", i, err)
 		}
 	}
 
-	if _, _, err := manager.Create("system", 10); err == nil {
+	if _, err := manager.Create("system", 10); err == nil {
 		t.Fatal("expected session limit error")
 	}
 	if got := len(manager.List()); got != MaxSessions {

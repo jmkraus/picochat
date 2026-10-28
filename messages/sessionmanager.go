@@ -64,22 +64,21 @@ func (sm *SessionManager) Add(history *ChatHistory) (int, error) {
 //
 // Returns:
 //
-//	int          - the new chat's zero-based slot index
-//	*ChatHistory - the new chat history
-//	error        - error if the session limit is reached
-func (sm *SessionManager) Create(systemPrompt string, maxContext int) (int, *ChatHistory, error) {
+//	int   - the new chat's zero-based slot index
+//	error - error if the session limit is reached
+func (sm *SessionManager) Create(systemPrompt string, maxContext int) (int, error) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
 	if len(sm.histories) >= MaxSessions {
-		return -1, nil, fmt.Errorf("maximum of %d sessions reached", MaxSessions)
+		return -1, fmt.Errorf("maximum of %d sessions reached", MaxSessions)
 	}
 
 	history := NewHistory(systemPrompt, maxContext)
 	sm.histories = append(sm.histories, history)
 	sm.active = len(sm.histories) - 1
 
-	return sm.active, history, nil
+	return sm.active, nil
 }
 
 // Active returns the currently active chat history.
@@ -177,48 +176,48 @@ func (sm *SessionManager) Switch(index int) error {
 	return nil
 }
 
-// Copy creates a new active chat from the current chat.
-// If messageIndex is nil, the complete current history is copied. Otherwise,
-// messages from index 0 through messageIndex are copied, inclusive.
+// Copy creates a new active chat containing a complete copy of the current chat.
+// If messageIndex is provided, the copied history is trimmed through that index.
 //
 // Parameters:
 //
-//	messageIndex (*int) - optional inclusive upper message index to copy
+//	messageIndex (*int) - optional inclusive upper message index to retain
 //
 // Returns:
 //
-//	int          - the new chat's zero-based slot index
-//	*ChatHistory - the copied chat history
-//	error        - error if there is no active session, the session limit is reached, or the message index is invalid
-func (sm *SessionManager) Copy(messageIndex *int) (int, *ChatHistory, error) {
+//	int   - the new chat's zero-based slot index
+//	error - error if there is no active session, the session limit is reached, or the message index is invalid
+func (sm *SessionManager) Copy(messageIndex *int) (int, error) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
 	if sm.active < 0 || sm.active >= len(sm.histories) {
-		return -1, nil, fmt.Errorf("no active session")
+		return -1, fmt.Errorf("no active session")
 	}
 	if len(sm.histories) >= MaxSessions {
-		return -1, nil, fmt.Errorf("maximum of %d sessions reached", MaxSessions)
+		return -1, fmt.Errorf("maximum of %d sessions reached", MaxSessions)
 	}
 
 	source := sm.histories[sm.active]
-	end := len(source.Messages)
 	if messageIndex != nil {
-		if *messageIndex < 0 || *messageIndex >= end {
-			return -1, nil, fmt.Errorf("message index %d out of bounds", *messageIndex)
+		if _, err := source.GetByIndex(*messageIndex); err != nil {
+			return -1, err
 		}
-		end = *messageIndex + 1
 	}
 
 	copied := &ChatHistory{
-		Messages:          cloneMessages(source.Messages[:end]),
+		Messages:          cloneMessages(source.Messages),
 		MaxContext:        source.MaxContext,
-		MaxContextReached: end >= source.MaxContext,
+		MaxContextReached: source.MaxContextReached,
 	}
+	if messageIndex != nil && !copied.Trim(*messageIndex) {
+		return -1, fmt.Errorf("message index %d out of bounds", *messageIndex)
+	}
+
 	sm.histories = append(sm.histories, copied)
 	sm.active = len(sm.histories) - 1
 
-	return sm.active, copied, nil
+	return sm.active, nil
 }
 
 // cloneMessages creates a copy of the supplied messages and their image lists.
