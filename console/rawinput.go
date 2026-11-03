@@ -20,6 +20,26 @@ type InputResult struct {
 	Error     error
 }
 
+// IsInteractiveStdIn reports whether stdin is an interactive terminal.
+func IsInteractiveStdIn() bool {
+	return term.IsTerminal(int(os.Stdin.Fd()))
+}
+
+// ReadPipedInput reads a prompt from non-interactive stdin.
+//
+// Returns:
+//
+//	InputResult - the result of the piped input
+func ReadPipedInput() InputResult {
+	data, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return InputResult{Error: fmt.Errorf("read stdin failed: %w", err)}
+	}
+	text := strings.TrimRight(string(data), "\n")
+	trimText := strings.TrimSpace(text)
+	return InputResult{Text: trimText, EOF: true, IsCommand: strings.HasPrefix(trimText, "/")}
+}
+
 // ReadMultilineInputWithPrompt reads multiline input using the supplied numbered prompt.
 //
 // Parameters:
@@ -32,15 +52,9 @@ type InputResult struct {
 func ReadMultilineInputWithPrompt(prompt string) InputResult {
 	in := os.Stdin
 	fd := int(in.Fd())
-	if !term.IsTerminal(fd) {
+	if !IsInteractiveStdIn() {
 		// stdin is not an interactive console → pipe or file
-		data, err := io.ReadAll(in)
-		if err != nil {
-			return InputResult{Error: fmt.Errorf("read stdin failed: %w", err)}
-		}
-		text := strings.TrimRight(string(data), "\n")
-		trimText := strings.TrimSpace(text)
-		return InputResult{Text: trimText, EOF: true, IsCommand: strings.HasPrefix(trimText, "/")}
+		return ReadPipedInput()
 	} else {
 		oldState, err := term.MakeRaw(fd)
 		if err != nil {

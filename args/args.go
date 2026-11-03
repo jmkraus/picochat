@@ -11,6 +11,7 @@ var (
 	Image       = flag.String("image", "", "Sets a path to an image file")
 	Output      = flag.String("output", "", "Sets the response output format (plain, json, json-pretty, yaml)")
 	Schema      = flag.String("schema", "", "Sets the path to a JSON schema file")
+	Prompt      = flag.String("prompt", "", "Sends an immediate user prompt")
 )
 
 func Parse() {

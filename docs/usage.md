@@ -37,6 +37,24 @@ stdin pipe:
 echo "Write a haiku about cheese" | picochat -quiet
 ```
 
+Immediate prompt:
+
+```bash
+picochat -quiet -prompt "Write a haiku about cheese"
+```
+
+Prompt combined with piped input:
+
+```bash
+cat address.csv | picochat -quiet -prompt "Convert this csv into padded markdown table"
+```
+
+The `-prompt` value is sent immediately as user content and the program exits
+after the response. When stdin is piped, its contents are appended to the
+prompt as additional user content. Combined prompt input is never interpreted
+as a PicoChat command, even when it starts with `/`; use stdin or interactive
+input without `-prompt` when you need to execute a command.
+
 Windows UTF-8 setup:
 
 ```text
@@ -59,6 +77,7 @@ echo "/models" | picochat -quiet
 | `-image`   | Path to image file            |
 | `-model`   | Override configured model     |
 | `-output`  | Response output format        |
+| `-prompt`  | Send an immediate user prompt |
 | `-quiet`   | Suppress app messages         |
 | `-version` | Show version and exit         |
 

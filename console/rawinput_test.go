@@ -100,6 +100,43 @@ func TestDetermineLineBreak(t *testing.T) {
 	}
 }
 
+func TestReadPipedInput(t *testing.T) {
+	stdin := os.Stdin
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("create stdin pipe failed: %v", err)
+	}
+	if _, err := w.WriteString("  /models\n\n"); err != nil {
+		t.Fatalf("write piped input failed: %v", err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatalf("close piped input failed: %v", err)
+	}
+	os.Stdin = r
+	t.Cleanup(func() {
+		os.Stdin = stdin
+		_ = r.Close()
+	})
+
+	if IsInteractiveStdIn() {
+		t.Fatal("expected pipe stdin to be non-interactive")
+	}
+
+	got := ReadPipedInput()
+	if got.Error != nil {
+		t.Fatalf("unexpected read error: %v", got.Error)
+	}
+	if got.Text != "/models" {
+		t.Fatalf("text = %q, want %q", got.Text, "/models")
+	}
+	if !got.EOF {
+		t.Fatal("expected piped input to be marked EOF")
+	}
+	if !got.IsCommand {
+		t.Fatal("expected slash-prefixed piped input to be a command")
+	}
+}
+
 func TestDetermineLineBreakAtWidth(t *testing.T) {
 	tests := []struct {
 		name       string

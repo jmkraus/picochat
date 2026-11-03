@@ -33,6 +33,39 @@ func newTestInstance() *Instance {
 	}
 }
 
+func TestImmediatePromptInput_CombinesPipedInputAsUserContent(t *testing.T) {
+	stdin := os.Stdin
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("create stdin pipe failed: %v", err)
+	}
+	if _, err := w.WriteString("/models\n"); err != nil {
+		t.Fatalf("write piped input failed: %v", err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatalf("close piped input failed: %v", err)
+	}
+	os.Stdin = r
+	t.Cleanup(func() {
+		os.Stdin = stdin
+		_ = r.Close()
+	})
+
+	got := immediatePromptInput("Summarize this")
+	if got.Error != nil {
+		t.Fatalf("unexpected read error: %v", got.Error)
+	}
+	if got.Text != "Summarize this\n\n/models" {
+		t.Fatalf("text = %q, want %q", got.Text, "Summarize this\n\n/models")
+	}
+	if !got.EOF {
+		t.Fatal("expected immediate prompt input to be marked EOF")
+	}
+	if got.IsCommand {
+		t.Fatal("combined prompt input must not be interpreted as a command")
+	}
+}
+
 func TestSendPrompt_AppendsUserAndClearsImagePath(t *testing.T) {
 	instance := newTestInstance()
 
@@ -149,6 +182,7 @@ func TestInitInstanceFromArgs_InitializesSessionManager(t *testing.T) {
 		image       string
 		output      string
 		schema      string
+		prompt      string
 	}{
 		configPath:  *args.ConfigPath,
 		historyFile: *args.HistoryFile,
@@ -158,6 +192,7 @@ func TestInitInstanceFromArgs_InitializesSessionManager(t *testing.T) {
 		image:       *args.Image,
 		output:      *args.Output,
 		schema:      *args.Schema,
+		prompt:      *args.Prompt,
 	}
 	t.Cleanup(func() {
 		*args.ConfigPath = previous.configPath
@@ -168,6 +203,7 @@ func TestInitInstanceFromArgs_InitializesSessionManager(t *testing.T) {
 		*args.Image = previous.image
 		*args.Output = previous.output
 		*args.Schema = previous.schema
+		*args.Prompt = previous.prompt
 	})
 
 	*args.ConfigPath = ""
@@ -178,6 +214,7 @@ func TestInitInstanceFromArgs_InitializesSessionManager(t *testing.T) {
 	*args.Image = ""
 	*args.Output = ""
 	*args.Schema = ""
+	*args.Prompt = "immediate prompt"
 
 	showVersion, instance, _, err := initInstanceFromArgs()
 	if err != nil {
@@ -188,6 +225,9 @@ func TestInitInstanceFromArgs_InitializesSessionManager(t *testing.T) {
 	}
 	if instance == nil {
 		t.Fatal("expected initialized instance")
+	}
+	if *args.Prompt != "immediate prompt" {
+		t.Fatalf("prompt argument = %q, want %q", *args.Prompt, "immediate prompt")
 	}
 	if instance.Sessions == nil {
 		t.Fatal("expected session manager")

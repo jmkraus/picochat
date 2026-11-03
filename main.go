@@ -60,6 +60,24 @@ func retryPrompt(instance *Instance) {
 	runChat(instance)
 }
 
+// immediatePromptInput creates a completed user input from -prompt and any
+// available piped stdin. Combined input is always treated as user content.
+func immediatePromptInput(prompt string) console.InputResult {
+	input := console.InputResult{Text: prompt, EOF: true}
+	if console.IsInteractiveStdIn() {
+		return input
+	}
+
+	piped := console.ReadPipedInput()
+	if piped.Error != nil {
+		return piped
+	}
+	if piped.Text != "" {
+		input.Text += "\n\n" + piped.Text
+	}
+	return input
+}
+
 // getActiveHistory retrieves the pointer to the active history from the
 // session manager and stores it in the instance.
 //
@@ -236,16 +254,25 @@ func main() {
 
 	for {
 		printNewLine()
-		prompt := console.NumberedPrompt(instance.Sessions.ActiveIndex())
-		if !instance.Quiet {
-			fmt.Print(prompt + console.ShadowText)
+		cliPrompt := console.NumberedPrompt(instance.Sessions.ActiveIndex())
+		if !instance.Quiet && *args.Prompt == "" {
+			fmt.Print(cliPrompt + console.ShadowText)
 			console.SetCursorPos(console.PromptWidth() + 1)
 		}
 
-		input := console.ReadMultilineInputWithPrompt(prompt)
-		if input.Error != nil {
-			console.Error(input.Error)
-			continue
+		var input console.InputResult
+		if *args.Prompt != "" {
+			input = immediatePromptInput(*args.Prompt)
+			if input.Error != nil {
+				console.Error(input.Error)
+				break
+			}
+		} else {
+			input = console.ReadMultilineInputWithPrompt(cliPrompt)
+			if input.Error != nil {
+				console.Error(input.Error)
+				continue
+			}
 		}
 
 		if input.Aborted {
