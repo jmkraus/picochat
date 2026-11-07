@@ -30,7 +30,7 @@ History files are stored in the PicoChat config directory (for example `.config/
 | `Reasoning`   | bool    | Enable or disable reasoning behavior                                |
 | `Effort`      | string  | Tune the trace length of reasoning output (`low`, `medium`, `high`) |
 
-NOTE: The `Quiet` option is intended for pipeline and scripting use and should not be set for interactive mode.
+NOTE: The `Quiet` option suppresses PicoChat application messages. Quiet mode is enabled automatically whenever stdin is non-interactive, such as in a pipeline. In interactive mode, it can still be enabled through configuration or the `-quiet` flag when desired.
 
 NOTE: The `Effort` option currently only works when backend mode is set to `ollama`.
 

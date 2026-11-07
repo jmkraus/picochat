@@ -162,6 +162,8 @@ func initInstanceFromArgs() (bool, *Instance, []string, error) {
 		cfg.Quiet = true
 	}
 
+	cfg.Quiet = cfg.Quiet || !console.IsInteractiveStdIn() // pipe input always quiet
+
 	if *args.Output == "" {
 		cfg.OutputFmt = defaultOutputFormat
 	} else {

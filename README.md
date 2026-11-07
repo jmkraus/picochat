@@ -38,14 +38,16 @@ sudo xattr -rd com.apple.quarantine ./picochat
 Interactive mode:
 
 ```bash
-./picochat
+picochat
 ```
 
 Pipe mode:
 
 ```bash
-echo "Write a Haiku about Cheese" | ./picochat -quiet
+echo "Write a Haiku about Cheese" | picochat
 ```
+
+When stdin is piped, quiet mode is enabled automatically, so prompts and startup messages are not written to the pipeline.
 
 ## Documentation
 

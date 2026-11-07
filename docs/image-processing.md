@@ -23,5 +23,5 @@ Behavior:
 Example with stdin pipe:
 
 ```bash
-echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./imgfile.jpg -quiet
+echo "What's on the image?" | picochat -model Qwen3-VL-8B-Instruct-4bit -image ./imgfile.jpg
 ```

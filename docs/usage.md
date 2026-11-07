@@ -34,7 +34,7 @@ How are you today? ↵
 stdin pipe:
 
 ```bash
-echo "Write a haiku about cheese" | picochat -quiet
+echo "Write a haiku about cheese" | picochat
 ```
 
 Immediate prompt:
@@ -46,7 +46,7 @@ picochat -quiet -prompt "Write a haiku about cheese"
 Prompt combined with piped input:
 
 ```bash
-cat address.csv | picochat -quiet -prompt "Convert this csv into padded markdown table"
+cat address.csv | picochat -prompt "Convert this csv into padded markdown table"
 ```
 
 The `-prompt` value is sent immediately as user content and the program exits
@@ -55,16 +55,16 @@ prompt as additional user content. Combined prompt input is never interpreted
 as a PicoChat command, even when it starts with `/`; use stdin or interactive
 input without `-prompt` when you need to execute a command.
 
+Piped command example:
+
+```bash
+echo "/models" | picochat
+```
+
 Windows UTF-8 setup:
 
 ```text
 chcp 65001
-```
-
-Piped command example:
-
-```bash
-echo "/models" | picochat -quiet
 ```
 
 ## Command-line arguments
@@ -81,7 +81,7 @@ echo "/models" | picochat -quiet
 | `-quiet`   | Suppress app messages         |
 | `-version` | Show version and exit         |
 
-NOTE: The `-quiet` flag is intended for pipeline and scripting use and should not be set for interactive mode.
+NOTE: The `-quiet` flag suppresses PicoChat application messages. Quiet mode is enabled automatically whenever stdin is non-interactive, such as in a pipeline. In interactive mode, use `-quiet` only when you want to suppress those messages.
 
 
 ## Commands
