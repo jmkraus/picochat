@@ -90,7 +90,6 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 			if firstToken {
 				console.StopSpinner(cfg.Quiet, stop)
 			}
-			seconds, elapsed = elapsedTime(start)
 		}
 		return nil
 	})
@@ -98,9 +97,7 @@ func HandleChat(cfg *config.Config, history *messages.ChatHistory, stop chan str
 		return nil, err
 	}
 
-	if seconds == 0 {
-		seconds, elapsed = elapsedTime(start)
-	}
+	seconds, elapsed = elapsedTime(start)
 
 	if fullContent.Len() == 0 {
 		console.StopSpinner(cfg.Quiet, stop)
