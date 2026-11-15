@@ -211,6 +211,10 @@ func HandleCommand(commandLine string,
 				return CommandResult{Error: fmt.Errorf("get models failed: %w", err)}
 			}
 
+			if len(models) == 0 {
+				return CommandResult{Warn: "No models installed."}
+			}
+
 			list, err := utils.ListAvailableModels(models)
 			if err != nil {
 				return CommandResult{Error: fmt.Errorf("list models failed: %w", err)}
