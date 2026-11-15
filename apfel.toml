@@ -1,0 +1,6 @@
+# apfel configuration for PicoChat
+# For details see: https://apfel.franzai.com
+Backend = "openai"
+Model = "apple-foundationmodel"
+URL = "http://127.0.0.1:11434"
+Prompt = "You are a Large Language Model. Answer as concisely as possible. Your answers should be informative, helpful and engaging."
