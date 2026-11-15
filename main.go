@@ -213,8 +213,8 @@ func initInstanceFromArgs() (bool, *Instance, []string, error) {
 		history = messages.NewHistory(cfg.Prompt, cfg.Context)
 	}
 
-	manager := messages.NewSessionManager()
-	_, err = manager.Add(history)
+	sessions := messages.NewSessionManager()
+	_, err = sessions.Add(history)
 	if err != nil {
 		return false, nil, nil, fmt.Errorf("init session manager failed: %w", err)
 	}
@@ -222,7 +222,7 @@ func initInstanceFromArgs() (bool, *Instance, []string, error) {
 	instance := &Instance{
 		Config:   cfg,
 		History:  history,
-		Sessions: manager,
+		Sessions: sessions,
 		Quiet:    cfg.Quiet,
 	}
 
