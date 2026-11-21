@@ -2,6 +2,7 @@ package messages
 
 import (
 	"fmt"
+	"picochat/limits"
 	"testing"
 )
 
@@ -140,11 +141,11 @@ func TestSetContextSize(t *testing.T) {
 	}
 
 	// Invalid values
-	if err := h.SetContextSize(2); err == nil {
-		t.Errorf("Expected error for context size < 3, got nil")
+	if err := h.SetContextSize(limits.MinContext - 1); err == nil {
+		t.Errorf("Expected error for context size < %d, got nil", limits.MinContext)
 	}
-	if err := h.SetContextSize(200); err == nil {
-		t.Errorf("Expected error for context size > 100, got nil")
+	if err := h.SetContextSize(limits.MaxContext + 1); err == nil {
+		t.Errorf("Expected error for context size > %d, got nil", limits.MaxContext)
 	}
 
 	// No effect at same size
@@ -247,6 +248,65 @@ func TestEstimateTokens(t *testing.T) {
 	tokens := h.EstimateTokens()
 	if tokens <= 0 {
 		t.Errorf("expected positive token count, got %.1f", tokens)
+	}
+}
+
+func TestCountImages(t *testing.T) {
+	tests := []struct {
+		name     string
+		messages []Message
+		want     int
+	}{
+		{
+			name:     "empty history",
+			messages: nil,
+			want:     0,
+		},
+		{
+			name: "messages without images",
+			messages: []Message{
+				{Role: RoleSystem},
+				{Role: RoleUser, Images: nil},
+				{Role: RoleAssistant, Images: []string{}},
+			},
+			want: 0,
+		},
+		{
+			name: "one image",
+			messages: []Message{
+				{Role: RoleUser, Images: []string{"data:image/png;base64,image1"}},
+			},
+			want: 1,
+		},
+		{
+			name: "multiple images in one message",
+			messages: []Message{
+				{Role: RoleUser, Images: []string{
+					"data:image/png;base64,image1",
+					"data:image/jpeg;base64,image2",
+				}},
+			},
+			want: 2,
+		},
+		{
+			name: "images across messages",
+			messages: []Message{
+				{Role: RoleSystem, Images: []string{"system-image"}},
+				{Role: RoleUser, Images: []string{"user-image-1", "user-image-2"}},
+				{Role: RoleAssistant, Images: []string{"assistant-image"}},
+			},
+			want: 4,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := &ChatHistory{Messages: tt.messages}
+
+			if got := h.CountImages(); got != tt.want {
+				t.Errorf("CountImages() = %d, want %d", got, tt.want)
+			}
+		})
 	}
 }
 

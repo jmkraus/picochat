@@ -4,6 +4,7 @@ import (
 	"math"
 	"os"
 	"picochat/envs"
+	"picochat/limits"
 	"picochat/vartypes"
 	"strings"
 	"testing"
@@ -176,14 +177,14 @@ func TestConfig_NormalizeConfig(t *testing.T) {
 		}
 		warnings := cfg.NormalizeConfig()
 
-		if cfg.Context != MinContext {
-			t.Fatalf("Context = %d, want %d", cfg.Context, MinContext)
+		if cfg.Context != limits.MinContext {
+			t.Fatalf("Context = %d, want %d", cfg.Context, limits.MinContext)
 		}
-		if cfg.Temperature == nil || *cfg.Temperature != MinTemperature {
-			t.Fatalf("Temperature = %v, want %v", cfg.Temperature, MinTemperature)
+		if cfg.Temperature == nil || *cfg.Temperature != limits.MinTemperature {
+			t.Fatalf("Temperature = %v, want %v", cfg.Temperature, limits.MinTemperature)
 		}
-		if cfg.Top_p == nil || *cfg.Top_p != MaxTopP {
-			t.Fatalf("Top_p = %v, want %v", cfg.Top_p, MaxTopP)
+		if cfg.Top_p == nil || *cfg.Top_p != limits.MaxTopP {
+			t.Fatalf("Top_p = %v, want %v", cfg.Top_p, limits.MaxTopP)
 		}
 		if cfg.Effort != "medium" {
 			t.Fatalf("Effort = %q, want %q", cfg.Effort, "medium")
@@ -213,8 +214,8 @@ func TestConfig_NormalizeConfig(t *testing.T) {
 		temp := math.NaN()
 		cfg := Config{Context: 20, Temperature: &temp}
 		warnings := cfg.NormalizeConfig()
-		if cfg.Temperature == nil || *cfg.Temperature != MinTemperature {
-			t.Fatalf("Temperature = %v, want %v", cfg.Temperature, MinTemperature)
+		if cfg.Temperature == nil || *cfg.Temperature != limits.MinTemperature {
+			t.Fatalf("Temperature = %v, want %v", cfg.Temperature, limits.MinTemperature)
 		}
 		found := false
 		for _, w := range warnings {

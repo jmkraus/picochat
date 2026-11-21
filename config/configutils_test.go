@@ -2,6 +2,7 @@ package config
 
 import (
 	"math"
+	"picochat/limits"
 	"strings"
 	"testing"
 )
@@ -17,9 +18,9 @@ func TestClampInt(t *testing.T) {
 		wantValue int
 		wantChg   bool
 	}{
-		{name: "within range", in: 20, min: MinContext, max: MaxContext, wantValue: 20, wantChg: false},
-		{name: "below min", in: 1, min: MinContext, max: MaxContext, wantValue: MinContext, wantChg: true},
-		{name: "above max", in: 999, min: MinContext, max: MaxContext, wantValue: MaxContext, wantChg: true},
+		{name: "within range", in: 20, min: limits.MinContext, max: limits.MaxContext, wantValue: 20, wantChg: false},
+		{name: "below min", in: 1, min: limits.MinContext, max: limits.MaxContext, wantValue: limits.MinContext, wantChg: true},
+		{name: "above max", in: 999, min: limits.MinContext, max: limits.MaxContext, wantValue: limits.MaxContext, wantChg: true},
 	}
 
 	for _, tt := range tests {
@@ -44,12 +45,12 @@ func TestClampFloat(t *testing.T) {
 		wantValue float64
 		wantChg   bool
 	}{
-		{name: "within range", in: 0.7, min: MinTemperature, max: MaxTemperature, wantValue: 0.7, wantChg: false},
-		{name: "below min", in: -0.1, min: MinTemperature, max: MaxTemperature, wantValue: MinTemperature, wantChg: true},
-		{name: "above max", in: 3.5, min: MinTemperature, max: MaxTemperature, wantValue: MaxTemperature, wantChg: true},
-		{name: "nan", in: math.NaN(), min: MinTopP, max: MaxTopP, wantValue: MinTopP, wantChg: true},
-		{name: "negative inf", in: math.Inf(-1), min: MinTopP, max: MaxTopP, wantValue: MinTopP, wantChg: true},
-		{name: "positive inf", in: math.Inf(1), min: MinTopP, max: MaxTopP, wantValue: MaxTopP, wantChg: true},
+		{name: "within range", in: 0.7, min: limits.MinTemperature, max: limits.MaxTemperature, wantValue: 0.7, wantChg: false},
+		{name: "below min", in: -0.1, min: limits.MinTemperature, max: limits.MaxTemperature, wantValue: limits.MinTemperature, wantChg: true},
+		{name: "above max", in: 3.5, min: limits.MinTemperature, max: limits.MaxTemperature, wantValue: limits.MaxTemperature, wantChg: true},
+		{name: "nan", in: math.NaN(), min: limits.MinTopP, max: limits.MaxTopP, wantValue: limits.MinTopP, wantChg: true},
+		{name: "negative inf", in: math.Inf(-1), min: limits.MinTopP, max: limits.MaxTopP, wantValue: limits.MinTopP, wantChg: true},
+		{name: "positive inf", in: math.Inf(1), min: limits.MinTopP, max: limits.MaxTopP, wantValue: limits.MaxTopP, wantChg: true},
 	}
 
 	for _, tt := range tests {
@@ -102,14 +103,14 @@ func TestNormalizeConfig_ClampsAndWarns(t *testing.T) {
 
 	warnings := cfg.NormalizeConfig()
 
-	if cfg.Context != MinContext {
-		t.Fatalf("context = %d, want %d", cfg.Context, MinContext)
+	if cfg.Context != limits.MinContext {
+		t.Fatalf("context = %d, want %d", cfg.Context, limits.MinContext)
 	}
-	if cfg.Temperature == nil || *cfg.Temperature != MaxTemperature {
-		t.Fatalf("temperature = %v, want %v", cfg.Temperature, MaxTemperature)
+	if cfg.Temperature == nil || *cfg.Temperature != limits.MaxTemperature {
+		t.Fatalf("temperature = %v, want %v", cfg.Temperature, limits.MaxTemperature)
 	}
-	if cfg.Top_p == nil || *cfg.Top_p != MinTopP {
-		t.Fatalf("top_p = %v, want %v", cfg.Top_p, MinTopP)
+	if cfg.Top_p == nil || *cfg.Top_p != limits.MinTopP {
+		t.Fatalf("top_p = %v, want %v", cfg.Top_p, limits.MinTopP)
 	}
 	if cfg.Effort != "medium" {
 		t.Fatalf("effort = %q, want %q", cfg.Effort, "medium")

@@ -38,6 +38,10 @@ var (
 	initConfigPath string
 )
 
+const (
+	ImagePrompt string = "\n\nWhen multiple images are present in the conversation, use the most recently provided image as the primary image for this request."
+)
+
 // Init sets startup config path override.
 //
 // Parameters:

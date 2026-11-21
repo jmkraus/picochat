@@ -2,8 +2,9 @@ package messages
 
 import (
 	"fmt"
-	"picochat/config"
+
 	"picochat/console"
+	"picochat/limits"
 	"picochat/utils"
 )
 
@@ -41,6 +42,28 @@ func NewHistory(systemPrompt string, maxContext int) *ChatHistory {
 		Messages:   []Message{{Role: RoleSystem, Content: systemPrompt}},
 		MaxContext: maxContext,
 	}
+}
+
+// ModifySystemPrompt adds additional info to the system prompt, e.g., skills.
+//
+// Parameters:
+//
+//	systemPrompt (string) - the current system prompt as defined in the config
+//	content (string)      - the text to be concatenated to the system prompt.
+//
+// Returns:
+//
+//	error - error if any
+func (h *ChatHistory) ModifySystemPrompt(systemPrompt, content string) error {
+	if h.Len() == 0 {
+		return fmt.Errorf("history is empty")
+	}
+	if h.Messages[0].Role != RoleSystem {
+		return fmt.Errorf("first history message is not a system message")
+	}
+
+	h.Messages[0].Content = systemPrompt + content
+	return nil
 }
 
 // Add appends a message with the specified role and content to the history.
@@ -250,8 +273,8 @@ func (h *ChatHistory) ClearExceptSystemPrompt() {
 //
 //	error
 func (h *ChatHistory) SetContextSize(max int) error {
-	if max < config.MinContext || max > config.MaxContext {
-		return fmt.Errorf("context size must be between %d and %d", config.MinContext, config.MaxContext)
+	if max < limits.MinContext || max > limits.MaxContext {
+		return fmt.Errorf("context size must be between %d and %d", limits.MinContext, limits.MaxContext)
 	}
 	if h.MaxContext == max {
 		h.MaxContextReached = h.Len() >= h.MaxContext
@@ -375,4 +398,21 @@ func (h *ChatHistory) EstimateTokens() float64 {
 	}
 
 	return total
+}
+
+// CountImages returns the total number of loaded images in the current chat history.
+//
+// Parameters:
+//
+//	none
+//
+// Returns:
+//
+//	int - the total number of images
+func (h *ChatHistory) CountImages() int {
+	count := 0
+	for _, msg := range h.Messages {
+		count += len(msg.Images)
+	}
+	return count
 }

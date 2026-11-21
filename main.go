@@ -8,6 +8,7 @@ import (
 	"picochat/command"
 	"picochat/config"
 	"picochat/console"
+	"picochat/limits"
 	"picochat/messages"
 	"picochat/output"
 	"picochat/paths"
@@ -44,6 +45,19 @@ func sendPrompt(instance *Instance, prompt string) {
 	}
 
 	instance.Config.ImagePath = "" // store once in history and forget
+
+	// Add the latest-image instruction when multiple images are present
+	imageCount := instance.History.CountImages()
+	if imageCount > 1 {
+		if err := instance.History.ModifySystemPrompt(
+			instance.Config.Prompt,
+			config.ImagePrompt,
+		); err != nil {
+			console.Error(err)
+			return
+		}
+	}
+
 	runChat(instance)
 }
 
@@ -205,7 +219,7 @@ func initInstanceFromArgs() (bool, *Instance, []string, error) {
 			return false, nil, nil, fmt.Errorf("load history failed: %w", err)
 		}
 		ctxSize := max(cfg.Context, history.Len()+1)
-		ctxSize = min(ctxSize, config.MaxContext)
+		ctxSize = min(ctxSize, limits.MaxContext)
 		if err := history.SetContextSize(ctxSize); err != nil {
 			return false, nil, nil, fmt.Errorf("set context size failed: %w", err)
 		}

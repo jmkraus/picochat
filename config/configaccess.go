@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"picochat/envs"
+	"picochat/limits"
 	"picochat/vartypes"
 	"reflect"
 	"strings"
@@ -89,24 +90,24 @@ func (c *Config) NormalizeConfig() []string {
 	var warnings []string
 
 	origCtx := c.Context
-	if v, changed := clampInt("context", c.Context, MinContext, MaxContext); changed {
+	if v, changed := clampInt("context", c.Context, limits.MinContext, limits.MaxContext); changed {
 		c.Context = v
-		warnings = append(warnings, fmt.Sprintf("config value 'context' (%d) out of range [%d..%d], clamped to %d", origCtx, MinContext, MaxContext, v))
+		warnings = append(warnings, fmt.Sprintf("config value 'context' (%d) out of range [%d..%d], clamped to %d", origCtx, limits.MinContext, limits.MaxContext, v))
 	}
 
 	if c.Temperature != nil {
 		origTemp := *c.Temperature
-		if v, changed := clampFloat("temperature", *c.Temperature, MinTemperature, MaxTemperature); changed {
+		if v, changed := clampFloat("temperature", *c.Temperature, limits.MinTemperature, limits.MaxTemperature); changed {
 			c.Temperature = &v
-			warnings = append(warnings, fmt.Sprintf("config value 'temperature' (%g) out of range [%g..%g], clamped to %g", origTemp, MinTemperature, MaxTemperature, v))
+			warnings = append(warnings, fmt.Sprintf("config value 'temperature' (%g) out of range [%g..%g], clamped to %g", origTemp, limits.MinTemperature, limits.MaxTemperature, v))
 		}
 	}
 
 	if c.Top_p != nil {
 		origTopP := *c.Top_p
-		if v, changed := clampFloat("top_p", *c.Top_p, MinTopP, MaxTopP); changed {
+		if v, changed := clampFloat("top_p", *c.Top_p, limits.MinTopP, limits.MaxTopP); changed {
 			c.Top_p = &v
-			warnings = append(warnings, fmt.Sprintf("config value 'top_p' (%g) out of range [%g..%g], clamped to %g", origTopP, MinTopP, MaxTopP, v))
+			warnings = append(warnings, fmt.Sprintf("config value 'top_p' (%g) out of range [%g..%g], clamped to %g", origTopP, limits.MinTopP, limits.MaxTopP, v))
 		}
 	}
 
