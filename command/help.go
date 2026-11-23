@@ -42,9 +42,10 @@ var helpTopics = map[string][]string{
 		"  /copy code         Copy first code snippet enclosed in ``` to clipboard",
 		"  /copy think        Copy last answer to clipboard & retain reasoning",
 		"  /copy all          Copy full conversation without ANSI formatting",
-		"  /copy #<number>    Copy message with index <number> to clipboard",
+		"  /copy #<index>     Copy message <index> to clipboard",
 		"  /copy <role>       Copy last entry of the given role to clipboard",
 		"  Valid roles: system, user, assistant",
+		"  Message indexes start at 0.",
 	},
 	"paste": {
 		"  /paste             Paste clipboard content as user prompt and send",
